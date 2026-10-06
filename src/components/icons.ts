@@ -50,12 +50,15 @@ import tree from 'lucide-static/icons/tree-deciduous.svg?raw';
 import globe from 'lucide-static/icons/globe.svg?raw';
 import trash from 'lucide-static/icons/trash-2.svg?raw';
 import mouse from 'lucide-static/icons/mouse-pointer-click.svg?raw';
+import logout from 'lucide-static/icons/log-out.svg?raw';
+import lock from 'lucide-static/icons/lock.svg?raw';
+import copy from 'lucide-static/icons/copy.svg?raw';
 
 const lucide = {
   leaf, search, help, cart, menu, close, sparkles, chevronRight, chevronDown, phone, clock, pin, email,
   truck, warranty, exchange, support, ar, arrowCircle, arrowRight, arrowLeft, camera, bag, drop, solar,
   mobile, sprout, home, hourglass, maximize, settings, product, science, warning, minus, plus, info, box,
-  user, check, quote, layers, move, chat, send, refresh, tree, globe, trash, mouse,
+  user, check, quote, layers, move, chat, send, refresh, tree, globe, trash, mouse, logout, lock, copy,
 };
 
 const brand = (path: string) =>
@@ -70,8 +73,11 @@ const brands = {
   zalo: brand('<path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 5 3.2 6.6-.1.9-.5 2.2-1.5 3.1 0 0 2.6.2 4.6-1.4 1.2.4 2.4.6 3.7.6 5.5 0 10-4 10-9S17.5 2 12 2zM8.6 13.6H5.4v-.6l2-2.6h-2v-.8h3.1v.6l-2 2.6h2.1v.8zm2.8 0h-.8v-.3c-.3.2-.6.4-1 .4-.9 0-1.5-.7-1.5-1.6s.6-1.6 1.5-1.6c.4 0 .7.1 1 .4v-.3h.8v3zm1.6 0h-.9V9.4h.9v4.2zm2.6.1c-.9 0-1.7-.7-1.7-1.6s.8-1.6 1.7-1.6 1.7.7 1.7 1.6-.8 1.6-1.7 1.6zm0-2.4c-.5 0-.8.4-.8.8s.3.8.8.8.8-.4.8-.8-.3-.8-.8-.8zm-5.6 0c-.4 0-.8.4-.8.8s.4.8.8.8.8-.4.8-.8-.4-.8-.8-.8z"/>'),
 };
 
-export const icons: Record<string, string> = { ...lucide, ...brands };
-export type IconName = keyof typeof lucide | keyof typeof brands;
+// Logo "G" nhiều màu của Google (nút đăng nhập) — giữ màu gốc theo quy định thương hiệu Google
+const google = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.2-2.1 3.5-5.1 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.9 3.6-4.9 6.7-4.9z"/></svg>';
+
+export const icons: Record<string, string> = { ...lucide, ...brands, google };
+export type IconName = keyof typeof lucide | keyof typeof brands | 'google';
 
 /** Trả về chuỗi SVG (đã bỏ comment license, thêm class) — dùng cả ở server lẫn client */
 export function iconSvg(name: IconName | string, cls = ''): string {

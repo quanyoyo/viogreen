@@ -7,7 +7,7 @@ Bản đầy đủ (kèm logo PNG, package-lock) nằm trong file zip `viogreen-
 - Trang: Trang chủ, Sản phẩm (nhóm + bộ lọc diện tích/điện/nước + tìm kiếm ?q= không dấu), 16 trang Chi tiết, Giỏ hàng, Đặt hàng, Đặt hàng thành công, Giới thiệu, Trải nghiệm AR, **Liên hệ (mới, theo Figma 265:1813)**, **4 trang chính sách từ 1 template** (menu chính sách + mục lục), **404**.
 - Hiệu ứng: reveal khi cuộn (fade-up + stagger), Ken Burns "breath", light sweep, pulse ring nút chat, hover lift thẻ, carousel hero (tự chạy, vuốt, chấm).
 - Giỏ hàng localStorage (biến thể Hose 6/8/10mm, số lượng), nhớ thông tin khách, mã đơn VG-yymmdd-XXXX.
-- Form đặt hàng / liên hệ / nhận tin / số ĐT từ chatbot → Google Apps Script (`apps-script/Code.gs` + README). `formEndpoint` trống = chế độ thử.
+- Form đặt hàng / liên hệ / nhận tin / số ĐT từ chatbot → Firestore (`src/scripts/forms.ts`, `fb.ts`). `site.firebase.projectId` trống = chế độ thử.
 - AR: nút "Thử với AR" trên 6 ECOHUB → modal; có file 3D thì tải `<model-viewer>` 4.3.1 (glb + usdz), chưa có thì hiện "đang cập nhật" + Hỏi MIO.
 - Chatbot MIO v1: chips (Tư vấn chọn máy · Phụ kiện · Giao hàng · Đổi trả · Bảo hành · Gặp nhân viên); tư vấn 3 câu (diện tích → điện → nước) gợi ý model + thêm giỏ/AR; trả lời FAQ + chính sách theo từ khóa (`src/data/chatbot-kb.ts`); không hiểu → xin tên + SĐT gửi về Sheet; báo ngoài giờ (giờ VN).
 - SEO: title/description/canonical/OG, JSON-LD Organization + FAQPage + Product + Breadcrumb, robots.txt, `_headers` cache cho Cloudflare.
@@ -15,7 +15,7 @@ Bản đầy đủ (kèm logo PNG, package-lock) nằm trong file zip `viogreen-
 
 ## Còn chờ / bước tiếp
 - ✅ Deploy (06/10/2026): https://viogreen.pages.dev – repo github.com/quanyoyo/viogreen, push `main` là Cloudflare tự build.
-- Tạo Google Sheet + dán URL Apps Script vào `src/data/site.ts`.
+- ~~Google Sheet~~ → **Đổi sang Firebase** (06–07/10/2026): đã code đăng nhập (Google + Email), /tai-khoan/ (lịch sử đơn), /quan-tri/, `firestore.rules`. Còn: chủ web publish rules + thêm admin, test thật, email báo đơn (Blaze), App Check, sửa Chính sách bảo mật. Chi tiết: CLAUDE.md mục 8 bước 2.
 - Chờ khách: giá, ảnh SP, file 3D, logo gốc, thông tin liên hệ chính thức, link mạng xã hội.
 - ✅ Ảnh MIO (06/10/2026): đã thay vào nút chat, avatar chat, favicon (`site.mio`).
 - Chưa có: sitemap.xml (thêm @astrojs/sitemap khi có tên miền), chatbot AI v2 (Cloudflare Worker).

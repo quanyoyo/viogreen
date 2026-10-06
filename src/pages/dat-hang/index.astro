@@ -18,12 +18,19 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
       <div class="grid gap-8 lg:grid-cols-[1fr_380px]" data-cart-wrap hidden>
         <form class="space-y-8" data-form="order" novalidate>
           <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+          <div class="flex flex-col gap-3 rounded-2xl border border-brand-200 bg-brand-50 p-4 text-sm sm:flex-row sm:items-center" data-auth-hint hidden>
+            <Icon name="user" class="size-5 shrink-0 text-brand" />
+            <p class="flex-1"><strong>Đã có tài khoản?</strong> Đăng nhập để điền sẵn thông tin và xem lại lịch sử đơn hàng. Bạn vẫn có thể đặt hàng không cần tài khoản.</p>
+            <a href="/dang-nhap/?next=/dat-hang/" class="btn btn-outline min-h-10 shrink-0 px-5 py-2">Đăng nhập</a>
+          </div>
+          <p class="flex items-center gap-2 text-sm text-muted" hidden><Icon name="check" class="size-4 text-brand" /> Đặt hàng với tài khoản <strong class="text-ink" data-auth-who></strong></p>
           <fieldset class="space-y-4">
             <legend class="mb-4 flex items-center gap-2 text-lg font-bold text-brand"><Icon name="user" class="size-5" /> Thông tin người nhận</legend>
             <div class="grid gap-4 sm:grid-cols-2">
               <label class="field sm:col-span-2">Họ và tên *<input class="input" name="name" required autocomplete="name" /></label>
               <label class="field">Số điện thoại *<input class="input" name="phone" type="tel" required autocomplete="tel" inputmode="tel" /></label>
-              <label class="field">Email<input class="input" name="email" type="email" autocomplete="email" /></label>
+              <label class="field">Email<input class="input" name="email" type="email" autocomplete="email" />
+                <span class="text-xs font-normal text-muted">Nhập email để xem lại đơn này khi tạo tài khoản bằng cùng email.</span></label>
               <label class="field">Tỉnh / Thành phố *<input class="input" name="province" required autocomplete="address-level1" placeholder="VD: Hà Nội" /></label>
               <label class="field">Phường / Xã *<input class="input" name="ward" required autocomplete="address-level2" /></label>
               <label class="field sm:col-span-2">Địa chỉ cụ thể *<input class="input" name="address" required autocomplete="street-address" placeholder="Số nhà, ngõ, đường…" /></label>

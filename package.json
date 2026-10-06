@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.6",
+    "firebase": "^12.19.0",
     "lucide-static": "^1.52.0",
     "tailwindcss": "^4.3.3"
   },

@@ -24,7 +24,8 @@ Website giới thiệu và bán hàng cho **VIO GREEN ECOHUB**, hệ thống ch�
 - **Framework:** Astro 7 (xuất trang tĩnh) + Tailwind CSS 4 (`@tailwindcss/vite`) + TypeScript.
 - **Icon:** `lucide-static` (import `?raw`) + icon thương hiệu trong `src/components/icons.ts`.
 - **JS phía trình duyệt:** TypeScript thuần trong `src/scripts/`. Không dùng React/Vue.
-- **Form** (đặt hàng, liên hệ, nhận tin, lead từ chatbot) gửi về Google Apps Script, ghi vào Google Sheet. Code nằm ở `apps-script/`.
+- **Firebase** (project `viogreen-44a7f`, config trong `site.ts → firebase`): Auth (Google + Email/mật khẩu) + Firestore. Form đặt hàng/liên hệ/nhận tin/lead chatbot ghi vào Firestore (`src/scripts/forms.ts` → `fb.ts`). Quy tắc bảo mật: `firestore.rules` (dán vào Console, **không** tự deploy). Cloud Functions gửi email báo đơn: chưa làm (cần gói Blaze). Hosting **vẫn là Cloudflare Pages**.
+- **`src/scripts/fb.ts` kéo theo SDK ~540KB**: chỉ import tĩnh ở trang `/dang-nhap/`, `/tai-khoan/`, `/quan-tri/`; nơi khác dùng `await import('./fb')`. Không import tĩnh từ BaseLayout.
 - **AR:** `<model-viewer>`, chỉ tải khi sản phẩm có file 3D.
 - **Hosting:** Cloudflare Pages (build `npm run build`, output `dist`).
 - **Node:** 22 trở lên.
@@ -50,7 +51,8 @@ src/
   data/                  site.ts (cấu hình), products.ts (16 SP), faq.ts, chatbot-kb.ts
   content/policies/      van-chuyen, doi-tra, bao-hanh, bao-mat (.md; {{address}} {{email}}… thay từ site.ts)
   styles/global.css      design tokens + hiệu ứng
-apps-script/             Code.gs + README hướng dẫn tạo Sheet
+                         (+ dang-nhap, tai-khoan, quan-tri — dùng Firebase)
+firestore.rules          quy tắc bảo mật Firestore (dán vào Console)
 public/                  favicon, robots.txt, _headers, assets/logo.png, products/, models/
 ```
 
@@ -93,7 +95,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Dinh dưỡng (2)
   - VIO-Care (2)
 - **Bộ lọc ECOHUB:** diện tích (`<10` / `10-20`), nguồn điện (`solar` / `grid`), nguồn nước (`tank` / `direct`).
-- **Mã đơn:** `VG-yymmdd-XXXX`. `formEndpoint` trống = chế độ thử, không gửi dữ liệu đi.
+- **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
 ## 7. Trạng thái (cập nhật 06/10/2026)
 
@@ -105,7 +107,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Giới thiệu, AR, Liên hệ, 4 chính sách, 404
 - **Hiệu ứng:** đủ theo mục 5. Carousel hero tự chạy, vuốt được, có chấm chuyển slide.
 - **Giỏ hàng:** lưu localStorage, có biến thể và số lượng, nhớ thông tin khách.
-- **Form:** gửi qua Apps Script.
+- **Form:** gửi vào Firestore (xem mục 8 bước 2).
 - **AR:** modal với `<model-viewer>`.
 - **Chatbot MIO v1:**
   - Nút gợi ý: Tư vấn chọn máy, Phụ kiện, Giao hàng, Đổi trả, Bảo hành, Gặp nhân viên
@@ -118,8 +120,20 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 ## 8. Việc tiếp theo (theo thứ tự ưu tiên)
 
 1. ~~**Deploy bản xem thử**~~ **Xong 06/10/2026:** https://viogreen.pages.dev (Cloudflare Pages, repo `github.com/quanyoyo/viogreen`, nhánh `main` – push là tự build). Đã kiểm tra 28 trang + asset trả về 200, trang lạ trả 404, canonical đúng.
-2. **Kết nối Google Sheet:** tạo Sheet, deploy `apps-script/Code.gs`, dán URL vào `site.ts → formEndpoint`.
-   - **Xong khi:** gửi thử 1 đơn, 1 liên hệ, 1 đăng ký nhận tin và đều có dòng mới trong Sheet kèm email báo.
+2. **Chuyển sang Firebase** (thay cho Google Sheet; quyết định 06/10/2026). Lựa chọn đã chốt:
+   - Đăng nhập: **Google + Email/mật khẩu** (không dùng SMS OTP). Đăng nhập là **tuỳ chọn** – khách vẫn đặt hàng không cần tài khoản.
+   - Lịch sử đơn: đơn có `uid` nếu đặt khi đã đăng nhập; đơn khách vãng lai hiện trong lịch sử nếu **email đơn = email đã xác minh** của tài khoản.
+   - Nhân viên xử lý đơn ở trang **`/quan-tri/`** (chỉ tài khoản có trong `admins/{uid}`), đổi trạng thái: Mới → Đã xác nhận → Đang giao → Hoàn tất / Đã huỷ.
+   - **Email tự động** báo đơn mới qua Cloud Function (gói Blaze).
+   - Các giai đoạn:
+     - ✅ **2a.** Project `viogreen-44a7f` đã tạo, config đã lưu ở `site.ts → firebase` (`projectId` rỗng = chế độ thử).
+     - ✅ **2b (code).** `firestore.rules`: `orders` (tạo: ai cũng được, kiểm tra dữ liệu; đọc: chủ đơn theo uid/email đã xác minh, hoặc admin; sửa trạng thái: admin), `leads` (chỉ tạo; admin đọc/sửa trạng thái), `users/{uid}`, `admins/{uid}` (chỉ sửa trong Console). **Chờ chủ web dán rules vào Console.** Chưa làm: App Check chống spam (cần đăng ký reCAPTCHA).
+     - ✅ **2c (code).** `forms.ts` ghi Firestore; `/dang-nhap/` (Google, email, quên mật khẩu), `/tai-khoan/` (lịch sử + trạng thái đơn, hồ sơ giao hàng, xác minh email); icon tài khoản ở Header; trang đặt hàng điền sẵn khi đã đăng nhập. Đã gỡ `apps-script/`.
+     - ✅ **2d (code).** `/quan-tri/`: đơn realtime, lọc + đổi trạng thái, tab liên hệ/lead; tài khoản chưa có quyền thì hiện UID để thêm vào `admins`.
+     - **Chưa test thật** đăng nhập / ghi đơn trên Firebase: cần rules đã publish + chủ web đăng nhập thử.
+     - **2e.** Cloud Function `onOrderCreated` gửi email cho nhân viên (cần email nhận + tài khoản gửi SMTP do chủ web cung cấp).
+     - **2f.** Cập nhật Chính sách bảo mật theo cách lưu dữ liệu mới (Nghị định 13/2023) – nội dung cần khách duyệt.
+   - **Xong khi:** đặt thử đơn khi chưa đăng nhập và khi đã đăng nhập → đơn hiện ở `/quan-tri/` và `/tai-khoan/`, nhân viên nhận email, khách không đọc được đơn người khác.
 3. ~~**Ảnh MIO**~~ **Xong 06/10/2026:** đã tách nền, có `public/assets/mio.webp` (toàn thân), `mio-head-128.webp` (nút nổi + avatar chat), `mio-head-512.png` (bản gốc đầu), `favicon-48.png`, `apple-touch-icon.png`. Đường dẫn khai báo ở `site.mio`. `favicon.svg` cũ không còn dùng.
 4. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc, liên hệ, mạng xã hội. Chỉ sửa trong `src/data/` và `public/`.
 5. **Khi có tên miền:** đổi `site` trong `astro.config.mjs`, thêm `@astrojs/sitemap`, gắn Custom domain trên Cloudflare.

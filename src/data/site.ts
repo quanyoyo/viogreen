@@ -34,9 +34,17 @@ export const site = {
     youtube: '',
   } as Record<string, string>,
 
-  // ---- Google Apps Script Web App URL (nhận đơn hàng / liên hệ / đăng ký nhận tin) ----
-  // Hướng dẫn: apps-script/README.md. Để trống = chế độ thử (form chạy, không gửi dữ liệu đi).
-  formEndpoint: '',
+  // ---- Firebase (đơn hàng, liên hệ, tài khoản khách) ----
+  // Config web của Firebase là thông tin công khai, không phải mật khẩu — bảo mật nằm ở firestore.rules.
+  // Để projectId '' = chế độ thử (form chạy, không gửi dữ liệu đi, không đăng nhập được).
+  firebase: {
+    apiKey: 'AIzaSyCfsfq4pg_OuyYLmCurGjWuYIuSxf-N-1g',
+    authDomain: 'viogreen-44a7f.firebaseapp.com',
+    projectId: 'viogreen-44a7f',
+    storageBucket: 'viogreen-44a7f.firebasestorage.app',
+    messagingSenderId: '1072915790565',
+    appId: '1:1072915790565:web:891b4ce882e83a85ff720c',
+  },
 
   // ---- Giá: chưa có giá thì hiển thị chữ này ----
   priceFallback: 'Liên hệ',

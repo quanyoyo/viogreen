@@ -5,7 +5,7 @@ import { faq } from '../data/faq';
 import { site, telHref } from '../data/site';
 import { kb, greetings, thanks, humanKeys, pickKeys, accessoryKeys } from '../data/chatbot-kb';
 import { addToCart } from './cart';
-import { submitToSheet } from './forms';
+import { submitLead } from './forms';
 import { $, openLayer, closeLayer, toast } from './ui';
 
 const chat = $('[data-chat]');
@@ -164,7 +164,7 @@ async function handleLead(text: string) {
   const { name, topic } = mode;
   mode = { kind: 'idle' };
   const recent = history.filter((m) => m.from === 'me').slice(-6).map((m) => m.html.replace(/<[^>]+>/g, '')).join(' | ');
-  const ok = await submitToSheet('chat-lead', { name, phone, topic, message: recent });
+  const ok = await submitLead('chat-lead', { name: name ?? '', phone, topic, message: recent.slice(0, 3000) });
   return bot(ok
     ? `Đã ghi nhận! Nhân viên VIO GREEN sẽ gọi cho ${esc(name ?? 'bạn')} theo số ${esc(phone)} ${isWorkingHours() ? 'trong ít phút tới' : 'vào đầu giờ làm việc tiếp theo'}. 💚`
     : `Xin lỗi, MIO chưa gửi được thông tin. Bạn gọi trực tiếp <a href="${telHref}" class="font-semibold underline">${esc(site.phone)}</a> giúp MIO nhé.`);

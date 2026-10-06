@@ -1,2 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /dang-nhap/
+Disallow: /tai-khoan/
+Disallow: /quan-tri/

@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { site, telHref } from '../../data/site';
+---
+<BaseLayout title="Tài khoản" noindex>
+  <section class="section bg-cream">
+    <div class="container-x max-w-5xl">
+      <p class="py-20 text-center text-muted" data-loading>Đang tải…</p>
+
+      <div class="space-y-8" data-account hidden>
+        <!-- Chào + đăng xuất -->
+        <div class="flex flex-wrap items-center gap-4">
+          <span class="inline-flex size-14 items-center justify-center rounded-full bg-brand text-xl font-bold text-white" data-avatar></span>
+          <div class="min-w-0 flex-1">
+            <p class="eyebrow mb-1">Tài khoản</p>
+            <h1 class="truncate text-2xl font-extrabold" data-name></h1>
+            <p class="truncate text-sm text-muted" data-email></p>
+          </div>
+          <button type="button" class="btn btn-outline min-h-11 px-5 py-2" data-logout><Icon name="logout" /> Đăng xuất</button>
+        </div>
+
+        <div class="flex flex-col gap-3 rounded-2xl border border-sun/60 bg-sun/10 p-4 text-sm sm:flex-row sm:items-center" data-verify hidden>
+          <Icon name="info" class="size-5 shrink-0 text-brand" />
+          <p class="flex-1"><strong>Xác minh email của bạn.</strong> Sau khi xác minh, các đơn bạn từng đặt (chưa đăng nhập) bằng email này sẽ hiện trong lịch sử. Sau khi bấm link trong email, hãy tải lại trang này.</p>
+          <button type="button" class="btn btn-outline min-h-10 shrink-0 px-5 py-2" data-resend>Gửi lại email</button>
+        </div>
+
+        <div class="grid gap-8 lg:grid-cols-[1fr_340px]">
+          <!-- Lịch sử đơn -->
+          <section aria-labelledby="h-orders">
+            <h2 id="h-orders" class="mb-4 flex items-center gap-2 text-lg font-bold text-brand"><Icon name="product" class="size-5" /> Đơn hàng của tôi</h2>
+            <div class="space-y-4" data-orders></div>
+            <div class="card p-8 text-center" data-orders-empty hidden>
+              <p class="font-semibold">Bạn chưa có đơn hàng nào.</p>
+              <p class="mt-1 text-sm text-muted">Đơn đặt khi đã đăng nhập, hoặc đặt bằng email đã xác minh của bạn, sẽ hiện ở đây.</p>
+              <a class="btn btn-primary mt-5" href="/san-pham/">Xem sản phẩm <Icon name="arrowRight" /></a>
+            </div>
+            <p class="mt-4 text-sm text-muted">Cần hỗ trợ về đơn hàng? Gọi <a href={telHref} class="font-semibold text-brand">{site.phone}</a> ({site.hours}).</p>
+          </section>
+
+          <!-- Thông tin giao hàng mặc định -->
+          <section class="card h-fit p-6" aria-labelledby="h-profile">
+            <h2 id="h-profile" class="text-lg font-bold text-brand">Thông tin giao hàng</h2>
+            <p class="mt-1 text-sm text-muted">Tự điền sẵn khi bạn đặt hàng.</p>
+            <form class="mt-4 space-y-3" data-profile novalidate>
+              <label class="field">Họ và tên<input class="input" name="name" autocomplete="name" maxlength="100" /></label>
+              <label class="field">Số điện thoại<input class="input" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" /></label>
+              <label class="field">Tỉnh / Thành phố<input class="input" name="province" autocomplete="address-level1" maxlength="100" /></label>
+              <label class="field">Phường / Xã<input class="input" name="ward" autocomplete="address-level2" maxlength="100" /></label>
+              <label class="field">Địa chỉ cụ thể<input class="input" name="address" autocomplete="street-address" maxlength="300" /></label>
+              <button class="btn btn-primary w-full" type="submit">Lưu thông tin</button>
+              <p class="form-msg text-center" data-form-msg role="status"></p>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { currentUser, myOrders, getProfile, saveProfile, verifyEmail, logout, type Profile } from '../../scripts/fb';
+    import { esc, badge, fmtTime, itemsHtml, totalText } from '../../scripts/order-view';
+    import { $, toast } from '../../scripts/ui';
+
+    async function main() {
+      const user = await currentUser();
+      if (!user) return location.replace('/dang-nhap/?next=/tai-khoan/');
+      const name = user.displayName || user.email?.split('@')[0] || 'Bạn';
+      $('[data-avatar]')!.textContent = name.trim().charAt(0).toUpperCase();
+      $('[data-name]')!.textContent = name;
+      $('[data-email]')!.textContent = user.email ?? '';
+      $('[data-verify]')!.hidden = user.emailVerified;
+      $('[data-loading]')!.hidden = true;
+      $('[data-account]')!.hidden = false;
+
+      $('[data-logout]')!.addEventListener('click', async () => { await logout(); location.href = '/'; });
+      const resend = $<HTMLButtonElement>('[data-resend]')!;
+      resend.addEventListener('click', async () => {
+        resend.disabled = true;
+        try { await verifyEmail(user); toast(`Đã gửi email xác minh tới ${user.email}`); }
+        catch { toast('Chưa gửi được, vui lòng thử lại sau ít phút.'); resend.disabled = false; }
+      });
+
+      // Đơn hàng
+      const list = $('[data-orders]')!;
+      list.innerHTML = '<p class="text-sm text-muted">Đang tải đơn hàng…</p>';
+      try {
+        const orders = await myOrders(user);
+        $('[data-orders-empty]')!.hidden = orders.length > 0;
+        list.innerHTML = orders.map((o) => `
+          <details class="card group overflow-hidden">
+            <summary class="flex cursor-pointer list-none flex-wrap items-center gap-x-4 gap-y-2 p-5">
+              <div class="min-w-0 flex-1"><p class="font-bold">${esc(o.orderId)}</p><p class="text-sm text-muted">${fmtTime(o.createdAt)} · ${o.totalQty} sản phẩm</p></div>
+              <strong class="text-brand">${totalText(o)}</strong>${badge(o.status)}
+            </summary>
+            <div class="space-y-3 border-t border-line p-5">
+              ${itemsHtml(o)}
+              <p class="text-sm"><span class="text-muted">Giao tới:</span> ${esc(o.name)} · ${esc(o.phone)}<br>${esc([o.address, o.ward, o.province].filter(Boolean).join(', '))}</p>
+              <p class="text-sm"><span class="text-muted">Hình thức:</span> ${esc(o.shipping)}</p>
+              ${o.note ? `<p class="text-sm"><span class="text-muted">Ghi chú:</span> ${esc(o.note)}</p>` : ''}
+            </div>
+          </details>`).join('');
+      } catch (err) {
+        console.error(err);
+        list.innerHTML = '<p class="text-sm text-red-600">Chưa tải được đơn hàng, vui lòng tải lại trang.</p>';
+      }
+
+      // Hồ sơ giao hàng
+      const form = $<HTMLFormElement>('[data-profile]')!;
+      const msg = $('[data-form-msg]', form)!;
+      try {
+        const p = await getProfile(user.uid);
+        const defaults: Profile = { name: user.displayName ?? '', ...p };
+        Object.entries(defaults).forEach(([k, v]) => {
+          const el = form.elements.namedItem(k) as HTMLInputElement | null;
+          if (el && typeof v === 'string') el.value = v;
+        });
+      } catch (err) { console.error(err); }
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const f = Object.fromEntries(new FormData(form)) as Record<string, string>;
+        const phone = f.phone.replace(/[\s().-]/g, '');
+        if (phone && !/^(\+?84|0)\d{9,10}$/.test(phone)) { msg.textContent = 'Số điện thoại chưa đúng.'; msg.dataset.state = 'error'; return; }
+        const btn = $<HTMLButtonElement>('button[type="submit"]', form)!;
+        btn.disabled = true;
+        try {
+          await saveProfile(user.uid, { name: f.name.trim(), phone, province: f.province.trim(), ward: f.ward.trim(), address: f.address.trim() });
+          msg.textContent = 'Đã lưu!'; msg.dataset.state = 'ok';
+        } catch (err) {
+          console.error(err);
+          msg.textContent = 'Chưa lưu được, vui lòng thử lại.'; msg.dataset.state = 'error';
+        }
+        btn.disabled = false;
+      });
+    }
+    main();
+  </script>
+</BaseLayout>

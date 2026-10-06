@@ -1,0 +1,147 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+---
+<BaseLayout title="Quản trị" noindex>
+  <section class="bg-cream py-8 sm:py-10">
+    <div class="container-x">
+      <p class="py-20 text-center text-muted" data-loading>Đang tải…</p>
+
+      <!-- Không có quyền -->
+      <div class="card mx-auto max-w-xl p-8 text-center" data-denied hidden>
+        <span class="circle-ic mx-auto"><Icon name="lock" /></span>
+        <h1 class="mt-4 text-xl font-bold">Tài khoản chưa có quyền quản trị</h1>
+        <p class="mt-2 text-sm text-muted">Chủ web thêm quyền trong Firebase Console → Firestore → collection <code>admins</code> → tạo document có ID là mã dưới đây.</p>
+        <p class="mt-4 flex items-center justify-center gap-2"><code class="rounded-lg bg-cream-200 px-3 py-2 text-sm break-all" data-uid></code>
+          <button type="button" class="icon-btn shrink-0" aria-label="Sao chép mã" data-copy><Icon name="copy" /></button></p>
+        <button type="button" class="btn btn-outline mt-6" data-logout><Icon name="logout" /> Đăng nhập tài khoản khác</button>
+      </div>
+
+      <!-- Bảng điều khiển -->
+      <div data-admin hidden>
+        <div class="mb-6 flex flex-wrap items-center gap-3">
+          <h1 class="flex-1 text-2xl font-extrabold">Quản trị đơn hàng</h1>
+          <span class="text-sm text-muted" data-who></span>
+          <button type="button" class="btn btn-outline min-h-10 px-4 py-2" data-logout><Icon name="logout" /> Đăng xuất</button>
+        </div>
+
+        <div class="mb-5 flex gap-2 border-b border-line" role="tablist">
+          <button type="button" role="tab" class="-mb-px border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-muted aria-selected:border-brand aria-selected:text-brand" aria-selected="true" data-tab="orders">Đơn hàng <span data-count-orders></span></button>
+          <button type="button" role="tab" class="-mb-px border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-muted aria-selected:border-brand aria-selected:text-brand" aria-selected="false" data-tab="leads">Liên hệ & khách để lại SĐT <span data-count-leads></span></button>
+        </div>
+
+        <div data-panel="orders">
+          <div class="scrollbar-none mb-4 flex gap-2 overflow-x-auto" data-filter></div>
+          <div class="space-y-3" data-order-list></div>
+        </div>
+        <div data-panel="leads" hidden>
+          <div class="space-y-3" data-lead-list></div>
+        </div>
+        <p class="mt-6 text-xs text-muted">Danh sách tự cập nhật khi có đơn mới (hiển thị 300 mục gần nhất).</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { currentUser, isAdmin, logout, watchOrders, watchLeads, setOrderStatus, setLeadStatus, ORDER_STATUS, LEAD_STATUS, type Order, type Lead } from '../../scripts/fb';
+    import { esc, badge, fmtTime, itemsHtml, totalText } from '../../scripts/order-view';
+    import { $, $$, toast } from '../../scripts/ui';
+
+    const LEAD_TYPE: Record<string, string> = { contact: 'Liên hệ', newsletter: 'Nhận tin', 'chat-lead': 'Chatbot MIO' };
+    const LEAD_FIELDS: [string, string][] = [['phone', 'SĐT'], ['email', 'Email'], ['company', 'Công ty'], ['province', 'Khu vực'],
+      ['space', 'Không gian'], ['area', 'Diện tích'], ['topic', 'Chủ đề'], ['message', 'Nội dung'], ['source', 'Nguồn'], ['page', 'Trang']];
+
+    const statusSelect = (kind: 'order' | 'lead', id: string, current: string, options: readonly string[]) =>
+      `<select class="input min-h-10 w-auto py-1.5 text-sm" data-status="${kind}" data-id="${esc(id)}" aria-label="Đổi trạng thái">
+        ${options.map((s) => `<option${s === current ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select>`;
+
+    let orders: Order[] = [];
+    let filter = 'Tất cả';
+
+    function renderOrders() {
+      const counts = Object.fromEntries(ORDER_STATUS.map((s) => [s, orders.filter((o) => o.status === s).length]));
+      $('[data-count-orders]')!.textContent = counts['Mới'] ? `(${counts['Mới']} mới)` : '';
+      $('[data-filter]')!.innerHTML = ['Tất cả', ...ORDER_STATUS].map((s) =>
+        `<button type="button" class="chip shrink-0" aria-pressed="${s === filter}" data-f="${esc(s)}">${esc(s)} <span class="ml-1 opacity-70">${s === 'Tất cả' ? orders.length : counts[s]}</span></button>`).join('');
+      const shown = filter === 'Tất cả' ? orders : orders.filter((o) => o.status === filter);
+      $('[data-order-list]')!.innerHTML = shown.length ? shown.map((o) => `
+        <details class="card overflow-hidden"${o.status === 'Mới' ? ' open' : ''}>
+          <summary class="flex cursor-pointer list-none flex-wrap items-center gap-x-4 gap-y-2 p-4">
+            <div class="min-w-0 flex-1"><p class="font-bold">${esc(o.orderId)} · ${esc(o.name)}</p>
+              <p class="text-sm text-muted">${fmtTime(o.createdAt)} · ${o.totalQty} SP · ${o.uid ? 'Có tài khoản' : 'Khách vãng lai'}</p></div>
+            <strong class="text-brand">${totalText(o)}</strong>${badge(o.status)}
+          </summary>
+          <div class="grid gap-5 border-t border-line p-4 md:grid-cols-2">
+            <div class="space-y-1.5 text-sm">
+              <p><a class="font-semibold text-brand" href="tel:${esc(o.phone)}">${esc(o.phone)}</a>${o.email ? ` · <a class="text-brand" href="mailto:${esc(o.email)}">${esc(o.email)}</a>` : ''}</p>
+              <p>${esc([o.address, o.ward, o.province].filter(Boolean).join(', '))}</p>
+              <p><span class="text-muted">Giao hàng:</span> ${esc(o.shipping)}</p>
+              ${o.note ? `<p><span class="text-muted">Ghi chú:</span> ${esc(o.note)}</p>` : ''}
+              <label class="flex items-center gap-2 pt-2"><span class="text-muted">Trạng thái:</span>${statusSelect('order', o.orderId, o.status, ORDER_STATUS)}</label>
+            </div>
+            ${itemsHtml(o)}
+          </div>
+        </details>`).join('') : '<p class="card p-8 text-center text-muted">Không có đơn nào.</p>';
+    }
+
+    function renderLeads(leads: Lead[]) {
+      const fresh = leads.filter((l) => l.status === 'Mới').length;
+      $('[data-count-leads]')!.textContent = fresh ? `(${fresh} mới)` : '';
+      $('[data-lead-list]')!.innerHTML = leads.length ? leads.map((l) => `
+        <div class="card flex flex-wrap items-start gap-4 p-4">
+          <div class="min-w-0 flex-1 space-y-1 text-sm">
+            <p class="font-bold">${esc(LEAD_TYPE[l.type] ?? l.type)}${l.name ? ` · ${esc(l.name)}` : ''} <span class="font-normal text-muted">· ${fmtTime(l.createdAt)}</span></p>
+            ${LEAD_FIELDS.filter(([k]) => l[k]).map(([k, label]) => `<p><span class="text-muted">${label}:</span> ${
+              k === 'phone' ? `<a class="font-semibold text-brand" href="tel:${esc(l[k])}">${esc(l[k])}</a>` : esc(l[k])}</p>`).join('')}
+          </div>
+          <div class="flex items-center gap-2">${badge(l.status)}${statusSelect('lead', l.id, l.status, LEAD_STATUS)}</div>
+        </div>`).join('') : '<p class="card p-8 text-center text-muted">Chưa có liên hệ nào.</p>';
+    }
+
+    async function main() {
+      const user = await currentUser();
+      if (!user) return location.replace('/dang-nhap/?next=/quan-tri/');
+      $$('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await logout(); location.href = '/dang-nhap/?next=/quan-tri/'; }));
+      $('[data-loading]')!.hidden = true;
+
+      if (!(await isAdmin(user.uid))) {
+        $('[data-uid]')!.textContent = user.uid;
+        $('[data-copy]')!.addEventListener('click', () => navigator.clipboard.writeText(user.uid).then(() => toast('Đã sao chép mã')));
+        $('[data-denied]')!.hidden = false;
+        return;
+      }
+      $('[data-who]')!.textContent = user.email ?? '';
+      $('[data-admin]')!.hidden = false;
+
+      const fail = (e: Error) => { console.error(e); toast('Mất kết nối dữ liệu, vui lòng tải lại trang.'); };
+      watchOrders((o) => { orders = o; renderOrders(); }, fail);
+      watchLeads(renderLeads, fail);
+
+      // Tab
+      $$<HTMLButtonElement>('[data-tab]').forEach((t) => t.addEventListener('click', () => {
+        $$('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === t)));
+        $$('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== t.dataset.tab));
+      }));
+      // Lọc trạng thái
+      $('[data-filter]')!.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest<HTMLElement>('[data-f]');
+        if (b) { filter = b.dataset.f!; renderOrders(); }
+      });
+      // Đổi trạng thái
+      document.addEventListener('change', async (e) => {
+        const sel = (e.target as HTMLElement).closest<HTMLSelectElement>('select[data-status]');
+        if (!sel) return;
+        sel.disabled = true;
+        try {
+          await (sel.dataset.status === 'order' ? setOrderStatus : setLeadStatus)(sel.dataset.id!, sel.value);
+          toast(`Đã chuyển sang "${sel.value}"`);
+        } catch (err) {
+          console.error(err);
+          toast('Chưa đổi được trạng thái, vui lòng thử lại.');
+          sel.disabled = false;
+        }
+      });
+    }
+    main();
+  </script>
+</BaseLayout>

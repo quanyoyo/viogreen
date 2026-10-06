@@ -1,0 +1,79 @@
+rules_version = '2';
+
+// Quy tắc bảo mật Firestore cho web VIO GREEN.
+// Dán toàn bộ file này vào Firebase Console → Firestore Database → Rules → Publish.
+// Nhân viên quản trị: tạo document admins/{uid} (nội dung tuỳ ý, VD { name: "..." }) trong Console.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function str(v, max) { return v is string && v.size() <= max; }
+    function optStr(d, k, max) { return !(k in d) || str(d[k], max); }
+
+    // ---- Đơn hàng ----
+    match /orders/{orderId} {
+      function validOrder(d) {
+        return d.keys().hasOnly(['orderId', 'uid', 'name', 'phone', 'email', 'province', 'ward', 'address',
+                                 'shipping', 'note', 'items', 'totalQty', 'total', 'status', 'createdAt', 'page'])
+          && d.orderId == orderId && orderId.matches('^VG-[0-9]{6}-[A-Z0-9]{4,8}$')
+          && (signedIn() ? d.uid == request.auth.uid : d.uid == null)
+          && str(d.name, 100) && d.name.size() > 0
+          && d.phone is string && d.phone.matches('^(\\+?84|0)[0-9]{9,10}$')
+          && str(d.email, 200) && d.email == d.email.lower()
+          && str(d.province, 100) && str(d.ward, 100) && str(d.address, 300)
+          && str(d.shipping, 50) && str(d.note, 2000) && str(d.page, 200)
+          && d.items is list && d.items.size() > 0 && d.items.size() <= 50
+          && d.totalQty is int && d.totalQty > 0 && d.totalQty <= 5000
+          && (d.total == null || d.total is int)
+          && d.status == 'Mới' && d.createdAt == request.time;
+      }
+      // Ai cũng đặt được (kể cả chưa đăng nhập). Ghi đè đơn cũ = update → bị chặn bên dưới.
+      allow create: if validOrder(request.resource.data);
+      // Khách chỉ đọc đơn của mình: theo uid, hoặc email đơn = email tài khoản đã xác minh.
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid)
+        || (signedIn() && request.auth.token.email_verified == true && resource.data.email == request.auth.token.email);
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'staffNote', 'updatedAt'])
+        && request.resource.data.status in ['Mới', 'Đã xác nhận', 'Đang giao', 'Hoàn tất', 'Đã huỷ'];
+      allow delete: if false;
+    }
+
+    // ---- Liên hệ, đăng ký nhận tin, khách để lại SĐT qua chatbot ----
+    match /leads/{id} {
+      function validLead(d) {
+        return d.keys().hasOnly(['type', 'name', 'phone', 'email', 'company', 'province', 'space', 'area',
+                                 'message', 'source', 'topic', 'page', 'status', 'createdAt'])
+          && d.type in ['contact', 'newsletter', 'chat-lead']
+          && optStr(d, 'name', 100) && optStr(d, 'phone', 20) && optStr(d, 'email', 200)
+          && optStr(d, 'company', 200) && optStr(d, 'province', 100) && optStr(d, 'space', 300)
+          && optStr(d, 'area', 50) && optStr(d, 'message', 3000) && optStr(d, 'source', 100)
+          && optStr(d, 'topic', 200) && optStr(d, 'page', 200)
+          && d.status == 'Mới' && d.createdAt == request.time;
+      }
+      allow create: if validLead(request.resource.data);
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && request.resource.data.status in ['Mới', 'Đã liên hệ', 'Xong'];
+      allow delete: if false;
+    }
+
+    // ---- Hồ sơ khách (thông tin giao hàng mặc định) ----
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'phone', 'province', 'ward', 'address', 'updatedAt'])
+        && optStr(request.resource.data, 'name', 100) && optStr(request.resource.data, 'phone', 20)
+        && optStr(request.resource.data, 'province', 100) && optStr(request.resource.data, 'ward', 100)
+        && optStr(request.resource.data, 'address', 300);
+    }
+
+    // ---- Danh sách nhân viên quản trị (chỉ sửa trong Console) ----
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+  }
+}

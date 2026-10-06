@@ -1,0 +1,160 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   Design tokens — màu lấy từ Figma VIO GREEN
+   ============================================================ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --color-brand-50: #eef4ee;
+  --color-brand-100: #dce8dd;
+  --color-brand-200: #b7d0b9;
+  --color-brand-300: #8bb38f;
+  --color-brand-400: #5f8f64;
+  --color-brand-500: #44744a;
+  --color-brand: #355e3b;
+  --color-brand-700: #2a4b2f;
+  --color-brand-800: #1f3923;
+  --color-brand-900: #142617;
+  --color-leaf: #8cc63f;
+  --color-sun: #e9b949;
+  --color-cream: #fcfbf7;
+  --color-cream-200: #f4f1e8;
+  --color-ink: #1d2a1f;
+  --color-muted: #5c6b5e;
+  --color-line: #d9e3da;
+
+  --radius-card: 1.75rem;
+  --shadow-soft: 0 18px 40px -18px rgb(53 94 59 / 0.28);
+  --shadow-lift: 0 26px 50px -20px rgb(53 94 59 / 0.38);
+  --ease-soft: cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  --animate-fade-up: fade-up 0.8s var(--ease-soft) both;
+  --animate-breath: breath 12s ease-in-out infinite;
+  --animate-sweep: sweep 9s ease-in-out infinite alternate;
+  --animate-pulse-ring: pulse-ring 2.2s ease-out infinite;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes breath {
+    0%, 100% { transform: scale(1.02); }
+    50% { transform: scale(1.055); }
+  }
+  @keyframes sweep {
+    from { opacity: 0.36; transform: translateX(-18%); }
+    to { opacity: 0.62; transform: translateX(8%); }
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.95); opacity: 0.6; }
+    100% { transform: scale(1.18); opacity: 0; }
+  }
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { @apply bg-white font-sans text-ink antialiased; }
+  ::selection { background: var(--color-brand-200); }
+  :focus-visible { outline: 3px solid var(--color-leaf); outline-offset: 2px; border-radius: 6px; }
+  [hidden] { display: none !important; }
+  h1, h2, h3 { text-wrap: balance; }
+  p { text-wrap: pretty; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+}
+
+/* ============================================================
+   Components (các mẫu lặp lại nhiều lần)
+   ============================================================ */
+@layer components {
+  .container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+  .section { @apply py-16 sm:py-20 lg:py-24; }
+
+  /* Eyebrow: chữ nhỏ viết hoa có gạch hai bên */
+  .eyebrow { @apply mb-3 inline-flex items-center gap-3 text-xs font-semibold tracking-[0.22em] text-brand uppercase; }
+  .eyebrow::before, .eyebrow::after { content: ''; @apply h-px w-7 bg-current opacity-50; }
+  .eyebrow-light { @apply text-brand-200; }
+  .h-display { @apply text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem]; }
+  .h-section { @apply text-2xl leading-snug font-bold tracking-tight sm:text-3xl lg:text-4xl; }
+
+  /* Buttons */
+  .btn { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-all duration-300 select-none disabled:cursor-not-allowed disabled:opacity-60; transition-timing-function: var(--ease-soft); }
+  .btn svg { @apply size-5 shrink-0; }
+  .btn-primary { @apply bg-brand text-white shadow-soft hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-lift; }
+  .btn-dark { @apply bg-ink text-white hover:-translate-y-0.5 hover:bg-brand-800; }
+  .btn-accent { @apply bg-sun text-ink hover:-translate-y-0.5 hover:brightness-105; }
+  .btn-light { @apply bg-white text-brand shadow-soft hover:-translate-y-0.5 hover:bg-cream; }
+  .btn-outline { @apply border-2 border-brand text-brand hover:bg-brand hover:text-white; }
+  .btn-outline-light { @apply border-2 border-white/70 text-white hover:border-white hover:bg-white/10; }
+
+  .icon-btn { @apply relative inline-flex size-11 items-center justify-center rounded-full border border-line bg-white text-brand transition-colors duration-300 hover:border-brand hover:bg-brand-50; }
+  .icon-btn svg { @apply size-5; }
+
+  .link-arrow { @apply inline-flex items-center gap-2 font-semibold text-brand underline-offset-4 hover:underline; }
+  .link-arrow svg { @apply size-4 transition-transform duration-300; }
+  .link-arrow:hover svg { transform: translateX(4px); }
+
+  /* Chip (bộ lọc, gợi ý) */
+  .chip { @apply inline-flex min-h-10 items-center rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink transition-all duration-300 hover:border-brand hover:text-brand; }
+  .chip.is-active, .chip[aria-pressed='true'], .chip[aria-checked='true'] { @apply border-brand bg-brand text-white; }
+
+  /* Card */
+  .card { @apply rounded-card border border-brand-200 bg-white transition-all duration-300; transition-timing-function: var(--ease-soft); }
+  .card-hover:hover { @apply -translate-y-1.5 border-brand-400 shadow-lift; }
+
+  .circle-ic { @apply inline-flex size-14 items-center justify-center rounded-full bg-brand-50 text-brand; }
+  .circle-ic svg { @apply size-7; }
+  .sq-ic { @apply inline-flex size-14 items-center justify-center rounded-2xl bg-brand text-white; }
+  .sq-ic svg { @apply size-7; }
+
+  .tag { @apply rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700; }
+
+  /* Forms */
+  .field { @apply flex flex-col gap-1.5 text-sm font-semibold text-ink; }
+  .input { @apply min-h-12 w-full rounded-xl border border-line bg-white px-4 py-3 text-base font-normal text-ink placeholder:text-muted/70 transition-colors duration-200 focus:border-brand focus:ring-4 focus:ring-brand-100 focus:outline-none; }
+  .input:user-invalid { @apply border-red-500 ring-red-100; }
+  .form-msg { @apply min-h-5 text-sm font-medium; }
+  .form-msg[data-state='ok'] { @apply text-brand; }
+  .form-msg[data-state='error'] { @apply text-red-600; }
+
+  /* Placeholder image (until real photos arrive) */
+  .ph { @apply relative flex w-full flex-col items-center justify-center gap-2 overflow-hidden bg-gradient-to-br from-brand-50 via-cream to-brand-100 p-4 text-center text-brand; }
+  .ph::before { content: ''; @apply absolute inset-0 opacity-40; background-image: radial-gradient(circle at 20% 20%, white 0 18%, transparent 19%), radial-gradient(circle at 85% 80%, rgb(255 255 255 / .8) 0 22%, transparent 23%); }
+  .ph-dark { @apply from-brand-700 via-brand to-brand-800 text-brand-100; }
+  .ph-dark::before { opacity: 0.08; }
+
+  /* Ken Burns "breathing" image wrapper */
+  .breath { @apply relative overflow-hidden rounded-card; }
+  .breath > * { @apply animate-breath; }
+  .breath::after { content: ''; @apply pointer-events-none absolute inset-y-0 -left-1/4 w-2/3 animate-sweep; background: linear-gradient(100deg, transparent, rgb(255 255 255 / .55), transparent); }
+
+  /* Scroll reveal — JS thêm .is-visible */
+  .js [data-reveal] { opacity: 0; transform: translateY(28px); }
+  .js [data-reveal].is-visible { animation: var(--animate-fade-up); animation-delay: var(--d, 0ms); }
+
+  /* Policy / rich text */
+  .prose-vg { @apply text-[15px] leading-7 text-ink sm:text-base; }
+  .prose-vg > * + * { @apply mt-4; }
+  .prose-vg h2 { @apply mt-10 scroll-mt-28 border-b border-line pb-2 text-xl font-bold text-brand sm:text-2xl; }
+  .prose-vg h3 { @apply mt-7 text-lg font-semibold text-brand-700; }
+  .prose-vg ul { @apply list-disc space-y-1.5 pl-6 marker:text-brand-400; }
+  .prose-vg ul ul { @apply mt-1.5 list-[circle]; }
+  .prose-vg strong { @apply font-semibold text-ink; }
+  .prose-vg em { @apply text-muted; }
+  .prose-vg a { @apply font-medium text-brand underline underline-offset-2; }
+  .prose-vg .table-wrap { @apply -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0; }
+  .prose-vg table { @apply w-full min-w-[560px] overflow-hidden rounded-2xl border border-line text-left text-sm; border-collapse: separate; border-spacing: 0; }
+  .prose-vg th { @apply bg-brand px-4 py-3 font-semibold text-white; }
+  .prose-vg td { @apply border-t border-line px-4 py-3 align-top; }
+  .prose-vg tr:nth-child(even) td { @apply bg-cream; }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}

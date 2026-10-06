@@ -1,0 +1,20 @@
+---
+import Icon from './Icon.astro';
+interface Props { title?: string; sub?: string }
+const {
+  title = 'Sẵn sàng biến góc xanh của bạn thành một không gian thông minh?',
+  sub = 'Trải nghiệm sự khác biệt cùng VIO GREEN ECOHUB. Tận hưởng thiên nhiên không lo bận rộn.',
+} = Astro.props;
+---
+<section class="relative overflow-hidden bg-brand py-16 text-white sm:py-20">
+  <div aria-hidden="true" class="pointer-events-none absolute -top-10 -right-10 size-72 rotate-12 text-white/[0.06]"><Icon name="leaf" class="size-full" /></div>
+  <div aria-hidden="true" class="pointer-events-none absolute -bottom-16 -left-12 size-64 -rotate-45 text-white/[0.05]"><Icon name="sprout" class="size-full" /></div>
+  <div class="container-x relative mx-auto max-w-3xl text-center" data-reveal>
+    <h2 class="h-section">{title}</h2>
+    <p class="mt-4 text-brand-100 sm:text-lg">{sub}</p>
+    <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+      <a class="btn btn-light" href="/trai-nghiem-ar/"><Icon name="camera" /> Trải nghiệm AR ngay</a>
+      <a class="btn btn-outline-light" href="/san-pham/#ecohub"><Icon name="bag" /> Đặt hàng ECOHUB</a>
+    </div>
+  </div>
+</section>

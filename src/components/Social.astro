@@ -1,0 +1,20 @@
+---
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+interface Props { variant?: 'soft' | 'light' }
+const { variant = 'soft' } = Astro.props;
+const list = [
+  ['facebook', 'Facebook'], ['tiktok', 'TikTok'], ['messenger', 'Messenger'],
+  ['instagram', 'Instagram'], ['zalo', 'Zalo'], ['youtube', 'YouTube'],
+] as const;
+const base = variant === 'light'
+  ? 'bg-white/10 text-white hover:bg-white hover:text-brand'
+  : 'bg-brand-50 text-brand hover:bg-brand hover:text-white';
+---
+<div class="flex flex-wrap gap-2">
+  {list.map(([k, label]) => site.social[k] ? (
+    <a href={site.social[k]} target="_blank" rel="noopener" aria-label={label} class:list={['inline-flex size-10 items-center justify-center rounded-full transition-colors duration-300', base]}><Icon name={k} class="size-5" /></a>
+  ) : (
+    <span title={`${label} – đang cập nhật`} aria-label={`${label} (đang cập nhật)`} class:list={['inline-flex size-10 cursor-default items-center justify-center rounded-full opacity-45', variant === 'light' ? 'bg-white/10 text-white' : 'bg-brand-50 text-brand']}><Icon name={k} class="size-5" /></span>
+  ))}
+</div>

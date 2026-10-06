@@ -1,0 +1,185 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Ph from '../../components/Ph.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import PolicyStrip from '../../components/PolicyStrip.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { products, inCategory, categories, areaLabels, powerLabels, waterLabels, type CategoryKey } from '../../data/products';
+
+const filters = [
+  ['area', 'Diện tích', areaLabels],
+  ['power', 'Nguồn điện', powerLabels],
+  ['water', 'Nguồn nước', waterLabels],
+] as const;
+
+const sections: { key: CategoryKey; title: string; sub: string; cols: string; tint: boolean }[] = [
+  { key: 'ecobox', title: 'Hộp chứa ECOBOX', sub: 'Hộp chứa dinh dưỡng và nước – thay thế hoặc bổ sung theo cấu hình X10 / X20.', cols: 'sm:grid-cols-2 lg:grid-cols-4', tint: true },
+  { key: 'irrigation', title: 'Phụ kiện tưới', sub: 'Đầu tưới nhỏ giọt và ống dẫn để đưa nước, dinh dưỡng đến từng gốc cây.', cols: 'sm:grid-cols-2 lg:max-w-4xl lg:mx-auto', tint: false },
+];
+const nutriInfo = [
+  ['settings', 'Công dụng', 'Bổ sung dinh dưỡng cho cây trong hệ thống ECOHUB theo cấu hình phù hợp.'],
+  ['product', 'Quy cách', 'Gói lẻ 25g hoặc hộp Multi-Pack nhiều gói để dự trữ cho nhiều chu kỳ.'],
+  ['science', 'Hướng dẫn', 'Liều lượng, cách pha/trộn và tần suất theo hướng dẫn chính thức của VIO GREEN.'],
+  ['warning', 'Lưu ý', 'Không tự ý tăng liều lượng khi chưa có hướng dẫn kỹ thuật.'],
+] as const;
+---
+<BaseLayout title="Sản phẩm" active="products"
+  description="Hệ thống chăm sóc cây thông minh ECOHUB X10, X20, hộp chứa ECOBOX, phụ kiện tưới, phân bón Bio-Nutri và gói bảo hành VIO-Care.">
+  <Breadcrumbs items={[['Sản phẩm']]} />
+
+  <!-- HERO -->
+  <section class="overflow-hidden bg-cream py-12 sm:py-16">
+    <div class="container-x grid items-center gap-10 lg:grid-cols-2">
+      <div class="order-2 grid grid-cols-[0.8fr_1fr_0.8fr] items-center gap-3 lg:order-1" aria-hidden="true">
+        <div class="overflow-hidden rounded-3xl opacity-80"><Ph title="X10" label="" ratio="3/4" /></div>
+        <div class="breath shadow-lift"><Ph title="ECOHUB" ratio="3/4" /></div>
+        <div class="overflow-hidden rounded-3xl opacity-80"><Ph title="X20" label="" ratio="3/4" /></div>
+      </div>
+      <div class="order-1 lg:order-2" data-reveal>
+        <p class="eyebrow">Sản phẩm VIO GREEN</p>
+        <h1 class="h-display">ECOHUB Smart Plant Care System</h1>
+        <p class="mt-4 text-lg text-muted">Hệ thống chăm sóc cây trồng đô thị thông minh tích hợp toàn diện các công nghệ tiên tiến.</p>
+        <nav aria-label="Nhóm sản phẩm" class="mt-6 flex flex-wrap gap-2">
+          {categories.map((c) => <a class="chip" href={`#${c.key}`}>{c.short}</a>)}
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kết quả tìm kiếm (hiện khi có ?q=) -->
+  <section class="section bg-white" data-search-results hidden>
+    <div class="container-x">
+      <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="eyebrow">Tìm kiếm</p>
+          <h2 class="h-section">Kết quả cho “<span data-search-term></span>”</h2>
+          <p class="mt-1 text-sm text-muted" data-search-count></p>
+        </div>
+        <a class="link-arrow" href="/san-pham/">Xóa tìm kiếm <Icon name="close" /></a>
+      </div>
+      <p class="rounded-2xl bg-cream p-6 text-muted" data-search-empty hidden>
+        Không tìm thấy sản phẩm phù hợp. Thử từ khóa khác như “ECOHUB”, “Bio-Tank”, “Hose” hoặc <button type="button" class="font-semibold text-brand underline" data-open-chat>hỏi MIO</button> nhé.
+      </p>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-search-grid>
+        {products.map((p) => <ProductCard p={p} reveal={false} />)}
+      </div>
+    </div>
+  </section>
+
+  <div data-catalog>
+    <!-- ECOHUB + bộ lọc -->
+    <section class="section scroll-mt-28" id="ecohub">
+      <div class="container-x">
+        <SectionHead eyebrow="Hệ thống ECOHUB" title="Chọn ECOHUB phù hợp không gian của bạn" sub="6 phiên bản theo diện tích, nguồn điện và nguồn nước. Tất cả đều xem được bằng AR." />
+        <div class="card mb-8 grid gap-4 p-5 sm:p-6 lg:grid-cols-3" data-filters data-reveal>
+          {filters.map(([name, label, map]) => (
+            <div role="group" aria-label={label}>
+              <p class="mb-2 text-xs font-bold tracking-[0.16em] text-muted uppercase">{label}</p>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="chip" aria-pressed="true" data-filter={name} data-value="">Tất cả</button>
+                {Object.entries(map).map(([v, l]) => <button type="button" class="chip" aria-pressed="false" data-filter={name} data-value={v}>{l}</button>)}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-filter-grid>
+          {inCategory('ecohub').map((p, i) => <ProductCard p={p} delay={(i % 3) * 80} />)}
+        </div>
+        <p class="mt-6 rounded-2xl bg-cream p-6 text-center text-muted" data-filter-empty hidden>
+          Chưa có phiên bản khớp với lựa chọn này.
+          <button type="button" class="font-semibold text-brand underline" data-filter-reset>Xóa bộ lọc</button> hoặc
+          <button type="button" class="font-semibold text-brand underline" data-open-chat>hỏi MIO</button>.
+        </p>
+      </div>
+    </section>
+
+    {sections.map((s) => (
+      <section class:list={['section scroll-mt-28', s.tint && 'bg-cream']} id={s.key}>
+        <div class="container-x">
+          <SectionHead eyebrow={categories.find((c) => c.key === s.key)!.label} title={s.title} sub={s.sub} />
+          <div class:list={['grid gap-6', s.cols]}>{inCategory(s.key).map((p, i) => <ProductCard p={p} delay={i * 70} />)}</div>
+        </div>
+      </section>
+    ))}
+
+    <!-- Dinh dưỡng -->
+    <section class="section scroll-mt-28 bg-brand text-white" id="nutrition">
+      <div class="container-x grid gap-10 lg:grid-cols-2 lg:items-center">
+        <div data-reveal>
+          <p class="eyebrow eyebrow-light">Dinh dưỡng Bio-Nutri</p>
+          <h2 class="h-section">Gói phân bón VIO GREEN</h2>
+          <p class="mt-4 text-brand-100">Phân bón sinh học dạng gói được thiết kế để bổ sung dinh dưỡng cho cây trong hệ thống chăm sóc VIO GREEN – dễ bảo quản, dễ sử dụng theo từng chu kỳ.</p>
+          <div class="mt-8 grid gap-4 sm:grid-cols-2">
+            {nutriInfo.map(([ic, t, d]) => (
+              <div class="flex gap-3 rounded-2xl bg-white/[0.07] p-4 ring-1 ring-white/10">
+                <span class="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/15"><Icon name={ic} class="size-5" /></span>
+                <div><h3 class="font-semibold">{t}</h3><p class="mt-1 text-sm text-brand-100">{d}</p></div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div class="grid gap-6 text-ink sm:grid-cols-2">{inCategory('nutrition').map((p, i) => <ProductCard p={p} delay={i * 80} />)}</div>
+      </div>
+    </section>
+
+    <section class="section scroll-mt-28 bg-cream" id="service">
+      <div class="container-x">
+        <SectionHead eyebrow="Gói bảo hành VIO-Care" title="Các gói bảo hành VIO-Care" sub="Gia hạn bảo hành/bảo dưỡng cho sản phẩm VIO GREEN đủ điều kiện." />
+        <div class="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2">{inCategory('service').map((p, i) => <ProductCard p={p} delay={i * 80} />)}</div>
+      </div>
+    </section>
+  </div>
+
+  <PolicyStrip />
+  <CtaBand />
+</BaseLayout>
+
+<script>
+  // Bộ lọc ECOHUB + tìm kiếm ?q=
+  const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]+/g, ' ').trim();
+
+  const state: Record<string, string> = { area: '', power: '', water: '' };
+  const grid = document.querySelector<HTMLElement>('[data-filter-grid]');
+  const empty = document.querySelector<HTMLElement>('[data-filter-empty]');
+  const applyFilters = () => {
+    let shown = 0;
+    grid?.querySelectorAll<HTMLElement>('[data-product]').forEach((card) => {
+      const ok = Object.entries(state).every(([k, v]) => !v || card.dataset[k] === v);
+      card.hidden = !ok;
+      if (ok) { shown++; card.classList.add('is-visible'); }
+    });
+    if (empty) empty.hidden = shown > 0;
+    document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(state[b.dataset.filter!] === b.dataset.value));
+    });
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) =>
+    b.addEventListener('click', () => { state[b.dataset.filter!] = b.dataset.value!; applyFilters(); }));
+  document.querySelector('[data-filter-reset]')?.addEventListener('click', () => {
+    Object.keys(state).forEach((k) => (state[k] = '')); applyFilters();
+  });
+
+  // Tìm kiếm: mọi từ khóa (không dấu) phải có trong tên/mô tả
+  const q = new URLSearchParams(location.search).get('q')?.trim() ?? '';
+  if (q) {
+    const terms = norm(q).split(' ').filter(Boolean);
+    const box = document.querySelector<HTMLElement>('[data-search-results]')!;
+    let n = 0;
+    box.querySelectorAll<HTMLElement>('[data-product]').forEach((card) => {
+      const hay = norm(card.dataset.search ?? '');
+      const ok = terms.every((t) => ` ${hay}`.includes(` ${t}`)); // khớp đầu từ: “ong” không khớp “không”
+      card.hidden = !ok;
+      if (ok) n++;
+    });
+    box.hidden = false;
+    box.querySelector('[data-search-term]')!.textContent = q;
+    box.querySelector('[data-search-count]')!.textContent = n ? `Tìm thấy ${n} sản phẩm` : '';
+    (box.querySelector('[data-search-empty]') as HTMLElement).hidden = n > 0;
+    document.querySelectorAll<HTMLInputElement>('input[name="q"]').forEach((i) => (i.value = q));
+    document.title = `Tìm “${q}” | VIO GREEN`;
+    requestAnimationFrame(() => box.scrollIntoView({ block: 'start' }));
+  }
+</script>

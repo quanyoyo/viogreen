@@ -1,0 +1,17 @@
+---
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+interface Props { light?: boolean; size?: 'sm' | 'md' | 'lg' }
+const { light = false, size = 'md' } = Astro.props;
+const h = { sm: 'h-12', md: 'h-14 sm:h-16', lg: 'h-20' }[size];
+---
+<a href="/" class="inline-flex shrink-0 items-center" aria-label={`${site.name} – Trang chủ`}>
+  {site.logo ? (
+    <img src={site.logo} alt={site.name} width="135" height="132" class:list={[h, 'w-auto', light && 'rounded-2xl bg-white p-1']} />
+  ) : (
+    <span class:list={['flex items-center gap-2', light ? 'text-white' : 'text-brand']}>
+      <span class="inline-flex size-10 items-center justify-center rounded-full bg-brand text-white"><Icon name="leaf" class="size-5" /></span>
+      <span class="leading-tight"><strong class="block text-lg font-extrabold tracking-wide">VIO GREEN</strong><small class="text-[10px] opacity-80">Smart care for Urban Green Spaces</small></span>
+    </span>
+  )}
+</a>

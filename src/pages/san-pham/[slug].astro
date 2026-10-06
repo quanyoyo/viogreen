@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Ph from '../../components/Ph.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import PolicyStrip from '../../components/PolicyStrip.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { products, bySlug, categoryOf, formatPrice, productTags, areaLabels, powerLabels, waterLabels, type Product } from '../../data/products';
+import { site, telHref } from '../../data/site';
+
+export function getStaticPaths() {
+  return products.map((p) => ({ params: { slug: p.slug }, props: { p } }));
+}
+const { p } = Astro.props as { p: Product };
+const cat = categoryOf(p);
+const tags = productTags(p);
+
+const specs: [string, string][] = [];
+if (p.category === 'ecohub' && p.area && p.power && p.water) {
+  specs.push(['Diện tích phù hợp', areaLabels[p.area]], ['Nguồn điện', powerLabels[p.power]], ['Nguồn nước', waterLabels[p.water]], ['Phiên bản', p.edition ?? '']);
+}
+if (p.fits) specs.push(['Tương thích', p.fits]);
+specs.push(...p.specs);
+
+const acc = p.accessories.map((s) => bySlug[s]).filter(Boolean);
+const related = acc.length >= 3
+  ? { title: 'Phụ kiện tương thích', items: acc.slice(0, 4) }
+  : { title: 'Sản phẩm liên quan', items: [...acc, ...products.filter((x) => x.category === p.category && x.slug !== p.slug)].slice(0, 3) };
+const relCols = related.items.length >= 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-2 lg:grid-cols-3';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: p.name,
+  description: p.description[0],
+  brand: { '@type': 'Brand', name: 'VIO GREEN' },
+  category: cat.label,
+  ...(p.images[0] ? { image: new URL(p.images[0], Astro.site).href } : {}),
+  ...(p.price ? { offers: { '@type': 'Offer', priceCurrency: 'VND', price: p.price, availability: 'https://schema.org/InStock' } } : {}),
+};
+---
+<BaseLayout title={p.shortName} description={p.summary} active="products" jsonLd={jsonLd}>
+  <Breadcrumbs items={[['Sản phẩm', '/san-pham/'], [cat.short, `/san-pham/#${cat.key}`], [p.shortName]]} />
+
+  <section class="py-10 sm:py-14">
+    <div class="container-x grid gap-10 lg:grid-cols-2 lg:gap-14" data-pdp={p.slug}>
+      <!-- Ảnh -->
+      <div data-reveal>
+        <div class="relative overflow-hidden rounded-card border border-brand-200">
+          {p.images[0] ? <img src={p.images[0]} alt={p.name} class="aspect-square w-full object-cover" /> : <Ph title={p.shortName} ratio="1/1" label="Ảnh sản phẩm đang cập nhật" />}
+          {p.hasAR && (
+            <button type="button" data-ar={p.slug} class="btn btn-light absolute bottom-4 left-4 min-h-11 px-4 py-2"><Icon name="ar" /> Thử với AR</button>
+          )}
+        </div>
+        <div class="mt-3 grid grid-cols-4 gap-3" aria-hidden="true">
+          {[1, 2, 3, 4].map(() => <div class="overflow-hidden rounded-2xl border border-line opacity-70"><Ph ratio="1/1" label="" /></div>)}
+        </div>
+      </div>
+
+      <!-- Thông tin mua -->
+      <div data-reveal style="--d:100ms">
+        <p class="text-xs font-semibold tracking-[0.16em] text-brand-500 uppercase">{cat.label}</p>
+        <h1 class="mt-2 text-2xl leading-tight font-extrabold sm:text-3xl">{p.name}</h1>
+        <p class="mt-3 text-muted sm:text-lg">{p.summary}</p>
+        {tags.length > 0 && <ul class="mt-4 flex flex-wrap gap-2">{tags.map((t) => <li class="tag px-3 py-1.5 text-sm">{t}</li>)}</ul>}
+
+        <div class="mt-6 rounded-2xl bg-cream p-5">
+          <p class:list={['text-2xl font-extrabold', p.price ? 'text-ink' : 'text-brand']}>{formatPrice(p, site.priceFallback)}</p>
+          {!p.price && <p class="mt-1 text-sm text-muted">Nhân viên sẽ báo giá khi xác nhận đơn</p>}
+        </div>
+
+        <dl class="mt-6 space-y-5">
+          {p.variants && (
+            <div>
+              <dt class="mb-2 text-sm font-semibold">{p.variants.label}</dt>
+              <dd class="flex flex-wrap gap-2" role="radiogroup" aria-label={p.variants.label}>
+                {p.variants.options.map((o, i) => <button type="button" class="chip" role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-variant={o}>{o}</button>)}
+              </dd>
+            </div>
+          )}
+          <div>
+            <dt class="mb-2 text-sm font-semibold">Số lượng</dt>
+            <dd>
+              <div class="inline-flex items-center rounded-full border border-line" data-qty>
+                <button type="button" aria-label="Giảm" data-qty-minus class="inline-flex size-11 items-center justify-center rounded-full hover:bg-brand-50"><Icon name="minus" class="size-4" /></button>
+                <input type="number" value="1" min="1" max="99" aria-label="Số lượng" data-qty-input class="w-12 appearance-none bg-transparent text-center font-semibold outline-none [&::-webkit-inner-spin-button]:appearance-none" />
+                <button type="button" aria-label="Tăng" data-qty-plus class="inline-flex size-11 items-center justify-center rounded-full hover:bg-brand-50"><Icon name="plus" class="size-4" /></button>
+              </div>
+            </dd>
+          </div>
+          <div class="flex items-start gap-2 text-sm text-muted"><Icon name="truck" class="mt-0.5 size-4 shrink-0 text-brand" /> Giao hàng toàn quốc – phí vận chuyển được thông báo khi xác nhận đơn</div>
+        </dl>
+
+        <div class="mt-7 grid gap-3 sm:grid-cols-2">
+          <button class="btn btn-dark" type="button" data-add-cart={p.slug} data-with-qty><Icon name="cart" /> Thêm vào giỏ hàng</button>
+          <button class="btn btn-accent" type="button" data-buy-now={p.slug}>Mua ngay</button>
+        </div>
+        <p class="mt-5 flex flex-wrap items-center gap-1.5 text-sm text-muted">
+          <Icon name="help" class="size-4 text-brand" /> Cần tư vấn chọn cấu hình?
+          <button type="button" class="font-semibold text-brand underline" data-open-chat>Hỏi MIO</button> hoặc gọi
+          <a href={telHref} class="font-semibold text-brand">{site.phone}</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-cream">
+    <div class="container-x grid gap-10 lg:grid-cols-[1.6fr_1fr]">
+      <div data-reveal>
+        <h2 class="flex items-center gap-2 text-xl font-bold text-brand sm:text-2xl"><Icon name="info" class="size-6" /> Mô tả chi tiết sản phẩm</h2>
+        <div class="mt-5 space-y-4 leading-7 text-ink/90">{p.description.map((d) => <p>{d}</p>)}</div>
+        {p.note && (
+          <div class="mt-6 flex gap-3 rounded-2xl border border-sun/50 bg-sun/10 p-4 text-sm">
+            <Icon name="warning" class="mt-0.5 size-5 shrink-0 text-[#a37813]" />
+            <p><strong>Lưu ý:</strong> {p.note}</p>
+          </div>
+        )}
+      </div>
+      <aside class="card h-fit space-y-6 p-6" data-reveal style="--d:100ms">
+        <div>
+          <h3 class="font-bold">Thông tin sản phẩm</h3>
+          <dl class="mt-3 divide-y divide-line text-sm">
+            {specs.map(([k, v]) => <div class="flex justify-between gap-4 py-2.5"><dt class="text-muted">{k}</dt><dd class="text-right font-medium">{v}</dd></div>)}
+          </dl>
+        </div>
+        {acc.length > 0 && (
+          <div>
+            <h3 class="font-bold">Phụ kiện tương thích</h3>
+            <ul class="mt-3 space-y-2">
+              {acc.map((a) => <li><a href={`/san-pham/${a.slug}/`} class="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-medium text-brand hover:bg-brand-50"><Icon name="box" class="size-4" /> {a.shortName}</a></li>)}
+            </ul>
+          </div>
+        )}
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-x">
+      <SectionHead title={related.title} />
+      <div class:list={['grid gap-6', relCols]}>{related.items.map((x, i) => <ProductCard p={x} delay={i * 70} />)}</div>
+    </div>
+  </section>
+
+  <PolicyStrip />
+  <CtaBand />
+</BaseLayout>

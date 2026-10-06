@@ -1,0 +1,40 @@
+---
+import type { Product } from '../data/products';
+import { categoryOf, formatPrice, productTags } from '../data/products';
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+import Ph from './Ph.astro';
+interface Props { p: Product; reveal?: boolean; delay?: number }
+const { p, reveal = true, delay = 0 } = Astro.props;
+const tags = productTags(p);
+const href = `/san-pham/${p.slug}/`;
+const searchText = [p.name, p.shortName, p.summary, categoryOf(p).label].join(' ');
+---
+<article class="card card-hover group relative flex flex-col overflow-hidden"
+  data-reveal={reveal ? '' : undefined} style={delay ? `--d:${delay}ms` : undefined}
+  data-product={p.slug} data-cat={p.category} data-area={p.area} data-power={p.power} data-water={p.water}
+  data-search={searchText}>
+  <a href={href} tabindex="-1" aria-hidden="true" class="block overflow-hidden">
+    <div class="transition-transform duration-700 group-hover:scale-[1.04]">
+      {p.images[0] ? <img src={p.images[0]} alt="" loading="lazy" class="aspect-[4/3] w-full object-cover" /> : <Ph title={p.shortName} ratio="4/3" />}
+    </div>
+  </a>
+  {p.hasAR && (
+    <button type="button" data-ar={p.slug} class="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-brand shadow-soft transition-colors hover:bg-brand hover:text-white">
+      <Icon name="ar" class="size-4" /> Thử với AR
+    </button>
+  )}
+  <div class="flex flex-1 flex-col gap-2.5 p-5">
+    <p class="text-xs font-semibold tracking-[0.16em] text-brand-500 uppercase">{categoryOf(p).short}</p>
+    <h3 class="text-lg leading-snug font-bold"><a href={href} class="after:absolute after:inset-0 after:content-[''] hover:text-brand">{p.shortName}</a></h3>
+    <p class="line-clamp-2 text-sm text-muted">{p.summary}</p>
+    {tags.length > 0 && <ul class="flex flex-wrap gap-1.5">{tags.map((t) => <li class="tag">{t}</li>)}</ul>}
+    <div class="mt-auto flex items-center justify-between gap-3 pt-3">
+      <span class:list={['font-bold', p.price ? 'text-lg text-ink' : 'text-base text-brand']}>{formatPrice(p, site.priceFallback)}</span>
+      <button type="button" data-add-cart={p.slug} aria-label={`Thêm ${p.shortName} vào giỏ`}
+        class="relative z-10 inline-flex size-11 items-center justify-center rounded-full bg-brand text-white transition-all duration-300 hover:scale-105 hover:bg-brand-700">
+        <Icon name="plus" class="size-5" />
+      </button>
+    </div>
+  </div>
+</article>

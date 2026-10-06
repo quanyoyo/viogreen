@@ -1,0 +1,24 @@
+---
+import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
+const items = [
+  ['truck', 'Giao hàng tận nơi', 'Đóng gói cẩn thận, giao sản phẩm đến tận tay khách hàng.', '/chinh-sach/van-chuyen/'],
+  ['warranty', 'Bảo hành sản phẩm', 'Hỗ trợ bảo hành, kiểm tra và xử lý các vấn đề kỹ thuật trong thời gian quy định.', '/chinh-sach/bao-hanh/'],
+  ['exchange', 'Đổi trả dễ dàng', 'Hỗ trợ đổi trả khi sản phẩm gặp lỗi theo chính sách của VIO GREEN.', '/chinh-sach/doi-tra/'],
+  ['support', 'Hỗ trợ tận tâm', 'Đồng hành cùng khách hàng từ lắp đặt, sử dụng đến chăm sóc cây.', '/lien-he/'],
+] as const;
+---
+<section class="section">
+  <div class="container-x">
+    <SectionHead eyebrow="Cam kết" title="Chính sách của VIO GREEN" />
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map(([ic, t, d, href], i) => (
+        <a href={href} class="card card-hover flex flex-col items-center gap-3 p-6 text-center" data-reveal style={`--d:${i * 80}ms`}>
+          <span class="circle-ic"><Icon name={ic} /></span>
+          <h3 class="text-lg font-bold text-brand">{t}</h3>
+          <p class="text-sm text-muted">{d}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

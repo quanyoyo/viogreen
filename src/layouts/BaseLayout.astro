@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+import { site } from '../data/site';
+import { clientProducts } from '../data/products';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ArModal from '../components/ArModal.astro';
+import Chatbot from '../components/Chatbot.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  active?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | null;
+}
+const { title = '', description = site.description, active = '', noindex = false, jsonLd = null } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} – ${site.tagline}`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+<!doctype html>
+<html lang={site.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#355e3b" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL('/assets/logo.png', Astro.site).href} />
+    <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a href="#main" class="sr-only z-[100] rounded-full bg-brand px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">Bỏ qua tới nội dung</a>
+    <Header active={active} />
+    <main id="main" class="flex-1"><slot /></main>
+    <Footer />
+    <ArModal />
+    <Chatbot />
+    <div data-toast role="status" aria-live="polite"
+      class="pointer-events-none fixed top-24 left-1/2 z-[70] -translate-x-1/2 -translate-y-2 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white opacity-0 shadow-lift transition-all duration-300 data-[show]:translate-y-0 data-[show]:opacity-100"></div>
+    <script type="application/json" id="vg-data" set:html={JSON.stringify(clientProducts)} />
+    <script>
+      import '../scripts/ui';
+      import '../scripts/cart';
+      import '../scripts/forms';
+      import '../scripts/ar';
+      import '../scripts/chatbot';
+    </script>
+  </body>
+</html>

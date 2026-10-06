@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+---
+<BaseLayout title="Đặt hàng" noindex>
+  <Breadcrumbs items={[['Giỏ hàng', '/gio-hang/'], ['Đặt hàng']]} />
+  <section class="py-10 sm:py-14">
+    <div class="container-x">
+      <div class="mb-8"><p class="eyebrow">Đặt hàng</p><h1 class="h-display">Thông tin đặt hàng</h1></div>
+
+      <div class="card mx-auto max-w-xl p-10 text-center" data-cart-empty hidden>
+        <span class="circle-ic mx-auto"><Icon name="cart" /></span>
+        <h2 class="mt-4 text-xl font-bold">Chưa có sản phẩm để đặt</h2>
+        <a class="btn btn-primary mt-6" href="/san-pham/">Xem sản phẩm <Icon name="arrowRight" /></a>
+      </div>
+
+      <div class="grid gap-8 lg:grid-cols-[1fr_380px]" data-cart-wrap hidden>
+        <form class="space-y-8" data-form="order" novalidate>
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+          <fieldset class="space-y-4">
+            <legend class="mb-4 flex items-center gap-2 text-lg font-bold text-brand"><Icon name="user" class="size-5" /> Thông tin người nhận</legend>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <label class="field sm:col-span-2">Họ và tên *<input class="input" name="name" required autocomplete="name" /></label>
+              <label class="field">Số điện thoại *<input class="input" name="phone" type="tel" required autocomplete="tel" inputmode="tel" /></label>
+              <label class="field">Email<input class="input" name="email" type="email" autocomplete="email" /></label>
+              <label class="field">Tỉnh / Thành phố *<input class="input" name="province" required autocomplete="address-level1" placeholder="VD: Hà Nội" /></label>
+              <label class="field">Phường / Xã *<input class="input" name="ward" required autocomplete="address-level2" /></label>
+              <label class="field sm:col-span-2">Địa chỉ cụ thể *<input class="input" name="address" required autocomplete="street-address" placeholder="Số nhà, ngõ, đường…" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend class="mb-4 flex items-center gap-2 text-lg font-bold text-brand"><Icon name="truck" class="size-5" /> Hình thức giao hàng</legend>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="card flex cursor-pointer gap-3 p-4 has-[:checked]:border-brand has-[:checked]:bg-brand-50">
+                <input type="radio" name="shipping" value="Giao tiêu chuẩn" checked class="mt-1 size-4 accent-brand" />
+                <span><strong class="block">Giao tiêu chuẩn</strong><small class="text-muted">Nội thành HN 1–2 ngày · Tỉnh khác 5–7 ngày</small></span>
+              </label>
+              <label class="card flex cursor-pointer gap-3 p-4 has-[:checked]:border-brand has-[:checked]:bg-brand-50">
+                <input type="radio" name="shipping" value="Giao nhanh/Hỏa tốc" class="mt-1 size-4 accent-brand" />
+                <span><strong class="block">Giao nhanh / Hỏa tốc</strong><small class="text-muted">Nội thành HN 2–4 giờ · phí theo hãng vận chuyển</small></span>
+              </label>
+            </div>
+            <p class="mt-2 text-sm text-muted">Xem chi tiết tại <a href="/chinh-sach/van-chuyen/" class="text-brand underline">Chính sách vận chuyển</a>.</p>
+          </fieldset>
+
+          <label class="field">Ghi chú cho đơn hàng<textarea class="input min-h-24" name="note" rows="3" placeholder="Thời gian nhận hàng, yêu cầu lắp đặt…"></textarea></label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remember" value="1" class="size-4 accent-brand" /> Lưu thông tin cho lần đặt sau (chỉ trên trình duyệt này)</label>
+
+          <div class="flex gap-3 rounded-2xl bg-brand-50 p-4 text-sm"><Icon name="info" class="mt-0.5 size-5 shrink-0 text-brand" /><p><strong>Thanh toán:</strong> Sau khi nhận đơn, nhân viên VIO GREEN sẽ gọi xác nhận sản phẩm, phí vận chuyển và hình thức thanh toán phù hợp.</p></div>
+
+          <div>
+            <button class="btn btn-primary w-full text-base" type="submit">Xác nhận đặt hàng <Icon name="check" /></button>
+            <p class="form-msg mt-3 text-center" data-form-msg role="status"></p>
+            <p class="mt-2 text-center text-xs text-muted">Bằng việc đặt hàng, bạn đồng ý với <a href="/chinh-sach/bao-mat/" class="underline">Chính sách bảo mật</a> và <a href="/chinh-sach/doi-tra/" class="underline">Chính sách đổi trả</a>.</p>
+          </div>
+        </form>
+
+        <aside class="card h-fit p-6 lg:sticky lg:top-40" aria-label="Tóm tắt đơn hàng">
+          <h2 class="text-lg font-bold">Đơn hàng</h2>
+          <ul class="mt-4 divide-y divide-line" data-summary-rows></ul>
+          <div class="mt-4 flex items-baseline justify-between border-t border-line pt-4"><span class="font-semibold">Tổng cộng</span><strong class="text-xl text-brand" data-cart-total>—</strong></div>
+          <p class="mt-2 text-xs text-muted">Giá và phí vận chuyển sẽ được xác nhận qua điện thoại.</p>
+          <a class="link-arrow mt-4 text-sm" href="/gio-hang/"><Icon name="arrowLeft" /> Sửa giỏ hàng</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { site, telHref } from '../../data/site';
+---
+<BaseLayout title="Đặt hàng thành công" noindex>
+  <section class="section">
+    <div class="container-x mx-auto max-w-2xl text-center">
+      <span class="mx-auto inline-flex size-20 items-center justify-center rounded-full bg-brand text-white shadow-lift"><Icon name="check" class="size-10" /></span>
+      <h1 class="h-display mt-6">Đặt hàng thành công!</h1>
+      <p class="mt-4 text-lg text-muted">Cảm ơn bạn đã tin chọn VIO GREEN. Mã đơn hàng của bạn là <strong class="text-ink" data-order-id>—</strong>.</p>
+      <p class="mt-2 text-muted">Nhân viên sẽ gọi cho bạn trong giờ làm việc ({site.hours}) để xác nhận đơn, phí vận chuyển và thanh toán.</p>
+      <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+        <a class="btn btn-primary" href="/san-pham/">Tiếp tục mua sắm</a>
+        <a class="btn btn-outline" href={telHref}><Icon name="phone" /> {site.phone}</a>
+      </div>
+    </div>
+  </section>
+  <script>
+    const id = new URLSearchParams(location.search).get('ma') || sessionStorage.getItem('vg-last-order');
+    const el = document.querySelector('[data-order-id]');
+    if (id && el) el.textContent = id;
+  </script>
+</BaseLayout>

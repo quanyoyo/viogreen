@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site, policyPages, telHref } from '../../data/site';
+
+type MdModule = { compiledContent: () => string | Promise<string>; getHeadings: () => { depth: number; slug: string; text: string }[] };
+const files = import.meta.glob<MdModule>('../../content/policies/*.md', { eager: true });
+
+export function getStaticPaths() {
+  return policyPages.map((p) => ({ params: { slug: p.slug }, props: { page: p } }));
+}
+const { page } = Astro.props as { page: (typeof policyPages)[number] };
+const mod = files[`../../content/policies/${page.slug}.md`];
+const vars: Record<string, string> = {
+  address: site.address, email: site.email, phone: site.phone, hours: site.hours,
+  facebook: site.social.facebook ? `<a href="${site.social.facebook}" target="_blank" rel="noopener">Fanpage VIO GREEN</a>` : 'Đang cập nhật',
+};
+const html = (await mod.compiledContent()).replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? '');
+const toc = mod.getHeadings().filter((h) => h.depth === 2);
+---
+<BaseLayout title={page.title} description={page.intro}>
+  <Breadcrumbs items={[['Chính sách'], [page.title]]} />
+  <section class="bg-cream py-12 sm:py-16">
+    <div class="container-x max-w-4xl text-center" data-reveal>
+      <p class="eyebrow">Chính sách VIO GREEN</p>
+      <h1 class="h-display">{page.title}</h1>
+      <p class="mt-3 text-muted sm:text-lg">{page.intro}</p>
+    </div>
+  </section>
+
+  <section class="section pt-10 sm:pt-12">
+    <div class="container-x grid gap-10 lg:grid-cols-[260px_1fr]">
+      <aside class="lg:sticky lg:top-40 lg:self-start">
+        <nav aria-label="Các chính sách" class="card p-3">
+          <p class="px-3 pt-2 pb-1 text-xs font-bold tracking-[0.16em] text-muted uppercase">Chính sách</p>
+          <ul>
+            {policyPages.map((p) => (
+              <li><a href={`/chinh-sach/${p.slug}/`} aria-current={p.slug === page.slug ? 'page' : undefined}
+                class:list={['flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-colors', p.slug === page.slug ? 'bg-brand text-white' : 'hover:bg-brand-50 hover:text-brand']}>
+                {p.short}<Icon name="chevronRight" class="size-4 opacity-60" /></a></li>
+            ))}
+          </ul>
+        </nav>
+        {toc.length > 2 && (
+          <nav aria-label="Mục lục" class="mt-5 hidden px-3 lg:block">
+            <p class="mb-2 text-xs font-bold tracking-[0.16em] text-muted uppercase">Nội dung</p>
+            <ul class="space-y-1.5 border-l border-line text-sm">
+              {toc.map((h) => <li><a href={`#${h.slug}`} class="-ml-px block border-l-2 border-transparent pl-3 text-muted hover:border-brand hover:text-brand">{h.text}</a></li>)}
+            </ul>
+          </nav>
+        )}
+      </aside>
+      <article class="min-w-0">
+        <div class="prose-vg" set:html={html} />
+        <div class="mt-12 flex flex-col gap-4 rounded-card bg-brand-50 p-6 sm:flex-row sm:items-center">
+          <span class="circle-ic shrink-0 bg-white"><Icon name="support" /></span>
+          <p class="flex-1 text-sm">Cần hỗ trợ thêm? Gọi <a href={telHref} class="font-semibold text-brand">{site.phone}</a> ({site.hours}) hoặc chat với trợ lý MIO.</p>
+          <button type="button" data-open-chat class="btn btn-primary"><Icon name="chat" /> Chat với MIO</button>
+        </div>
+      </article>
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>

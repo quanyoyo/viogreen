@@ -1,0 +1,9 @@
+---
+interface Props { eyebrow?: string; title: string; sub?: string; align?: 'center' | 'left'; light?: boolean; as?: 'h1' | 'h2' }
+const { eyebrow, title, sub, align = 'center', light = false, as: Tag = 'h2' } = Astro.props;
+---
+<div class:list={['mb-10 sm:mb-12', align === 'center' ? 'mx-auto max-w-3xl text-center' : 'max-w-2xl']} data-reveal>
+  {eyebrow && <p class:list={['eyebrow', light && 'eyebrow-light']}>{eyebrow}</p>}
+  <Tag class:list={['h-section', light ? 'text-white' : 'text-ink']} set:html={title} />
+  {sub && <p class:list={['mt-4 text-base sm:text-lg', light ? 'text-brand-100' : 'text-muted']}>{sub}</p>}
+</div>

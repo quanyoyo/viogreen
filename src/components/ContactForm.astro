@@ -1,0 +1,54 @@
+---
+import Icon from './Icon.astro';
+interface Props { source: string; compact?: boolean }
+const { source, compact = false } = Astro.props;
+const spaces = ['Ban công', 'Sân thượng', 'Căn hộ', 'Văn phòng', 'Quán cà phê', 'Khác'];
+const areas = ['Dưới 10m²', '10–20m²', 'Trên 20m²', 'Chưa rõ'];
+---
+<form class="space-y-5" data-form="contact" novalidate>
+  <input type="hidden" name="source" value={source} />
+  <!-- chống spam: người thật không thấy ô này -->
+  <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+  <div class="grid gap-4 sm:grid-cols-2">
+    <label class="field">Họ và tên *<input class="input" name="name" required autocomplete="name" placeholder="Nhập họ và tên của bạn" /></label>
+    <label class="field">Số điện thoại *<input class="input" name="phone" type="tel" required autocomplete="tel" inputmode="tel" placeholder="090xxxxxxx" /></label>
+    <label class="field">Email<input class="input" name="email" type="email" autocomplete="email" placeholder="name@gmail.com" /></label>
+    {compact
+      ? <label class="field">Tên công ty<input class="input" name="company" autocomplete="organization" /></label>
+      : <label class="field">Khu vực<input class="input" name="province" autocomplete="address-level1" placeholder="VD: Hà Nội" /></label>}
+  </div>
+
+  {!compact && (
+    <>
+      <fieldset>
+        <legend class="mb-2 text-sm font-semibold">Loại không gian của bạn <span class="font-normal text-muted">(chọn các lựa chọn phù hợp)</span></legend>
+        <div class="flex flex-wrap gap-2">
+          {spaces.map((s) => (
+            <label class="chip cursor-pointer has-[:checked]:border-brand has-[:checked]:bg-brand has-[:checked]:text-white has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-brand-100">
+              <input type="checkbox" name="space" value={s} class="sr-only" />{s}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend class="mb-2 text-sm font-semibold">Diện tích không gian của bạn</legend>
+        <div class="flex flex-wrap gap-2">
+          {areas.map((a) => (
+            <label class="chip cursor-pointer has-[:checked]:border-brand has-[:checked]:bg-brand has-[:checked]:text-white has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-brand-100">
+              <input type="radio" name="area" value={a} class="sr-only" />{a}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    </>
+  )}
+
+  <label class="field">{compact ? 'Lời nhắn' : 'Lời nhắn / Yêu cầu chi tiết'}
+    <textarea class="input min-h-32 resize-y" name="message" rows="4" placeholder="Chia sẻ thêm về không gian hoặc yêu cầu cụ thể của bạn: diện tích, đã có nguồn điện/nước chưa…"></textarea>
+  </label>
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <button class="btn btn-primary sm:min-w-56" type="submit">{compact ? 'Đăng ký tư vấn' : 'Gửi yêu cầu'} <Icon name="send" /></button>
+    <p class="form-msg" data-form-msg role="status"></p>
+  </div>
+  <p class="text-xs text-muted">Thông tin của bạn được bảo mật theo <a href="/chinh-sach/bao-mat/" class="underline hover:text-brand">Chính sách bảo mật</a>.</p>
+</form>

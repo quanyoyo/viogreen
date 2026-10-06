@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Ph from '../../components/Ph.astro';
+import PolicyStrip from '../../components/PolicyStrip.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+---
+<BaseLayout title="Giới thiệu" active="about" description="Câu chuyện thương hiệu, tầm nhìn và sứ mệnh của VIO GREEN – giải pháp không gian xanh đô thị thông minh.">
+  <Breadcrumbs items={[['Giới thiệu']]} />
+
+  <section class="relative isolate overflow-hidden bg-brand-800 py-20 text-white sm:py-28">
+    <div aria-hidden="true" class="absolute inset-0 -z-10">
+      <div class="absolute inset-0 animate-breath bg-[radial-gradient(ellipse_at_80%_30%,var(--color-brand-400)_0%,var(--color-brand)_40%,var(--color-brand-800)_78%)]"></div>
+      <div class="absolute top-0 -left-1/4 h-full w-2/3 animate-sweep bg-[linear-gradient(100deg,transparent,rgb(255_255_255/.12),transparent)]"></div>
+      <div class="absolute -right-16 bottom-0 hidden size-[26rem] text-white/10 md:block"><Icon name="tree" class="size-full" /></div>
+    </div>
+    <div class="container-x max-w-3xl" data-reveal>
+      <p class="eyebrow eyebrow-light">Về VIO GREEN</p>
+      <h1 class="text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl">Công nghệ thông minh. Không gian xanh. Cuộc sống dễ dàng hơn.</h1>
+      <p class="mt-5 text-lg text-brand-100">VIO GREEN phát triển các giải pháp chăm sóc không gian xanh đô thị, kết nối công nghệ với thiên nhiên để giúp việc sống xanh trở nên đơn giản, thuận tiện và bền vững hơn.</p>
+      <a class="btn btn-light mt-8" href="/san-pham/">Khám phá ngay <Icon name="arrowCircle" /></a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-x grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      <div data-reveal>
+        <p class="eyebrow">Câu chuyện thương hiệu</p>
+        <h2 class="h-display">Câu chuyện thương hiệu</h2>
+        <blockquote class="mt-6 rounded-3xl border-l-4 border-brand bg-cream p-6">
+          <Icon name="quote" class="size-8 text-brand-300" />
+          <p class="mt-2 text-lg font-semibold text-brand-700 italic">Làm thế nào để con người có thể tận hưởng không gian xanh mà không phải dành quá nhiều thời gian và công sức để duy trì nó?</p>
+        </blockquote>
+        <p class="mt-6 text-muted sm:text-lg">Từ câu hỏi đó, VIO GREEN hướng đến việc ứng dụng công nghệ vào những công việc chăm sóc cây trồng thường ngày, giúp con người kết nối với thiên nhiên theo một cách đơn giản và phù hợp hơn với nhịp sống đô thị bận rộn.</p>
+        <a class="btn btn-primary mt-8" href="/san-pham/">Khám phá ngay <Icon name="arrowCircle" /></a>
+      </div>
+      <div class="grid grid-cols-3 items-center gap-3" data-reveal style="--d:120ms" aria-hidden="true">
+        <div class="translate-y-6 overflow-hidden rounded-3xl"><Ph ratio="3/4" label="" /></div>
+        <div class="breath shadow-lift"><Ph title="VIO GREEN" ratio="3/4" /></div>
+        <div class="-translate-y-6 overflow-hidden rounded-3xl"><Ph ratio="3/4" label="" /></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-cream">
+    <div class="container-x grid gap-6 lg:grid-cols-2">
+      <article class="card card-hover relative overflow-hidden p-8 sm:p-10" data-reveal>
+        <span aria-hidden="true" class="absolute -top-10 -right-10 size-32 rounded-full bg-brand-50"></span>
+        <p class="eyebrow relative">Tầm nhìn (Vision)</p>
+        <h2 class="relative text-2xl font-bold sm:text-3xl">Kiến tạo tương lai xanh đô thị</h2>
+        <p class="relative mt-4 text-muted">Kiến tạo một tương lai nơi công nghệ và thiên nhiên cùng phát triển trong mọi không gian đô thị. VIO GREEN hướng đến trở thành đơn vị tiên phong tại Việt Nam trong lĩnh vực giải pháp không gian xanh đô thị thông minh, góp phần đưa việc sống xanh trở thành một phần dễ dàng, bền vững và không thể thiếu trong đời sống hiện đại.</p>
+      </article>
+      <article class="relative overflow-hidden rounded-card bg-brand p-8 text-white shadow-lift sm:p-10" data-reveal style="--d:120ms">
+        <span aria-hidden="true" class="absolute -top-10 -right-10 size-32 rounded-full bg-white/10"></span>
+        <p class="eyebrow eyebrow-light relative">Sứ mệnh (Mission)</p>
+        <h2 class="relative text-2xl font-bold sm:text-3xl">Đưa lối sống xanh gắn liền đô thị</h2>
+        <p class="relative mt-4 text-brand-100">Đưa lối sống xanh bền vững gắn liền với cuộc sống đô thị bằng công nghệ thông minh. VIO GREEN phát triển các giải pháp chăm sóc cây trồng tích hợp tưới thông minh, quản lý dinh dưỡng và năng lượng mặt trời, giúp đơn giản hóa việc chăm sóc cây, giải phóng thời gian và trao quyền cho mỗi cá nhân, doanh nghiệp kiến tạo không gian xanh theo cách riêng.</p>
+      </article>
+    </div>
+  </section>
+
+  <PolicyStrip />
+  <CtaBand title="Smart Urban Green Solutions" sub="“Smart Care for Urban Green Spaces.”" />
+</BaseLayout>

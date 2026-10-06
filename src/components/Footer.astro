@@ -1,0 +1,54 @@
+---
+import { site, policyPages, telHref } from '../data/site';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import Social from './Social.astro';
+const year = new Date().getFullYear();
+---
+<footer class="bg-cream-200 text-ink">
+  <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.3fr_1.4fr]">
+    <div class="space-y-4">
+      <Logo size="lg" />
+      <p class="max-w-xs text-sm text-muted">Giải pháp chăm sóc không gian xanh đô thị – kết nối công nghệ, con người và thiên nhiên.</p>
+      <Social />
+    </div>
+    <div>
+      <h3 class="mb-4 font-bold text-brand">Chính sách</h3>
+      <ul class="space-y-2.5 text-sm">
+        {policyPages.map((p) => <li><a href={`/chinh-sach/${p.slug}/`} class="text-muted transition-colors hover:text-brand">{p.title}</a></li>)}
+      </ul>
+    </div>
+    <div>
+      <h3 class="mb-4 font-bold text-brand">Hỗ trợ</h3>
+      <ul class="space-y-2.5 text-sm">
+        <li><a href="/#faq" class="text-muted hover:text-brand">Câu hỏi thường gặp</a></li>
+        <li><a href="/trai-nghiem-ar/" class="text-muted hover:text-brand">Trải nghiệm AR</a></li>
+        <li><a href="/lien-he/" class="text-muted hover:text-brand">Liên hệ tư vấn</a></li>
+        <li><button type="button" data-open-chat class="text-muted hover:text-brand">Chat với MIO</button></li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="mb-4 font-bold text-brand">Thông tin liên hệ</h3>
+      <ul class="space-y-3 text-sm text-muted">
+        <li class="flex gap-2.5"><Icon name="pin" class="mt-0.5 size-4 shrink-0 text-brand" /><span>{site.address}</span></li>
+        <li class="flex gap-2.5"><Icon name="phone" class="mt-0.5 size-4 shrink-0 text-brand" /><a href={telHref} class="hover:text-brand">{site.phone}</a></li>
+        <li class="flex gap-2.5"><Icon name="email" class="mt-0.5 size-4 shrink-0 text-brand" /><a href={`mailto:${site.email}`} class="break-all hover:text-brand">{site.email}</a></li>
+        <li class="flex gap-2.5"><Icon name="clock" class="mt-0.5 size-4 shrink-0 text-brand" /><span>{site.hours}</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="mb-4 font-bold text-brand">Đăng ký nhận tin</h3>
+      <p class="mb-3 text-sm text-muted">Nhận thông tin sản phẩm mới và mẹo chăm cây từ VIO GREEN.</p>
+      <form data-form="newsletter" novalidate>
+        <div class="flex overflow-hidden rounded-full border border-line bg-white focus-within:border-brand">
+          <input type="email" name="email" required placeholder="Email của bạn" aria-label="Email" autocomplete="email" class="min-h-12 w-full min-w-0 bg-transparent px-4 text-base outline-none" />
+          <button type="submit" class="shrink-0 rounded-full bg-brand px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-700">Đăng ký</button>
+        </div>
+        <p class="form-msg mt-2" data-form-msg role="status"></p>
+      </form>
+    </div>
+  </div>
+  <div class="bg-brand py-4 text-center text-xs text-brand-100 sm:text-sm">
+    <div class="container-x">© {year} {site.companyName}. {site.tagline}.</div>
+  </div>
+</footer>

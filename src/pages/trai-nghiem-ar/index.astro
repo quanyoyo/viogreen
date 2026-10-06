@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import PolicyStrip from '../../components/PolicyStrip.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { inCategory } from '../../data/products';
+const steps = [
+  ['mobile', 'Mở trải nghiệm AR', 'Truy cập tính năng AR trực tiếp trên trình duyệt mà không cần tải thêm ứng dụng cồng kềnh.', 'Bước khởi đầu'],
+  ['layers', 'Chọn ECOHUB', 'Lựa chọn phiên bản ECOHUB phù hợp với diện tích, nguồn điện và nguồn nước của bạn.', 'Tùy chỉnh cá nhân'],
+  ['ar', 'Đặt vào không gian', 'Đưa camera về khu vực mặt sàn hoặc bàn làm việc bạn muốn bố trí ECOHUB.', 'Quét không gian'],
+  ['move', 'Điều chỉnh', 'Thay đổi vị trí, hướng và cách sắp xếp linh hoạt để tìm ra phương án tối ưu nhất.', 'Tinh chỉnh góc nhìn'],
+  ['bag', 'Đặt hàng', 'Sau khi lựa chọn được phương án ưng ý, chuyển tiếp liền đến trang đặt hàng nhanh chóng.', 'Hoàn tất mua sắm'],
+] as const;
+---
+<BaseLayout title="Trải nghiệm AR" active="ar" description="Ướm thử ECOHUB trong không gian thật của bạn bằng công nghệ AR – không cần cài ứng dụng.">
+  <Breadcrumbs items={[['Trải nghiệm AR']]} />
+
+  <section class="section">
+    <div class="container-x grid items-center gap-12 lg:grid-cols-2">
+      <div data-reveal>
+        <p class="eyebrow">Trải nghiệm AR</p>
+        <h1 class="text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl">See ECOHUB in Your Space</h1>
+        <p class="mt-3 text-xl font-semibold text-brand">Ướm thử không gian xanh trước khi mua.</p>
+        <p class="mt-4 text-muted sm:text-lg">Không cần tưởng tượng. Với công nghệ AR, bạn có thể hình dung ECOHUB trong chính không gian của mình trước khi quyết định mua sắm.</p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a class="btn btn-primary" href="#chon-ecohub"><Icon name="camera" /> Trải nghiệm AR ngay</a>
+          <a class="btn btn-outline" href="/san-pham/#ecohub">Đặt hàng ECOHUB <Icon name="arrowCircle" /></a>
+        </div>
+      </div>
+      <!-- Màn hình AR minh họa -->
+      <div class="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2.25rem] bg-brand-900 shadow-lift ring-8 ring-ink/90" data-reveal style="--d:120ms" aria-hidden="true">
+        <div class="absolute inset-0 animate-breath bg-[radial-gradient(ellipse_at_50%_20%,#f4f1e8_0%,#d9e3da_45%,#8bb38f_100%)]"></div>
+        <div class="absolute inset-x-0 bottom-0 h-2/5 bg-[linear-gradient(transparent,rgb(31_57_35/.35))] [perspective:600px]">
+          <div class="absolute inset-0 origin-bottom [transform:rotateX(62deg)] bg-[linear-gradient(rgb(255_255_255/.5)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/.5)_1px,transparent_1px)] bg-[size:36px_36px]"></div>
+        </div>
+        <div class="absolute top-4 inset-x-4 flex items-center justify-between text-[11px] font-semibold">
+          <span class="flex items-center gap-1.5 rounded-full bg-ink/70 px-3 py-1.5 text-white"><i class="size-2 animate-pulse rounded-full bg-red-500"></i> AR Live Camera</span>
+          <span class="flex gap-1 rounded-full bg-white/85 p-1 text-ink"><b class="rounded-full bg-brand px-2 py-0.5 text-white">Phòng khách</b><span class="px-1.5 py-0.5">Ban công</span></span>
+        </div>
+        <div class="absolute bottom-[30%] left-1/2 h-[38%] w-[34%] -translate-x-1/2 rounded-t-3xl rounded-b-xl bg-gradient-to-b from-white to-cream-200 shadow-2xl ring-1 ring-brand-200">
+          <div class="mx-auto mt-3 h-[18%] w-[80%] rounded-lg bg-[linear-gradient(135deg,#2a4b2f,#5f8f64)]"></div>
+          <div class="mx-auto mt-2 flex w-[80%] justify-between"><span class="size-2 rounded-full bg-leaf"></span><span class="h-2 w-8 rounded-full bg-brand-200"></span></div>
+          <div class="absolute -top-10 left-1/2 -translate-x-1/2 text-leaf"><Icon name="sprout" class="size-14" /></div>
+        </div>
+        <div class="absolute right-4 bottom-4 left-4 rounded-2xl bg-white/95 p-4 shadow-lift">
+          <div class="flex items-center gap-3">
+            <span class="sq-ic size-11"><Icon name="leaf" class="size-5" /></span>
+            <div class="min-w-0 flex-1"><strong class="block text-sm">ECOHUB X10 Sol</strong><small class="text-muted">Dưới 10m² · Năng lượng mặt trời</small></div>
+          </div>
+          <div class="mt-3 flex gap-2 text-[11px] font-semibold"><span class="tag">Xoay 360°</span><span class="tag">Sẵn sàng đặt hàng</span></div>
+        </div>
+        <span class="absolute bottom-[26%] left-1/2 -translate-x-1/2 rounded-full bg-white/80 px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-brand">SURFACE DETECTED</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-cream">
+    <div class="container-x">
+      <SectionHead eyebrow="5 bước" title="AR hoạt động như thế nào?" sub="Chỉ với 5 bước cực kỳ đơn giản trên điện thoại hoặc máy tính bảng, bạn đã có thể mang cả hệ sinh thái ECOHUB vào nhà." />
+      <ol class="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        {steps.map(([ic, t, d, foot], i) => (
+          <li class="card card-hover relative flex flex-col p-6" data-reveal style={`--d:${i * 80}ms`}>
+            <span class="absolute top-5 right-5 text-3xl font-extrabold text-brand-100">0{i + 1}</span>
+            <span class="sq-ic size-12"><Icon name={ic} class="size-6" /></span>
+            <h3 class="mt-4 text-lg font-bold">{t}</h3>
+            <p class="mt-2 flex-1 text-sm text-muted">{d}</p>
+            <span class="mt-4 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-brand uppercase">{foot} <Icon name={i === 4 ? 'check' : 'arrowRight'} class="size-3.5" /></span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section scroll-mt-28" id="chon-ecohub">
+    <div class="container-x">
+      <SectionHead eyebrow="Chọn mẫu để thử" title="Sản phẩm nổi bật" sub="Bấm “Thử với AR” trên điện thoại để đặt ECOHUB vào không gian thật của bạn." />
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{inCategory('ecohub').map((p, i) => <ProductCard p={p} delay={(i % 3) * 80} />)}</div>
+    </div>
+  </section>
+
+  <PolicyStrip />
+  <CtaBand />
+</BaseLayout>

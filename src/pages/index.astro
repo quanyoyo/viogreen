@@ -1,0 +1,203 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import Ph from '../components/Ph.astro';
+import SectionHead from '../components/SectionHead.astro';
+import ProductCard from '../components/ProductCard.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { inCategory } from '../data/products';
+import { faq } from '../data/faq';
+import { site } from '../data/site';
+
+const slides = [
+  { eyebrow: 'VIO GREEN ECOHUB', title: 'Smart Care for Urban Green Spaces', text: 'Chăm sóc không gian xanh đô thị bằng công nghệ thông minh.', cta: ['Khám phá ngay', '/san-pham/'] },
+  { eyebrow: 'Trải nghiệm AR', title: 'See ECOHUB in Your Space', text: 'Ướm thử ECOHUB ngay trong không gian của bạn trước khi quyết định mua.', cta: ['Trải nghiệm AR', '/trai-nghiem-ar/'] },
+  { eyebrow: 'Một hệ thống', title: 'Nhiều cách sống xanh.', text: 'Tưới tự động, quản lý dinh dưỡng và năng lượng mặt trời trong một hệ thống nhỏ gọn.', cta: ['Xem các dòng ECOHUB', '/san-pham/#ecohub'] },
+];
+const trust = [['drop', 'Tưới tự động'], ['solar', 'Năng lượng mặt trời'], ['mobile', 'Giám sát qua app'], ['ar', 'Ướm thử bằng AR']] as const;
+const pains = [
+  ['hourglass', 'Thời gian bận rộn', 'Lịch trình bận rộn khiến việc tưới cây đều đặn trở thành một áp lực nhỏ nhưng dai dẳng.'],
+  ['tree', 'Không biết cây cần gì', 'Không phải ai cũng có thời gian đọc hiểu mọi dấu hiệu của một chậu cây.'],
+  ['home', 'Thường xuyên đi xa', 'Công tác hay du lịch không còn đồng nghĩa với việc bỏ lại góc xanh phía sau.'],
+  ['maximize', 'Không gian và nguồn điện hạn chế', 'Ban công, sân thượng nhỏ hẹp và khó bố trí nguồn điện.'],
+] as const;
+const whys = [
+  ['drop', 'Tưới, tiêu thông minh', 'Hệ thống sử dụng cảm biến và dữ liệu để hỗ trợ xác định nhu cầu nước thực tế của cây, từ đó hỗ trợ điều chỉnh hoạt động tưới thay vì phụ thuộc hoàn toàn vào lịch tưới thủ công.'],
+  ['mobile', 'Giám sát mọi lúc', 'Người dùng có thể theo dõi tình trạng hệ thống, nước, dinh dưỡng và năng lượng thông qua ứng dụng, đồng thời nhận cảnh báo và gợi ý chăm sóc.'],
+  ['solar', 'Năng lượng mặt trời', 'Tích hợp tấm pin năng lượng mặt trời và pin dự phòng có thể tháo rời, giúp hệ thống vận hành linh hoạt và giảm sự phụ thuộc vào nguồn điện trực tiếp.'],
+  ['ar', 'Ướm thử trước khi mua', 'Công nghệ AR cho phép người dùng hình dung ECOHUB trong chính không gian của mình, hỗ trợ lựa chọn vị trí và cách bố trí phù hợp.'],
+] as const;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'Organization', name: site.name, url: Astro.site?.href, logo: new URL(site.logo || '/favicon.svg', Astro.site).href, telephone: site.phone, email: site.email, address: site.address, sameAs: Object.values(site.social).filter(Boolean) },
+    { '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+  ],
+};
+---
+<BaseLayout active="home" jsonLd={jsonLd}>
+  <!-- HERO (carousel) -->
+  <section class="relative isolate overflow-hidden bg-brand-800 text-white" data-carousel aria-roledescription="carousel" aria-label="Giới thiệu VIO GREEN">
+    <div aria-hidden="true" class="absolute inset-0 -z-10">
+      <div class="absolute inset-0 animate-breath bg-[radial-gradient(ellipse_at_75%_40%,var(--color-brand-400)_0%,var(--color-brand)_38%,var(--color-brand-800)_75%)]"></div>
+      <div class="absolute top-0 -left-1/4 h-full w-2/3 animate-sweep bg-[linear-gradient(100deg,transparent,rgb(255_255_255/.12),transparent)]"></div>
+      <div class="absolute top-1/2 right-[6%] hidden size-[30rem] -translate-y-1/2 text-white/10 lg:block"><Icon name="sprout" class="size-full" /></div>
+      <div class="absolute -bottom-24 left-[38%] size-72 rotate-[30deg] text-leaf/15"><Icon name="leaf" class="size-full" /></div>
+    </div>
+    <div class="container-x relative grid min-h-[min(78vh,640px)] items-center py-16 sm:py-20">
+      {slides.map((s, i) => (
+        <div class:list={['col-start-1 row-start-1 max-w-2xl transition-all duration-700', i === 0 ? 'opacity-100' : 'pointer-events-none translate-y-4 opacity-0']}
+          data-slide aria-hidden={i === 0 ? 'false' : 'true'} role="group" aria-roledescription="slide" aria-label={`${i + 1} / ${slides.length}`}>
+          <p class="eyebrow eyebrow-light">{s.eyebrow}</p>
+          {i === 0 ? <h1 class="text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl lg:text-6xl">{s.title}</h1>
+                   : <p class="text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl lg:text-6xl">{s.title}</p>}
+          <p class="mt-5 max-w-xl text-lg text-brand-100 sm:text-xl">{s.text}</p>
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a class="btn btn-light" href={s.cta[1]} tabindex={i ? -1 : undefined}>{s.cta[0]} <Icon name="arrowCircle" /></a>
+            <button class="btn btn-outline-light" type="button" data-open-chat tabindex={i ? -1 : undefined}><Icon name="chat" /> Hỏi MIO</button>
+          </div>
+        </div>
+      ))}
+      <div class="absolute bottom-24 left-4 flex gap-2 sm:left-6 lg:left-8" role="tablist" aria-label="Chọn slide">
+        {slides.map((_, i) => (
+          <button type="button" data-dot={i} aria-label={`Slide ${i + 1}`} aria-selected={i === 0 ? 'true' : 'false'} role="tab"
+            class="h-1.5 w-8 rounded-full bg-white/35 transition-all duration-500 aria-selected:w-14 aria-selected:bg-white"></button>
+        ))}
+      </div>
+    </div>
+    <ul class="relative border-t border-white/10 bg-brand-900/40 backdrop-blur-sm">
+      <div class="container-x grid grid-cols-2 gap-x-4 gap-y-3 py-5 text-sm sm:text-base lg:grid-cols-4">
+        {trust.map(([ic, t]) => (
+          <li class="flex items-center gap-3"><span class="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/40"><Icon name={ic} class="size-5" /></span>{t}</li>
+        ))}
+      </div>
+    </ul>
+  </section>
+
+  <!-- STORY -->
+  <section class="section">
+    <div class="container-x grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div data-reveal>
+        <p class="eyebrow">Câu chuyện VIO GREEN</p>
+        <h2 class="h-display">Khi sống xanh trở nên dễ dàng hơn</h2>
+        <div class="mt-5 space-y-4 text-muted sm:text-lg">
+          <p>Cuộc sống đô thị ngày càng bận rộn, nhưng nhu cầu kết nối với thiên nhiên vẫn luôn hiện hữu.</p>
+          <p>VIO GREEN tin rằng một không gian xanh không nên trở thành một nhiệm vụ khiến con người thêm áp lực.</p>
+          <p>Từ đó, VIO GREEN được hình thành với định hướng kết nối <strong class="text-brand">công nghệ – con người – thiên nhiên</strong>, tạo ra những giải pháp giúp mọi người dễ dàng đưa cây xanh vào cuộc sống và duy trì chúng lâu dài.</p>
+        </div>
+        <a class="btn btn-primary mt-8" href="/gioi-thieu/">Khám phá ngay <Icon name="arrowCircle" /></a>
+      </div>
+      <div class="breath shadow-soft" data-reveal style="--d:120ms"><Ph title="Không gian xanh đô thị" ratio="4/3" /></div>
+    </div>
+  </section>
+
+  <!-- PAINS -->
+  <section class="section bg-cream">
+    <div class="container-x">
+      <SectionHead eyebrow="Bạn có đang gặp?" title="Bạn yêu cây xanh. Nhưng không phải lúc nào cũng có thời gian." />
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {pains.map(([ic, t, d], i) => (
+          <div class="text-center" data-reveal style={`--d:${i * 80}ms`}>
+            <span class="sq-ic mx-auto"><Icon name={ic} /></span>
+            <h3 class="mt-4 text-lg font-bold">{t}</h3>
+            <p class="mt-2 text-sm text-muted">{d}</p>
+          </div>
+        ))}
+      </div>
+      <p class="mt-12 text-center text-lg font-bold text-brand sm:text-xl" data-reveal>VIO GREEN giúp bạn đơn giản hóa tất cả những điều đó.</p>
+    </div>
+  </section>
+
+  <!-- ECOSYSTEM -->
+  <section class="section bg-brand text-white">
+    <div class="container-x grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div class="breath" data-reveal><Ph title="Ảnh tách lớp sản phẩm ECOHUB" ratio="16/11" dark /></div>
+      <div data-reveal style="--d:120ms">
+        <p class="eyebrow eyebrow-light">Hệ sinh thái ECOHUB</p>
+        <h2 class="h-display">Một hệ sinh thái thông minh cho không gian xanh đô thị</h2>
+        <p class="mt-5 text-lg font-semibold text-leaf">Bạn yêu cây xanh nhưng không có đủ thời gian để chăm sóc mỗi ngày?</p>
+        <div class="mt-4 space-y-4 text-brand-100">
+          <p>VIO GREEN ECOHUB được phát triển để giải quyết những khó khăn phổ biến của người đô thị: thiếu thời gian, thiếu kiến thức chăm cây, không gian hạn chế và sự bất tiện về nguồn điện.</p>
+          <p>ECOHUB kết hợp tưới tự động, quản lý dinh dưỡng, cảm biến IoT, ứng dụng giám sát và năng lượng mặt trời trong một hệ thống nhỏ gọn, giúp người dùng chủ động duy trì không gian xanh mà không phải phụ thuộc hoàn toàn vào thao tác thủ công.</p>
+        </div>
+        <a class="link-arrow mt-6 text-white" href="/san-pham/#ecohub">Khám phá cách ECOHUB hoạt động <Icon name="arrowRight" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="section">
+    <div class="container-x">
+      <SectionHead eyebrow="Lý do lựa chọn" title="Tại sao chọn VIO GREEN?" />
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {whys.map(([ic, t, d], i) => (
+          <article class="card card-hover flex flex-col items-center p-6 text-center" data-reveal style={`--d:${i * 90}ms`}>
+            <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold tracking-widest text-brand">0{i + 1}</span>
+            <span class="mt-5 text-brand"><Icon name={ic} class="size-10 stroke-[1.5]" /></span>
+            <h3 class="mt-4 text-lg font-bold">{t}</h3>
+            <p class="mt-2 text-sm text-muted">{d}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ONE SYSTEM -->
+  <section class="section bg-cream">
+    <div class="container-x grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
+      <h2 class="text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl" data-reveal>Một hệ thống<br /><span class="text-brand">Nhiều cách sống xanh.</span></h2>
+      <div data-reveal style="--d:120ms">
+        <p class="text-lg text-muted">ECOHUB tích hợp IoT, bình nước &amp; dinh dưỡng, năng lượng mặt trời, pin dự phòng, Web App và AI trong một hệ thống nhỏ gọn, giúp tự động chăm sóc và theo dõi cây dễ dàng hơn mỗi ngày.</p>
+        <a class="link-arrow mt-5" href="/san-pham/#ecohub">Khám phá cách ECOHUB hoạt động <Icon name="arrowRight" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED -->
+  <section class="section">
+    <div class="container-x">
+      <SectionHead eyebrow="Sản phẩm" title="Các dòng ECOHUB" sub="Chọn theo diện tích, nguồn điện và nguồn nước của không gian bạn." />
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {inCategory('ecohub').slice(0, 3).map((p, i) => <ProductCard p={p} delay={i * 80} />)}
+      </div>
+      <div class="mt-10 text-center"><a class="btn btn-outline" href="/san-pham/">Xem tất cả sản phẩm <Icon name="arrowRight" /></a></div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section bg-cream" id="tu-van">
+    <div class="container-x grid items-center gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+      <div class="breath hidden shadow-soft lg:block" data-reveal><Ph title="Tư vấn giải pháp xanh" ratio="1/1" /></div>
+      <div data-reveal style="--d:120ms">
+        <p class="eyebrow">Tư vấn miễn phí</p>
+        <h2 class="h-display text-brand">Bạn muốn tìm hiểu ECOHUB?</h2>
+        <p class="mt-3 mb-7 text-muted">Hãy liên hệ với VIO GREEN để được tư vấn về sản phẩm, cách bố trí và giải pháp phù hợp với không gian của bạn.</p>
+        <ContactForm source="Trang chủ" compact />
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <div class="container-x grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+      <div class="lg:sticky lg:top-40 lg:self-start" data-reveal>
+        <h2 class="text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl">Câu hỏi nhỏ.<br /><span class="text-brand">Yên tâm lớn.</span></h2>
+        <p class="mt-5 text-muted sm:text-lg">Chúng tôi tin một sản phẩm tốt nên bắt đầu bằng sự rõ ràng. Nếu bạn chưa tìm thấy câu trả lời, hãy để lại thông tin để được tư vấn.</p>
+        <button class="link-arrow mt-6 text-lg" type="button" data-open-chat>Nói chuyện với VIO GREEN <Icon name="arrowRight" /></button>
+      </div>
+      <div class="divide-y divide-line border-y border-line">
+        {faq.map((f, i) => (
+          <details class="group py-1" data-reveal style={`--d:${i * 60}ms`} open={i === 0}>
+            <summary class="flex cursor-pointer list-none items-start gap-4 py-4 [&::-webkit-details-marker]:hidden">
+              <span class="pt-0.5 text-sm font-bold text-brand-400">0{i + 1}</span>
+              <span class="flex-1 text-base font-semibold sm:text-lg">{f.q}</span>
+              <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand transition-transform duration-300 group-open:rotate-180"><Icon name="chevronDown" class="size-4" /></span>
+            </summary>
+            <p class="pr-12 pb-5 pl-9 text-muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

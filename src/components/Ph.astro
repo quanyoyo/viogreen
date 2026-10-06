@@ -1,0 +1,11 @@
+---
+// Khung ảnh tạm (đến khi có ảnh thật)
+import Icon from './Icon.astro';
+interface Props { title?: string; label?: string; ratio?: string; dark?: boolean; class?: string }
+const { title = '', label = 'Ảnh đang cập nhật', ratio = '4/3', dark = false, class: cls = '' } = Astro.props;
+---
+<div class:list={['ph', dark && 'ph-dark', cls]} style={`aspect-ratio:${ratio}`} role="img" aria-label={title || label || 'Ảnh minh họa'}>
+  <span class="relative inline-flex size-12 items-center justify-center rounded-full bg-white/70 text-brand shadow-sm"><Icon name="leaf" class="size-6" /></span>
+  {title && <strong class="relative text-base font-bold sm:text-lg">{title}</strong>}
+  {label && <span class="relative text-xs opacity-70">{label}</span>}
+</div>

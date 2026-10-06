@@ -7,13 +7,10 @@ import { site, telHref } from '../data/site';
   <a href={telHref} aria-label={`Gọi ${site.phone}`} class="relative inline-flex size-12 items-center justify-center rounded-full bg-white text-brand shadow-lift ring-1 ring-line transition-transform hover:scale-105 sm:hidden">
     <Icon name="phone" class="size-5" />
   </a>
-  <button type="button" data-open-chat aria-label="Mở trợ lý MIO" class="group relative inline-flex items-center gap-3 rounded-full bg-brand py-2 pr-2 pl-2 text-white shadow-lift transition-all duration-300 hover:bg-brand-700 sm:pr-5">
-    <span aria-hidden="true" class="absolute inset-0 animate-pulse-ring rounded-full bg-brand/60"></span>
-    <span class="relative inline-flex size-14 items-center justify-center rounded-full bg-white">
-      <img src={site.mio.head} alt="" width="56" height="56" class="size-14 rounded-full object-cover" />
-      <span class="absolute right-0.5 bottom-0.5 size-3 rounded-full border-2 border-white bg-leaf"></span>
-    </span>
-    <span class="relative hidden text-sm font-semibold sm:inline">MIO giúp gì cho bạn?</span>
+  <!-- MIO đứng toàn thân, nhún nhẹ; bấm vào mở khung chat -->
+  <button type="button" data-open-chat aria-label="Mở trợ lý MIO" title="Chat với MIO" class="group relative -mb-1 block rounded-3xl pb-2 transition-transform duration-300 ease-(--ease-soft) hover:-translate-y-1">
+    <span aria-hidden="true" class="absolute bottom-0.5 left-1/2 h-3 w-3/5 -translate-x-1/2 animate-mio-shadow rounded-[50%] bg-ink/30 blur-[3px]"></span>
+    <img src={site.mio.stand} alt="" width="231" height="280" class="relative h-28 w-auto animate-mio-float drop-shadow-[0_8px_12px_rgb(53_94_59/0.3)] sm:h-36" />
   </button>
 </div>
 

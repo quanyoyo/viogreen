@@ -11,8 +11,8 @@ export const site = {
   // Logo: file trong public/assets/. Để '' thì web dùng logo chữ tạm.
   // (Logo hiện tại lấy từ Figma, độ phân giải thấp — thay bằng file PNG/SVG gốc khi có)
   logo: '/assets/logo.png',
-  // Linh vật chatbot MIO (đã tách nền). head = ảnh vuông cho nút chat / avatar.
-  mio: { head: '/assets/mio-head-128.webp', full: '/assets/mio.webp' },
+  // Linh vật chatbot MIO (đã tách nền). stand = toàn thân cỡ nhỏ cho nút chat nổi; head = avatar trong khung chat.
+  mio: { stand: '/assets/mio-stand.webp', head: '/assets/mio-head-128.webp', full: '/assets/mio.webp' },
 
   // ---- Thông tin liên hệ (TẠM – chờ khách xác nhận) ----
   phone: '035 717 0062',

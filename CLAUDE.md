@@ -117,8 +117,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 
 ## 8. Việc tiếp theo (theo thứ tự ưu tiên)
 
-1. **Deploy bản xem thử** lên Cloudflare Pages (`*.pages.dev`). Chủ web cần có tài khoản GitHub và Cloudflare.
-   - **Xong khi:** có link chạy được và mọi trang trả về 200.
+1. ~~**Deploy bản xem thử**~~ **Xong 06/10/2026:** https://viogreen.pages.dev (Cloudflare Pages, repo `github.com/quanyoyo/viogreen`, nhánh `main` – push là tự build). Đã kiểm tra 28 trang + asset trả về 200, trang lạ trả 404, canonical đúng.
 2. **Kết nối Google Sheet:** tạo Sheet, deploy `apps-script/Code.gs`, dán URL vào `site.ts → formEndpoint`.
    - **Xong khi:** gửi thử 1 đơn, 1 liên hệ, 1 đăng ký nhận tin và đều có dòng mới trong Sheet kèm email báo.
 3. ~~**Ảnh MIO**~~ **Xong 06/10/2026:** đã tách nền, có `public/assets/mio.webp` (toàn thân), `mio-head-128.webp` (nút nổi + avatar chat), `mio-head-512.png` (bản gốc đầu), `favicon-48.png`, `apple-touch-icon.png`. Đường dẫn khai báo ở `site.mio`. `favicon.svg` cũ không còn dùng.

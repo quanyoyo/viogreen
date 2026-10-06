@@ -14,7 +14,7 @@ Bản đầy đủ (kèm logo PNG, package-lock) nằm trong file zip `viogreen-
 - Logo thật lấy từ Figma (135px, độ phân giải thấp – cần file gốc).
 
 ## Còn chờ / bước tiếp
-- Deploy bản xem thử lên Cloudflare Pages (cần GitHub + Cloudflare của chủ web) – hướng dẫn trong README.md.
+- ✅ Deploy (06/10/2026): https://viogreen.pages.dev – repo github.com/quanyoyo/viogreen, push `main` là Cloudflare tự build.
 - Tạo Google Sheet + dán URL Apps Script vào `src/data/site.ts`.
 - Chờ khách: giá, ảnh SP, file 3D, logo gốc, thông tin liên hệ chính thức, link mạng xã hội.
 - ✅ Ảnh MIO (06/10/2026): đã thay vào nút chat, avatar chat, favicon (`site.mio`).

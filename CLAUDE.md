@@ -112,7 +112,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Đăng nhập, Tài khoản, Quản trị (Firebase – chủ web đã test: đặt đơn, liên hệ, lead, phân quyền OK)
 - **Hiệu ứng:** đủ theo mục 5. Carousel hero tự chạy, vuốt được, có chấm chuyển slide.
 - **Giỏ hàng:** lưu localStorage, có biến thể và số lượng, nhớ thông tin khách.
-- **Đặt hàng:** chọn thanh toán **COD (giao qua SPX Express)** hoặc **Chuyển khoản** → lưu `paymentMethod` (`cod`/`bank`) vào đơn. Chọn chuyển khoản thì trang thành công (`?tt=bank`) hiện QR + Techcombank / STK / chủ TK / nội dung = mã đơn, nút sao chép. Thông tin ngân hàng ở `site.payment`. QR `public/assets/qr-chuyen-khoan.png` **chưa có file** → trang tự ẩn QR (kiểm tra lúc build). Phương thức thanh toán hiện ở `/tai-khoan/` và `/quan-tri/`.
+- **Đặt hàng:** chọn thanh toán **COD (giao qua SPX Express)** hoặc **Chuyển khoản** → lưu `paymentMethod` (`cod`/`bank`) vào đơn. Chọn chuyển khoản thì trang thành công (`?tt=bank`) hiện QR + Techcombank / STK / chủ TK / nội dung = mã đơn, nút sao chép. Thông tin ngân hàng ở `site.payment`. QR: `public/assets/qr-chuyen-khoan.webp` (cắt từ ảnh gốc `qr-chuyen-khoan.jpg` khách gửi; thiếu file thì trang tự ẩn QR). Phương thức thanh toán hiện ở `/tai-khoan/` và `/quan-tri/`.
 - **Form:** gửi vào Firestore (xem mục 8 bước 2).
 - **Liên hệ & MXH:** email `viogreen102@gmail.com` (cả chính sách bảo mật qua `{{email}}`); Facebook, TikTok `@viogreen.vn`, YouTube `@VIOGREEN-vn`, Shopee có link; Messenger, Zalo, Instagram hiện icon mờ chưa có link.
 - **AR:** modal với `<model-viewer>`. **Chưa gắn file 3D** (`public/models/` trống).
@@ -134,9 +134,9 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
    - ✅ **2a–2d xong và đã chạy thật (07/10/2026):** project `viogreen-44a7f`; `firestore.rules` đã publish; Auth Google + Email/Password đã bật; đã có admin; chủ web test đặt đơn / liên hệ / lead / phân quyền OK; Claude đặt thêm 1 đơn thật trên web sau khi push (`VG-261007-C7GX`, tên "TEST Claude").
    - **Mỗi lần sửa `firestore.rules`:** báo chủ web dán lại vào Console → Publish **trước khi push** code dùng trường mới. Viết rule tương thích cả bản web cũ lẫn mới (trường mới để tuỳ chọn).
 3. ~~**Ảnh MIO**~~ **Xong 06–07/10/2026:** đã tách nền. Trong `public/assets/`: `mio.webp` (toàn thân 640px), `mio-stand.webp` (toàn thân 280px – nút chat nổi), `mio-head-128.webp` (avatar trong khung chat), `mio-head-512.png` (bản gốc phần đầu). Favicon: `public/favicon-48.png`, `apple-touch-icon.png` (đầu MIO). Đường dẫn khai báo ở `site.mio`. `favicon.svg` cũ không còn dùng.
-4. **AR:** gắn file trong `public/models/` vào `products.ts` (`model: { glb, usdz }`). Chờ khách gửi file + cho biết file nào ứng với model nào; thiếu `.usdz` thì iPhone không xem AR được – hỏi trước khi gắn.
+4. **AR:** `npm run models` (`scripts/stl-to-glb.mjs`) chuyển STL trong `models-src/` → GLB trong `public/models/`: mm→m, Z-up→Y-up, căn giữa + đáy chạm sàn, chất liệu theo `models-src/models.json` (`parts`: tên file STL → chất liệu), giảm đa giác khi vượt `maxTriangles`, nén meshopt, kiểm tra < 5MB. `ar.ts` khai báo bộ giải nén meshopt cho model-viewer. Chỉ cần `glb` (model-viewer tự tạo USDZ cho iPhone). **Hiện có:** 12 STL = các bộ phận của **1 máy** bản Sol (54×40×75,6 cm, tấm pin trên cột) → `public/models/ecohub-mau.glb` (466 KB, chưa commit, chưa gắn). **Chờ khách xác nhận** máy này là model nào trước khi đổi tên + gắn vào `products.ts`.
 5. ~~**Hero trang chủ 3 slide**~~ **Xong 07/10/2026** (`src/pages/index.astro` → `slides`): (1) máy trong góc xanh – "Smart Care for Urban Green Spaces", (2) điện thoại app + máy, nền tối kiểu techno – "Giám sát mọi lúc qua app", (3) tay chạm vào máy – "Chạm để chăm sóc". Chữ lấy từ nội dung sẵn có, không thêm thông số. Ảnh: đang là ảnh tạm (nhãn "Ảnh tạm" + mô tả ảnh cần chụp); có ảnh thật thì đặt vào `public/assets/` và điền `img.src`. Bố cục tham khảo hikari-mansion.com, smarthomesjapan.com, samsung.com/vn/smartthings (chữ trái – ảnh lớn phải; mobile ảnh dưới chữ).
-6. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc, QR chuyển khoản. Chỉ sửa trong `src/data/` và `public/`.
+6. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc. Chỉ sửa trong `src/data/` và `public/`.
 7. **Khi có tên miền:** đổi `site` trong `astro.config.mjs`, thêm `@astrojs/sitemap`, gắn Custom domain trên Cloudflare, thêm tên miền vào Firebase Auth → Authorized domains.
 8. **Việc treo (chủ web / Claude làm khi được yêu cầu):**
    - Đổi **Firebase support email** (Auth → Google provider; Project settings) sang `viogreen102@gmail.com` – chủ web làm trong Console.
@@ -159,7 +159,6 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Model nào có cảm biến / kết nối app
   - Link Shopee **từng sản phẩm** (hiện nút "Mua trên Shopee" trỏ về trang shop)
 - **Thanh toán:**
-  - Ảnh **QR chuyển khoản** → `public/assets/qr-chuyen-khoan.png`
   - Thời hạn bảo hành tiêu chuẩn
   - Email/Zalo nhận thông báo đơn (cho bước email báo đơn)
 - **Thông tin doanh nghiệp:**

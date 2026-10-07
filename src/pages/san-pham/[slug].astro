@@ -96,6 +96,11 @@ const jsonLd = {
         <div class="mt-7 grid gap-3 sm:grid-cols-2">
           <button class="btn btn-dark" type="button" data-add-cart={p.slug} data-with-qty><Icon name="cart" /> Thêm vào giỏ hàng</button>
           <button class="btn btn-accent" type="button" data-buy-now={p.slug}>Mua ngay</button>
+          {site.social.shopee && (
+            <a class="btn bg-[#ee4d2d] text-white hover:-translate-y-0.5 hover:brightness-110 sm:col-span-2" href={site.social.shopee} target="_blank" rel="noopener">
+              <Icon name="shopee" /> Mua trên Shopee
+            </a>
+          )}
         </div>
         <p class="mt-5 flex flex-wrap items-center gap-1.5 text-sm text-muted">
           <Icon name="help" class="size-4 text-brand" /> Cần tư vấn chọn cấu hình?

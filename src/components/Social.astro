@@ -4,8 +4,8 @@ import Icon from './Icon.astro';
 interface Props { variant?: 'soft' | 'light' }
 const { variant = 'soft' } = Astro.props;
 const list = [
-  ['facebook', 'Facebook'], ['tiktok', 'TikTok'], ['messenger', 'Messenger'],
-  ['instagram', 'Instagram'], ['zalo', 'Zalo'], ['youtube', 'YouTube'],
+  ['facebook', 'Facebook'], ['tiktok', 'TikTok'], ['youtube', 'YouTube'], ['shopee', 'Shopee'],
+  ['messenger', 'Messenger'], ['zalo', 'Zalo'], ['instagram', 'Instagram'],
 ] as const;
 const base = variant === 'light'
   ? 'bg-white/10 text-white hover:bg-white hover:text-brand'

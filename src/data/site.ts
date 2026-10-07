@@ -16,7 +16,7 @@ export const site = {
 
   // ---- Thông tin liên hệ (TẠM – chờ khách xác nhận) ----
   phone: '035 717 0062',
-  email: 'viogreen@gmail.com',
+  email: 'viogreen102@gmail.com',
   address: 'Số 9, Ngõ 45, Hạ Bằng, Thạch Thất, TP Hà Nội',
   hours: 'Thứ 2 – Thứ 7: 8h00 – 16h55',
   // Giờ làm việc cho chatbot (giờ Việt Nam). day: 1 = Thứ 2 … 6 = Thứ 7
@@ -27,11 +27,12 @@ export const site = {
   // ---- Mạng xã hội: để '' = icon vẫn hiện nhưng chưa có link ----
   social: {
     facebook: 'https://www.facebook.com/profile.php?id=61594287003144',
-    tiktok: '',
+    tiktok: 'https://www.tiktok.com/@viogreen.vn',
+    youtube: 'https://www.youtube.com/@VIOGREEN-vn',
+    shopee: 'https://shopee.vn/shop/1739793835', // cũng dùng cho nút "Mua trên Shopee" ở trang chi tiết SP
     messenger: '',
-    instagram: '',
     zalo: '', // ví dụ 'https://zalo.me/0357170062'
-    youtube: '',
+    instagram: '',
   } as Record<string, string>,
 
   // ---- Firebase (đơn hàng, liên hệ, tài khoản khách) ----

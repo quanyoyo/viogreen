@@ -98,21 +98,24 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Dinh dưỡng (2)
   - VIO-Care (2)
 - **Bộ lọc ECOHUB:** diện tích (`<10` / `10-20`), nguồn điện (`solar` / `grid`), nguồn nước (`tank` / `direct`).
+- **Thanh toán:** `paymentMethod` = `cod` | `bank` (đơn trước 07/10/2026 không có → hiển thị "—"). Nhãn hiển thị ở `order-view.ts → PAYMENT_LABEL`.
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
 ## 7. Trạng thái (cập nhật 07/10/2026)
 
-**Đã xong:** 32 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop.
+**Đã xong:** 32 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop. Đang chạy thật ở https://viogreen.pages.dev.
 
 - **Trang:**
   - Trang chủ, Sản phẩm (nhóm, bộ lọc, tìm kiếm `?q=` không dấu)
-  - 16 trang chi tiết, Giỏ hàng, Đặt hàng, Đặt hàng thành công
+  - 16 trang chi tiết (có nút **Mua trên Shopee** → `site.social.shopee`), Giỏ hàng, Đặt hàng, Đặt hàng thành công
   - Giới thiệu, AR, Liên hệ, 4 chính sách, 404
-  - Đăng nhập, Tài khoản, Quản trị (Firebase – code xong, chưa test thật)
+  - Đăng nhập, Tài khoản, Quản trị (Firebase – chủ web đã test: đặt đơn, liên hệ, lead, phân quyền OK)
 - **Hiệu ứng:** đủ theo mục 5. Carousel hero tự chạy, vuốt được, có chấm chuyển slide.
 - **Giỏ hàng:** lưu localStorage, có biến thể và số lượng, nhớ thông tin khách.
+- **Đặt hàng:** chọn thanh toán **COD (giao qua SPX Express)** hoặc **Chuyển khoản** → lưu `paymentMethod` (`cod`/`bank`) vào đơn. Chọn chuyển khoản thì trang thành công (`?tt=bank`) hiện QR + Techcombank / STK / chủ TK / nội dung = mã đơn, nút sao chép. Thông tin ngân hàng ở `site.payment`. QR `public/assets/qr-chuyen-khoan.png` **chưa có file** → trang tự ẩn QR (kiểm tra lúc build). Phương thức thanh toán hiện ở `/tai-khoan/` và `/quan-tri/`.
 - **Form:** gửi vào Firestore (xem mục 8 bước 2).
-- **AR:** modal với `<model-viewer>`.
+- **Liên hệ & MXH:** email `viogreen102@gmail.com` (cả chính sách bảo mật qua `{{email}}`); Facebook, TikTok `@viogreen.vn`, YouTube `@VIOGREEN-vn`, Shopee có link; Messenger, Zalo, Instagram hiện icon mờ chưa có link.
+- **AR:** modal với `<model-viewer>`. **Chưa gắn file 3D** (`public/models/` trống).
 - **Chatbot MIO v1:**
   - Nút gợi ý: Tư vấn chọn máy, Phụ kiện, Giao hàng, Đổi trả, Bảo hành, Gặp nhân viên
   - Tư vấn chọn máy qua 3 câu hỏi
@@ -124,27 +127,27 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 ## 8. Việc tiếp theo (theo thứ tự ưu tiên)
 
 1. ~~**Deploy bản xem thử**~~ **Xong 06/10/2026:** https://viogreen.pages.dev (Cloudflare Pages, repo `github.com/quanyoyo/viogreen`, nhánh `main` – push là tự build). Đã kiểm tra 28 trang + asset trả về 200, trang lạ trả 404, canonical đúng.
-2. **Chuyển sang Firebase** (thay cho Google Sheet; quyết định 06/10/2026). Lựa chọn đã chốt:
+2. **Firebase** (thay cho Google Sheet; quyết định 06/10/2026). Lựa chọn đã chốt:
    - Đăng nhập: **Google + Email/mật khẩu** (không dùng SMS OTP). Đăng nhập là **tuỳ chọn** – khách vẫn đặt hàng không cần tài khoản.
    - Lịch sử đơn: đơn có `uid` nếu đặt khi đã đăng nhập; đơn khách vãng lai hiện trong lịch sử nếu **email đơn = email đã xác minh** của tài khoản.
    - Nhân viên xử lý đơn ở trang **`/quan-tri/`** (chỉ tài khoản có trong `admins/{uid}`), đổi trạng thái: Mới → Đã xác nhận → Đang giao → Hoàn tất / Đã huỷ.
-   - **Email tự động** báo đơn mới qua Cloud Function (gói Blaze).
-   - Các giai đoạn:
-     - ✅ **2a.** Project `viogreen-44a7f` đã tạo, config đã lưu ở `site.ts → firebase` (`projectId` rỗng = chế độ thử).
-     - ✅ **2b (code).** `firestore.rules`: `orders` (tạo: ai cũng được, kiểm tra dữ liệu; đọc: chủ đơn theo uid/email đã xác minh, hoặc admin; sửa trạng thái: admin), `leads` (chỉ tạo; admin đọc/sửa trạng thái), `users/{uid}`, `admins/{uid}` (chỉ sửa trong Console). **Chờ chủ web dán rules vào Console.** Chưa làm: App Check chống spam (cần đăng ký reCAPTCHA).
-     - ✅ **2c (code).** `forms.ts` ghi Firestore; `/dang-nhap/` (Google, email, quên mật khẩu), `/tai-khoan/` (lịch sử + trạng thái đơn, hồ sơ giao hàng, xác minh email); icon tài khoản ở Header; trang đặt hàng điền sẵn khi đã đăng nhập. Đã gỡ `apps-script/`.
-     - ✅ **2d (code).** `/quan-tri/`: đơn realtime, lọc + đổi trạng thái, tab liên hệ/lead; tài khoản chưa có quyền thì hiện UID để thêm vào `admins`.
-     - **Chưa test thật** đăng nhập / ghi đơn trên Firebase: cần rules đã publish + chủ web đăng nhập thử.
-     - **Chưa push** các commit Firebase/MIO lên `main`: phải đợi chủ web publish `firestore.rules` trước (Firestore đang Production mode = chặn ghi → push sớm thì đơn trên web thật bị lỗi).
-     - **2e.** Cloud Function `onOrderCreated` gửi email cho nhân viên (cần email nhận + tài khoản gửi SMTP do chủ web cung cấp).
-     - **2f.** Cập nhật Chính sách bảo mật theo cách lưu dữ liệu mới (Nghị định 13/2023) – nội dung cần khách duyệt.
-   - **Xong khi:** đặt thử đơn khi chưa đăng nhập và khi đã đăng nhập → đơn hiện ở `/quan-tri/` và `/tai-khoan/`, nhân viên nhận email, khách không đọc được đơn người khác.
+   - ✅ **2a–2d xong và đã chạy thật (07/10/2026):** project `viogreen-44a7f`; `firestore.rules` đã publish; Auth Google + Email/Password đã bật; đã có admin; chủ web test đặt đơn / liên hệ / lead / phân quyền OK; Claude đặt thêm 1 đơn thật trên web sau khi push (`VG-261007-C7GX`, tên "TEST Claude").
+   - **Mỗi lần sửa `firestore.rules`:** báo chủ web dán lại vào Console → Publish **trước khi push** code dùng trường mới. Viết rule tương thích cả bản web cũ lẫn mới (trường mới để tuỳ chọn).
 3. ~~**Ảnh MIO**~~ **Xong 06–07/10/2026:** đã tách nền. Trong `public/assets/`: `mio.webp` (toàn thân 640px), `mio-stand.webp` (toàn thân 280px – nút chat nổi), `mio-head-128.webp` (avatar trong khung chat), `mio-head-512.png` (bản gốc phần đầu). Favicon: `public/favicon-48.png`, `apple-touch-icon.png` (đầu MIO). Đường dẫn khai báo ở `site.mio`. `favicon.svg` cũ không còn dùng.
-4. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc, liên hệ, mạng xã hội. Chỉ sửa trong `src/data/` và `public/`.
-5. **Khi có tên miền:** đổi `site` trong `astro.config.mjs`, thêm `@astrojs/sitemap`, gắn Custom domain trên Cloudflare.
-6. **Sau v1 (chỉ làm khi được yêu cầu):**
+4. **AR:** gắn file trong `public/models/` vào `products.ts` (`model: { glb, usdz }`). Chờ khách gửi file + cho biết file nào ứng với model nào; thiếu `.usdz` thì iPhone không xem AR được – hỏi trước khi gắn.
+5. **Hero trang chủ 3 slide** theo mục "Trang ảnh đầu" trong `Thông tin làm web.docx` (máy trong góc xanh / điện thoại app + máy / tay chạm vào máy), ảnh tạm ghi rõ nội dung cần chụp. **Chờ nội dung chữ** của mục này (Claude Code không đọc được file trong Claude Project – cần dán vào chat hoặc chép docx vào repo).
+6. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc, QR chuyển khoản. Chỉ sửa trong `src/data/` và `public/`.
+7. **Khi có tên miền:** đổi `site` trong `astro.config.mjs`, thêm `@astrojs/sitemap`, gắn Custom domain trên Cloudflare, thêm tên miền vào Firebase Auth → Authorized domains.
+8. **Việc treo (chủ web / Claude làm khi được yêu cầu):**
+   - Đổi **Firebase support email** (Auth → Google provider; Project settings) sang `viogreen102@gmail.com` – chủ web làm trong Console.
+   - **Xoá đơn test** trong Firestore `orders` (đơn tên "TEST…", gồm `VG-261007-C7GX`) – chủ web xoá trong Console (rules chặn xoá từ web).
+   - **App Check** chống spam form (đăng ký reCAPTCHA Enterprise / v3, bật enforce cho Firestore).
+   - **Email báo đơn mới:** Cloud Function `onOrderCreated` (cần nâng gói **Blaze** + đặt Budget alert, email nhận + tài khoản gửi SMTP).
+   - **Chính sách bảo mật** cập nhật theo cách lưu dữ liệu mới (Firebase, tài khoản khách; Nghị định 13/2023) – nội dung cần khách duyệt.
+   - **Bàn giao tài khoản:** Firebase (thêm chủ web làm Owner), Cloudflare Pages + GitHub repo, tên miền – chuyển quyền sở hữu sang tài khoản của chủ web.
+9. **Sau v1 (chỉ làm khi được yêu cầu):**
    - Chatbot AI v2: Cloudflare Worker, trả lời chỉ dựa trên `chatbot-kb.ts`, `faq.ts`, `products.ts` và chính sách
-   - Thanh toán VNPay/MoMo
+   - Thanh toán online VNPay/MoMo
    - Web App 360×640 (chờ quyền Figma)
 
 ## 9. Chờ khách (không tự điền)
@@ -154,17 +157,19 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Số gói trong Bio-Nutri Multi-Pack
   - Thông số kỹ thuật từng ECOHUB; phụ kiện **đi kèm** trong hộp từng model
   - Model nào có cảm biến / kết nối app
-- **Bảo hành và thanh toán:**
+  - Link Shopee **từng sản phẩm** (hiện nút "Mua trên Shopee" trỏ về trang shop)
+- **Thanh toán:**
+  - Ảnh **QR chuyển khoản** → `public/assets/qr-chuyen-khoan.png`
   - Thời hạn bảo hành tiêu chuẩn
-  - Thanh toán COD hay chuyển khoản, tài khoản nhận tiền
-  - Email/Zalo nhận thông báo đơn
+  - Email/Zalo nhận thông báo đơn (cho bước email báo đơn)
 - **Thông tin doanh nghiệp:**
-  - Email chính thức (doc ghi cả `cskh@viogreen.vn` và `viogreen@gmail.com`), tên miền
+  - Tên miền
   - Địa chỉ theo đơn vị hành chính mới
   - Tên công ty, MST
-- **Liên kết:** link TikTok, Instagram, Zalo, Messenger, YouTube (đang hiện icon chưa có link).
+- **Liên kết:** link Messenger, Zalo, Instagram (đang hiện icon mờ chưa có link).
 - **Nội dung 5 trang chưa có** (đang ẩn khỏi footer): Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
-- **Hình ảnh và file:** ảnh sản phẩm, file 3D (GLB + USDZ), logo gốc SVG/PNG, đánh giá khách hàng thật.
+- **Hình ảnh và file:** ảnh sản phẩm, ảnh 3 slide hero, file 3D (GLB + USDZ) kèm bảng file ↔ model, logo gốc SVG/PNG, đánh giá khách hàng thật.
+- **Nội dung chữ mục "Trang ảnh đầu"** trong `Thông tin làm web.docx` (bản mới).
 - **Ô trống trong bảng phí vận chuyển** (Figma để trống): hiện đang hiển thị "—".
 
 ## 10. Ghi chú

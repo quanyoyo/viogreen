@@ -119,6 +119,7 @@ $$<HTMLFormElement>('form[data-form]').forEach((form) => {
         name: data.name.trim(), phone: cleanPhone(data.phone), email: (data.email || '').trim().toLowerCase(),
         province: data.province.trim(), ward: data.ward.trim(), address: data.address.trim(),
         shipping: data.shipping || '', note: (data.note || '').trim(),
+        paymentMethod: (data.paymentMethod === 'bank' ? 'bank' : 'cod') as 'cod' | 'bank',
         items: lines.map((l) => ({ slug: l.slug, name: productBySlug[l.slug].shortName, variant: l.variant || '', qty: l.qty, price: productBySlug[l.slug].price ?? null })),
         totalQty: t.qty, total: t.sum, page: location.pathname,
       };
@@ -135,9 +136,10 @@ $$<HTMLFormElement>('form[data-form]').forEach((form) => {
             localStorage.setItem(SAVED, JSON.stringify({ name, phone, email, province, ward, address }));
           } else localStorage.removeItem(SAVED);
           sessionStorage.setItem('vg-last-order', id);
+          sessionStorage.setItem('vg-last-total', t.text);
         } catch { /* ignore */ }
         clearCart();
-        location.href = `/dat-hang-thanh-cong/?ma=${encodeURIComponent(id)}`;
+        location.href = `/dat-hang-thanh-cong/?ma=${encodeURIComponent(id)}&tt=${order.paymentMethod}`;
         return;
       }
     } else {

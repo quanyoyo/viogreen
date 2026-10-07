@@ -60,7 +60,7 @@ import { site, telHref } from '../../data/site';
 
   <script>
     import { currentUser, myOrders, getProfile, saveProfile, verifyEmail, logout, type Profile } from '../../scripts/fb';
-    import { esc, badge, fmtTime, itemsHtml, totalText } from '../../scripts/order-view';
+    import { esc, badge, fmtTime, itemsHtml, totalText, paymentText } from '../../scripts/order-view';
     import { $, toast } from '../../scripts/ui';
 
     async function main() {
@@ -97,7 +97,8 @@ import { site, telHref } from '../../data/site';
             <div class="space-y-3 border-t border-line p-5">
               ${itemsHtml(o)}
               <p class="text-sm"><span class="text-muted">Giao tới:</span> ${esc(o.name)} · ${esc(o.phone)}<br>${esc([o.address, o.ward, o.province].filter(Boolean).join(', '))}</p>
-              <p class="text-sm"><span class="text-muted">Hình thức:</span> ${esc(o.shipping)}</p>
+              <p class="text-sm"><span class="text-muted">Giao hàng:</span> ${esc(o.shipping)}</p>
+              <p class="text-sm"><span class="text-muted">Thanh toán:</span> ${esc(paymentText(o))}</p>
               ${o.note ? `<p class="text-sm"><span class="text-muted">Ghi chú:</span> ${esc(o.note)}</p>` : ''}
             </div>
           </details>`).join('');

@@ -44,7 +44,7 @@ import Icon from '../../components/Icon.astro';
 
   <script>
     import { currentUser, isAdmin, logout, watchOrders, watchLeads, setOrderStatus, setLeadStatus, ORDER_STATUS, LEAD_STATUS, type Order, type Lead } from '../../scripts/fb';
-    import { esc, badge, fmtTime, itemsHtml, totalText } from '../../scripts/order-view';
+    import { esc, badge, fmtTime, itemsHtml, totalText, paymentText } from '../../scripts/order-view';
     import { $, $$, toast } from '../../scripts/ui';
 
     const LEAD_TYPE: Record<string, string> = { contact: 'Liên hệ', newsletter: 'Nhận tin', 'chat-lead': 'Chatbot MIO' };
@@ -68,7 +68,7 @@ import Icon from '../../components/Icon.astro';
         <details class="card overflow-hidden"${o.status === 'Mới' ? ' open' : ''}>
           <summary class="flex cursor-pointer list-none flex-wrap items-center gap-x-4 gap-y-2 p-4">
             <div class="min-w-0 flex-1"><p class="font-bold">${esc(o.orderId)} · ${esc(o.name)}</p>
-              <p class="text-sm text-muted">${fmtTime(o.createdAt)} · ${o.totalQty} SP · ${o.uid ? 'Có tài khoản' : 'Khách vãng lai'}</p></div>
+              <p class="text-sm text-muted">${fmtTime(o.createdAt)} · ${o.totalQty} SP · ${o.paymentMethod === 'bank' ? 'Chuyển khoản' : o.paymentMethod === 'cod' ? 'COD' : 'Chưa chọn TT'} · ${o.uid ? 'Có tài khoản' : 'Khách vãng lai'}</p></div>
             <strong class="text-brand">${totalText(o)}</strong>${badge(o.status)}
           </summary>
           <div class="grid gap-5 border-t border-line p-4 md:grid-cols-2">
@@ -76,6 +76,7 @@ import Icon from '../../components/Icon.astro';
               <p><a class="font-semibold text-brand" href="tel:${esc(o.phone)}">${esc(o.phone)}</a>${o.email ? ` · <a class="text-brand" href="mailto:${esc(o.email)}">${esc(o.email)}</a>` : ''}</p>
               <p>${esc([o.address, o.ward, o.province].filter(Boolean).join(', '))}</p>
               <p><span class="text-muted">Giao hàng:</span> ${esc(o.shipping)}</p>
+              <p><span class="text-muted">Thanh toán:</span> <strong>${esc(paymentText(o))}</strong></p>
               ${o.note ? `<p><span class="text-muted">Ghi chú:</span> ${esc(o.note)}</p>` : ''}
               <label class="flex items-center gap-2 pt-2"><span class="text-muted">Trạng thái:</span>${statusSelect('order', o.orderId, o.status, ORDER_STATUS)}</label>
             </div>

@@ -53,12 +53,13 @@ import mouse from 'lucide-static/icons/mouse-pointer-click.svg?raw';
 import logout from 'lucide-static/icons/log-out.svg?raw';
 import lock from 'lucide-static/icons/lock.svg?raw';
 import copy from 'lucide-static/icons/copy.svg?raw';
+import wallet from 'lucide-static/icons/wallet.svg?raw';
 
 const lucide = {
   leaf, search, help, cart, menu, close, sparkles, chevronRight, chevronDown, phone, clock, pin, email,
   truck, warranty, exchange, support, ar, arrowCircle, arrowRight, arrowLeft, camera, bag, drop, solar,
   mobile, sprout, home, hourglass, maximize, settings, product, science, warning, minus, plus, info, box,
-  user, check, quote, layers, move, chat, send, refresh, tree, globe, trash, mouse, logout, lock, copy,
+  user, check, quote, layers, move, chat, send, refresh, tree, globe, trash, mouse, logout, lock, copy, wallet,
 };
 
 const brand = (path: string) =>

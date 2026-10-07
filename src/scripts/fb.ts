@@ -25,6 +25,7 @@ export interface OrderItem { slug: string; name: string; variant: string; qty: n
 export interface Order {
   orderId: string; uid: string | null; name: string; phone: string; email: string;
   province: string; ward: string; address: string; shipping: string; note: string;
+  paymentMethod?: 'cod' | 'bank'; // đơn cũ (trước 07/10/2026) không có trường này
   items: OrderItem[]; totalQty: number; total: number | null; status: string; page: string;
   createdAt?: Timestamp; staffNote?: string;
 }

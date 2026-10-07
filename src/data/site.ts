@@ -47,6 +47,16 @@ export const site = {
     appId: '1:1072915790565:web:891b4ce882e83a85ff720c',
   },
 
+  // ---- Thanh toán (trang đặt hàng + trang đặt hàng thành công) ----
+  payment: {
+    codCarrier: 'SPX Express',
+    bank: 'Techcombank',
+    account: '19070857077015', // số để sao chép
+    accountDisplay: '1907 0857 0770 15',
+    holder: 'NGUYEN THUY LINH',
+    qr: '/assets/qr-chuyen-khoan.png', // file trong public/; thiếu file thì trang tự ẩn QR
+  },
+
   // ---- Giá: chưa có giá thì hiển thị chữ này ----
   priceFallback: 'Liên hệ',
 };

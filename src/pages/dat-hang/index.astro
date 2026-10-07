@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { site } from '../../data/site';
 ---
 <BaseLayout title="Đặt hàng" noindex>
   <Breadcrumbs items={[['Giỏ hàng', '/gio-hang/'], ['Đặt hàng']]} />
@@ -52,10 +53,24 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
             <p class="mt-2 text-sm text-muted">Xem chi tiết tại <a href="/chinh-sach/van-chuyen/" class="text-brand underline">Chính sách vận chuyển</a>.</p>
           </fieldset>
 
+          <fieldset>
+            <legend class="mb-4 flex items-center gap-2 text-lg font-bold text-brand"><Icon name="wallet" class="size-5" /> Phương thức thanh toán</legend>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="card flex cursor-pointer gap-3 p-4 has-[:checked]:border-brand has-[:checked]:bg-brand-50">
+                <input type="radio" name="paymentMethod" value="cod" checked class="mt-1 size-4 accent-brand" />
+                <span><strong class="block">Thanh toán khi nhận hàng (COD)</strong><small class="text-muted">Giao qua {site.payment.codCarrier}, trả tiền cho người giao hàng</small></span>
+              </label>
+              <label class="card flex cursor-pointer gap-3 p-4 has-[:checked]:border-brand has-[:checked]:bg-brand-50">
+                <input type="radio" name="paymentMethod" value="bank" class="mt-1 size-4 accent-brand" />
+                <span><strong class="block">Chuyển khoản ngân hàng</strong><small class="text-muted">{site.payment.bank} – hiện mã QR và số tài khoản sau khi đặt hàng</small></span>
+              </label>
+            </div>
+          </fieldset>
+
           <label class="field">Ghi chú cho đơn hàng<textarea class="input min-h-24" name="note" rows="3" placeholder="Thời gian nhận hàng, yêu cầu lắp đặt…"></textarea></label>
           <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remember" value="1" class="size-4 accent-brand" /> Lưu thông tin cho lần đặt sau (chỉ trên trình duyệt này)</label>
 
-          <div class="flex gap-3 rounded-2xl bg-brand-50 p-4 text-sm"><Icon name="info" class="mt-0.5 size-5 shrink-0 text-brand" /><p><strong>Thanh toán:</strong> Sau khi nhận đơn, nhân viên VIO GREEN sẽ gọi xác nhận sản phẩm, phí vận chuyển và hình thức thanh toán phù hợp.</p></div>
+          <div class="flex gap-3 rounded-2xl bg-brand-50 p-4 text-sm"><Icon name="info" class="mt-0.5 size-5 shrink-0 text-brand" /><p><strong>Lưu ý:</strong> Sau khi nhận đơn, nhân viên VIO GREEN sẽ gọi xác nhận sản phẩm, phí vận chuyển và tổng tiền cần thanh toán.</p></div>
 
           <div>
             <button class="btn btn-primary w-full text-base" type="submit">Xác nhận đặt hàng <Icon name="check" /></button>

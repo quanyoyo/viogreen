@@ -20,6 +20,10 @@ export const badge = (status: string) =>
 
 export const totalText = (o: Order) => (o.total ? vnd(o.total) : 'Chờ báo giá');
 
+/** Nhãn phương thức thanh toán — khớp giá trị `paymentMethod` trong firestore.rules */
+export const PAYMENT_LABEL: Record<string, string> = { cod: 'COD – thanh toán khi nhận hàng', bank: 'Chuyển khoản' };
+export const paymentText = (o: Order) => (o.paymentMethod ? PAYMENT_LABEL[o.paymentMethod] ?? o.paymentMethod : '—');
+
 export const itemsHtml = (o: Order) => `<ul class="divide-y divide-line text-sm">${o.items.map((i) => `
   <li class="flex justify-between gap-3 py-2"><span>${esc(i.name)}${i.variant ? ` <span class="text-muted">(${esc(i.variant)})</span>` : ''} × ${i.qty}</span>
   <span class="shrink-0 text-muted">${i.price ? vnd(i.price * i.qty) : 'Liên hệ'}</span></li>`).join('')}</ul>`;

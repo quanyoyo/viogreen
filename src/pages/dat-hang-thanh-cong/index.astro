@@ -1,7 +1,11 @@
 ---
+import fs from 'node:fs';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import { site, telHref } from '../../data/site';
+const pay = site.payment;
+// Chỉ hiện QR khi đã có file ảnh trong public/
+const hasQr = fs.existsSync(`public${pay.qr}`);
 ---
 <BaseLayout title="Đặt hàng thành công" noindex>
   <section class="section">
@@ -9,7 +13,31 @@ import { site, telHref } from '../../data/site';
       <span class="mx-auto inline-flex size-20 items-center justify-center rounded-full bg-brand text-white shadow-lift"><Icon name="check" class="size-10" /></span>
       <h1 class="h-display mt-6">Đặt hàng thành công!</h1>
       <p class="mt-4 text-lg text-muted">Cảm ơn bạn đã tin chọn VIO GREEN. Mã đơn hàng của bạn là <strong class="text-ink" data-order-id>—</strong>.</p>
-      <p class="mt-2 text-muted">Nhân viên sẽ gọi cho bạn trong giờ làm việc ({site.hours}) để xác nhận đơn, phí vận chuyển và thanh toán.</p>
+      <p class="mt-2 text-muted">Nhân viên sẽ gọi cho bạn trong giờ làm việc ({site.hours}) để xác nhận đơn, phí vận chuyển và tổng tiền.</p>
+
+      <!-- Chuyển khoản: chỉ hiện khi khách chọn "Chuyển khoản" (?tt=bank) -->
+      <div class="card mt-8 p-6 text-left sm:p-8" data-bank hidden>
+        <h2 class="flex items-center gap-2 text-lg font-bold text-brand"><Icon name="wallet" class="size-5" /> Thông tin chuyển khoản</h2>
+        <div class:list={['mt-5 grid gap-6', hasQr && 'sm:grid-cols-[200px_1fr]']}>
+          {hasQr && <img src={pay.qr} alt={`Mã QR chuyển khoản ${pay.bank} – ${pay.holder}`} width="200" height="200" class="mx-auto w-full max-w-[220px] rounded-2xl border border-line bg-white p-2" />}
+          <dl class="space-y-3 text-sm">
+            <div><dt class="text-muted">Ngân hàng</dt><dd class="font-semibold">{pay.bank}</dd></div>
+            <div><dt class="text-muted">Số tài khoản</dt>
+              <dd class="flex items-center gap-2"><strong class="text-lg tracking-wide">{pay.accountDisplay}</strong>
+                <button type="button" class="chip min-h-8 px-3 py-1 text-xs" data-copy={pay.account}><Icon name="copy" class="mr-1 size-3.5" /> Sao chép</button></dd></div>
+            <div><dt class="text-muted">Chủ tài khoản</dt><dd class="font-semibold">{pay.holder}</dd></div>
+            <div><dt class="text-muted">Nội dung chuyển khoản</dt>
+              <dd class="flex items-center gap-2"><strong class="text-lg text-brand" data-order-id>—</strong>
+                <button type="button" class="chip min-h-8 px-3 py-1 text-xs" data-copy-order><Icon name="copy" class="mr-1 size-3.5" /> Sao chép</button></dd></div>
+            <div><dt class="text-muted">Số tiền</dt><dd><strong data-total>—</strong>
+              <span class="block text-xs text-muted">Nhân viên sẽ gọi xác nhận tổng tiền (gồm phí vận chuyển) trước khi bạn chuyển khoản.</span></dd></div>
+          </dl>
+        </div>
+        <p class="mt-5 rounded-2xl bg-brand-50 p-3 text-sm">Vui lòng ghi đúng <strong>mã đơn</strong> ở nội dung chuyển khoản để VIO GREEN đối chiếu nhanh.</p>
+      </div>
+
+      <p class="mt-8 text-sm text-muted" data-cod hidden>Thanh toán khi nhận hàng (COD) – đơn được giao qua {pay.codCarrier}.</p>
+
       <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
         <a class="btn btn-primary" href="/san-pham/">Tiếp tục mua sắm</a>
         <a class="btn btn-outline" href="/tai-khoan/"><Icon name="user" /> Xem đơn của tôi</a>
@@ -18,8 +46,21 @@ import { site, telHref } from '../../data/site';
     </div>
   </section>
   <script>
-    const id = new URLSearchParams(location.search).get('ma') || sessionStorage.getItem('vg-last-order');
-    const el = document.querySelector('[data-order-id]');
-    if (id && el) el.textContent = id;
+    import { toast } from '../../scripts/ui';
+    const params = new URLSearchParams(location.search);
+    const id = params.get('ma') || sessionStorage.getItem('vg-last-order') || '';
+    document.querySelectorAll('[data-order-id]').forEach((el) => { if (id) el.textContent = id; });
+
+    const bank = params.get('tt') === 'bank';
+    (document.querySelector('[data-bank]') as HTMLElement).hidden = !bank;
+    (document.querySelector('[data-cod]') as HTMLElement).hidden = bank;
+    const total = sessionStorage.getItem('vg-last-total');
+    const totalEl = document.querySelector('[data-total]');
+    if (totalEl) totalEl.textContent = total && total !== 'Chờ báo giá' ? `${total} (tạm tính)` : 'Chờ nhân viên báo giá';
+
+    const copy = (text: string, label: string) =>
+      navigator.clipboard.writeText(text).then(() => toast(`Đã sao chép ${label}`), () => toast('Không sao chép được, bạn chép tay giúp nhé'));
+    document.querySelector<HTMLElement>('[data-copy]')?.addEventListener('click', (e) => copy((e.currentTarget as HTMLElement).dataset.copy!, 'số tài khoản'));
+    document.querySelector('[data-copy-order]')?.addEventListener('click', () => id && copy(id, 'nội dung chuyển khoản'));
   </script>
 </BaseLayout>

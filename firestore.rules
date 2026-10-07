@@ -15,7 +15,7 @@ service cloud.firestore {
     match /orders/{orderId} {
       function validOrder(d) {
         return d.keys().hasOnly(['orderId', 'uid', 'name', 'phone', 'email', 'province', 'ward', 'address',
-                                 'shipping', 'note', 'items', 'totalQty', 'total', 'status', 'createdAt', 'page'])
+                                 'shipping', 'note', 'paymentMethod', 'items', 'totalQty', 'total', 'status', 'createdAt', 'page'])
           && d.orderId == orderId && orderId.matches('^VG-[0-9]{6}-[A-Z0-9]{4,8}$')
           && (signedIn() ? d.uid == request.auth.uid : d.uid == null)
           && str(d.name, 100) && d.name.size() > 0
@@ -23,6 +23,8 @@ service cloud.firestore {
           && str(d.email, 200) && d.email == d.email.lower()
           && str(d.province, 100) && str(d.ward, 100) && str(d.address, 300)
           && str(d.shipping, 50) && str(d.note, 2000) && str(d.page, 200)
+          // tuỳ chọn để bản web cũ (chưa có chọn thanh toán) vẫn đặt được trong lúc chuyển giao
+          && (!('paymentMethod' in d) || d.paymentMethod in ['cod', 'bank'])
           && d.items is list && d.items.size() > 0 && d.items.size() <= 50
           && d.totalQty is int && d.totalQty > 0 && d.totalQty <= 5000
           && (d.total == null || d.total is int)

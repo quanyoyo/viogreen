@@ -135,7 +135,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
    - **Mỗi lần sửa `firestore.rules`:** báo chủ web dán lại vào Console → Publish **trước khi push** code dùng trường mới. Viết rule tương thích cả bản web cũ lẫn mới (trường mới để tuỳ chọn).
 3. ~~**Ảnh MIO**~~ **Xong 06–07/10/2026:** đã tách nền. Trong `public/assets/`: `mio.webp` (toàn thân 640px), `mio-stand.webp` (toàn thân 280px – nút chat nổi), `mio-head-128.webp` (avatar trong khung chat), `mio-head-512.png` (bản gốc phần đầu). Favicon: `public/favicon-48.png`, `apple-touch-icon.png` (đầu MIO). Đường dẫn khai báo ở `site.mio`. `favicon.svg` cũ không còn dùng.
 4. **AR:** gắn file trong `public/models/` vào `products.ts` (`model: { glb, usdz }`). Chờ khách gửi file + cho biết file nào ứng với model nào; thiếu `.usdz` thì iPhone không xem AR được – hỏi trước khi gắn.
-5. **Hero trang chủ 3 slide** theo mục "Trang ảnh đầu" trong `Thông tin làm web.docx` (máy trong góc xanh / điện thoại app + máy / tay chạm vào máy), ảnh tạm ghi rõ nội dung cần chụp. **Chờ nội dung chữ** của mục này (Claude Code không đọc được file trong Claude Project – cần dán vào chat hoặc chép docx vào repo).
+5. ~~**Hero trang chủ 3 slide**~~ **Xong 07/10/2026** (`src/pages/index.astro` → `slides`): (1) máy trong góc xanh – "Smart Care for Urban Green Spaces", (2) điện thoại app + máy, nền tối kiểu techno – "Giám sát mọi lúc qua app", (3) tay chạm vào máy – "Chạm để chăm sóc". Chữ lấy từ nội dung sẵn có, không thêm thông số. Ảnh: đang là ảnh tạm (nhãn "Ảnh tạm" + mô tả ảnh cần chụp); có ảnh thật thì đặt vào `public/assets/` và điền `img.src`. Bố cục tham khảo hikari-mansion.com, smarthomesjapan.com, samsung.com/vn/smartthings (chữ trái – ảnh lớn phải; mobile ảnh dưới chữ).
 6. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc, QR chuyển khoản. Chỉ sửa trong `src/data/` và `public/`.
 7. **Khi có tên miền:** đổi `site` trong `astro.config.mjs`, thêm `@astrojs/sitemap`, gắn Custom domain trên Cloudflare, thêm tên miền vào Firebase Auth → Authorized domains.
 8. **Việc treo (chủ web / Claude làm khi được yêu cầu):**
@@ -169,7 +169,6 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Liên kết:** link Messenger, Zalo, Instagram (đang hiện icon mờ chưa có link).
 - **Nội dung 5 trang chưa có** (đang ẩn khỏi footer): Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
 - **Hình ảnh và file:** ảnh sản phẩm, ảnh 3 slide hero, file 3D (GLB + USDZ) kèm bảng file ↔ model, logo gốc SVG/PNG, đánh giá khách hàng thật.
-- **Nội dung chữ mục "Trang ảnh đầu"** trong `Thông tin làm web.docx` (bản mới).
 - **Ô trống trong bảng phí vận chuyển** (Figma để trống): hiện đang hiển thị "—".
 
 ## 10. Ghi chú

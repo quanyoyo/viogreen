@@ -43,17 +43,20 @@ npm run preview
 ```
 src/
   pages/                 index, san-pham/(index|[slug]), gio-hang, dat-hang, dat-hang-thanh-cong,
-                         gioi-thieu, trai-nghiem-ar, lien-he, chinh-sach/[slug], 404
+                         gioi-thieu, trai-nghiem-ar, lien-he, chinh-sach/[slug], 404,
+                         dang-nhap, tai-khoan, quan-tri (3 trang này dùng Firebase, noindex)
   layouts/BaseLayout.astro   head/SEO, Header, Footer, Chatbot, AR modal
   components/            Header, Footer, ProductCard, PolicyStrip, CtaBand, SectionHead, Ph (ảnh tạm),
                          Chatbot, ArModal, ContactForm, Breadcrumbs, Logo, Social, Icon
-  scripts/               ui.ts (reveal, carousel, menu), cart.ts, forms.ts, ar.ts, chatbot.ts, data.ts
+  scripts/               ui.ts (reveal, carousel, menu), cart.ts, forms.ts, ar.ts, chatbot.ts, data.ts,
+                         fb.ts (Firebase: auth, đơn, lead, quản trị), order-view.ts (hiển thị đơn dùng chung)
   data/                  site.ts (cấu hình), products.ts (16 SP), faq.ts, chatbot-kb.ts
   content/policies/      van-chuyen, doi-tra, bao-hanh, bao-mat (.md; {{address}} {{email}}… thay từ site.ts)
   styles/global.css      design tokens + hiệu ứng
-                         (+ dang-nhap, tai-khoan, quan-tri — dùng Firebase)
-firestore.rules          quy tắc bảo mật Firestore (dán vào Console)
-public/                  favicon, robots.txt, _headers, assets/logo.png, products/, models/
+firestore.rules          quy tắc bảo mật Firestore (dán vào Console → Firestore → Rules → Publish)
+public/                  favicon-48.png, apple-touch-icon.png, robots.txt, _headers,
+                         assets/ (logo.png, mio-*.webp), products/, models/
+.claude/launch.json      cấu hình dev server cho Browser pane (tên "dev")
 ```
 
 ## 5. Design system
@@ -64,7 +67,7 @@ public/                  favicon, robots.txt, _headers, assets/logo.png, product
 - **Phong cách và hiệu ứng** (tham khảo banhcaynguvi.com, *chỉ lấy cảm giác và chuyển động, không lấy màu*):
   - reveal khi cuộn: fade-up 28px, stagger
   - Ken Burns "breath" 12s và light sweep trên ảnh hero
-  - pulse ring ở nút chat nổi
+  - nút chat nổi = MIO đứng toàn thân (cao 75px mobile / 96px desktop), nhún nhẹ `animate-mio-float` + bóng chân `animate-mio-shadow` (không còn pill xanh + chữ "MIO giúp gì cho bạn?")
   - hover thẻ: nổi lên, bóng mềm màu xanh, đổi viền; easing `cubic-bezier(.25,.8,.25,1)` khoảng 0.35s
   - eyebrow chữ hoa giãn chữ, số thứ tự 01–0n, icon trong vòng tròn viền mảnh
 - **Responsive:** Figma chỉ có bản desktop 1440px, bản mobile tự chuyển đổi. Phải dùng tốt ở 360px.
@@ -97,14 +100,15 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Bộ lọc ECOHUB:** diện tích (`<10` / `10-20`), nguồn điện (`solar` / `grid`), nguồn nước (`tank` / `direct`).
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
-## 7. Trạng thái (cập nhật 06/10/2026)
+## 7. Trạng thái (cập nhật 07/10/2026)
 
-**Đã xong:** 29 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop.
+**Đã xong:** 32 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop.
 
 - **Trang:**
   - Trang chủ, Sản phẩm (nhóm, bộ lọc, tìm kiếm `?q=` không dấu)
   - 16 trang chi tiết, Giỏ hàng, Đặt hàng, Đặt hàng thành công
   - Giới thiệu, AR, Liên hệ, 4 chính sách, 404
+  - Đăng nhập, Tài khoản, Quản trị (Firebase – code xong, chưa test thật)
 - **Hiệu ứng:** đủ theo mục 5. Carousel hero tự chạy, vuốt được, có chấm chuyển slide.
 - **Giỏ hàng:** lưu localStorage, có biến thể và số lượng, nhớ thông tin khách.
 - **Form:** gửi vào Firestore (xem mục 8 bước 2).
@@ -113,7 +117,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Nút gợi ý: Tư vấn chọn máy, Phụ kiện, Giao hàng, Đổi trả, Bảo hành, Gặp nhân viên
   - Tư vấn chọn máy qua 3 câu hỏi
   - Trả lời FAQ và chính sách theo từ khoá
-  - Không hiểu câu hỏi thì xin tên và SĐT, gửi về Sheet
+  - Không hiểu câu hỏi thì xin tên và SĐT, lưu vào Firestore `leads` (type `chat-lead`)
   - Báo ngoài giờ làm việc
 - **SEO:** meta, OG, JSON-LD (Organization, FAQPage, Product, Breadcrumb), robots.txt, `_headers`.
 
@@ -131,10 +135,11 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
      - ✅ **2c (code).** `forms.ts` ghi Firestore; `/dang-nhap/` (Google, email, quên mật khẩu), `/tai-khoan/` (lịch sử + trạng thái đơn, hồ sơ giao hàng, xác minh email); icon tài khoản ở Header; trang đặt hàng điền sẵn khi đã đăng nhập. Đã gỡ `apps-script/`.
      - ✅ **2d (code).** `/quan-tri/`: đơn realtime, lọc + đổi trạng thái, tab liên hệ/lead; tài khoản chưa có quyền thì hiện UID để thêm vào `admins`.
      - **Chưa test thật** đăng nhập / ghi đơn trên Firebase: cần rules đã publish + chủ web đăng nhập thử.
+     - **Chưa push** các commit Firebase/MIO lên `main`: phải đợi chủ web publish `firestore.rules` trước (Firestore đang Production mode = chặn ghi → push sớm thì đơn trên web thật bị lỗi).
      - **2e.** Cloud Function `onOrderCreated` gửi email cho nhân viên (cần email nhận + tài khoản gửi SMTP do chủ web cung cấp).
      - **2f.** Cập nhật Chính sách bảo mật theo cách lưu dữ liệu mới (Nghị định 13/2023) – nội dung cần khách duyệt.
    - **Xong khi:** đặt thử đơn khi chưa đăng nhập và khi đã đăng nhập → đơn hiện ở `/quan-tri/` và `/tai-khoan/`, nhân viên nhận email, khách không đọc được đơn người khác.
-3. ~~**Ảnh MIO**~~ **Xong 06/10/2026:** đã tách nền, có `public/assets/mio.webp` (toàn thân), `mio-head-128.webp` (nút nổi + avatar chat), `mio-head-512.png` (bản gốc đầu), `favicon-48.png`, `apple-touch-icon.png`. Đường dẫn khai báo ở `site.mio`. `favicon.svg` cũ không còn dùng.
+3. ~~**Ảnh MIO**~~ **Xong 06–07/10/2026:** đã tách nền. Trong `public/assets/`: `mio.webp` (toàn thân 640px), `mio-stand.webp` (toàn thân 280px – nút chat nổi), `mio-head-128.webp` (avatar trong khung chat), `mio-head-512.png` (bản gốc phần đầu). Favicon: `public/favicon-48.png`, `apple-touch-icon.png` (đầu MIO). Đường dẫn khai báo ở `site.mio`. `favicon.svg` cũ không còn dùng.
 4. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc, liên hệ, mạng xã hội. Chỉ sửa trong `src/data/` và `public/`.
 5. **Khi có tên miền:** đổi `site` trong `astro.config.mjs`, thêm `@astrojs/sitemap`, gắn Custom domain trên Cloudflare.
 6. **Sau v1 (chỉ làm khi được yêu cầu):**
@@ -164,6 +169,8 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 
 ## 10. Ghi chú
 
+- **Git:** repo `github.com/quanyoyo/viogreen`, nhánh `main`. Commit đứng tên `quanyoyo <quanyoyo@users.noreply.github.com>` (cấu hình riêng repo; **không** dùng Gmail của chủ web). Một số phiên PowerShell chưa có git trong PATH → gọi `& "C:\Program Files\Git\cmd\git.exe"` (Git Bash thì dùng `git` bình thường). Push dùng đăng nhập đã lưu của Windows.
+- **Chạy thử:** xong phải tắt dev server (`preview_stop`). Nếu cổng 4321 đang có `astro dev` do chủ web tự chạy trong terminal thì dùng luôn, không tắt.
 - **FAQ câu 2, 5, 6** đã sửa nhẹ so với Figma:
   - bỏ chữ "demo / mô phỏng trong trang này"
   - "cartridge" đổi thành ECOBOX / Bio-Nutri

@@ -138,6 +138,8 @@
   .ph::before { content: ''; @apply absolute inset-0 opacity-40; background-image: radial-gradient(circle at 20% 20%, white 0 18%, transparent 19%), radial-gradient(circle at 85% 80%, rgb(255 255 255 / .8) 0 22%, transparent 23%); }
   .ph-dark { @apply from-brand-700 via-brand to-brand-800 text-brand-100; }
   .ph-dark::before { opacity: 0.08; }
+  /* Lưới mảnh kiểu "techno" cho ảnh tạm slide app */
+  .hero-grid { background-image: linear-gradient(rgb(140 198 63 / .12) 1px, transparent 1px), linear-gradient(90deg, rgb(140 198 63 / .12) 1px, transparent 1px), linear-gradient(to bottom right, var(--color-brand-900), var(--color-brand-700)); background-size: 28px 28px, 28px 28px, auto; }
 
   /* Ken Burns "breathing" image wrapper */
   .breath { @apply relative overflow-hidden rounded-card; }

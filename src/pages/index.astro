@@ -9,10 +9,18 @@ import { inCategory } from '../data/products';
 import { faq } from '../data/faq';
 import { site } from '../data/site';
 
+// Hero 3 slide theo mục "Trang ảnh đầu" (Thông tin làm web.docx). Chữ lấy từ nội dung sẵn có, không thêm thông số.
+// img.brief = mô tả ảnh cần chụp (hiện trên ảnh tạm). Có ảnh thật: thêm img.src = '/assets/hero-1.webp'…
 const slides = [
-  { eyebrow: 'VIO GREEN ECOHUB', title: 'Smart Care for Urban Green Spaces', text: 'Chăm sóc không gian xanh đô thị bằng công nghệ thông minh.', cta: ['Khám phá ngay', '/san-pham/'] },
-  { eyebrow: 'Trải nghiệm AR', title: 'See ECOHUB in Your Space', text: 'Ướm thử ECOHUB ngay trong không gian của bạn trước khi quyết định mua.', cta: ['Trải nghiệm AR', '/trai-nghiem-ar/'] },
-  { eyebrow: 'Một hệ thống', title: 'Nhiều cách sống xanh.', text: 'Tưới tự động, quản lý dinh dưỡng và năng lượng mặt trời trong một hệ thống nhỏ gọn.', cta: ['Xem các dòng ECOHUB', '/san-pham/#ecohub'] },
+  { eyebrow: 'VIO GREEN ECOHUB', title: 'Smart Care for Urban Green Spaces', text: 'Chăm sóc không gian xanh đô thị bằng công nghệ thông minh.', cta: ['Khám phá ngay', '/san-pham/'],
+    img: { src: '', alt: 'Máy ECOHUB trong góc ban công xanh tươi', dark: false,
+      brief: 'Máy ECOHUB đặt trong góc ban công / sân thượng nhiều cây xanh tươi tốt, ánh sáng tự nhiên, máy là tâm điểm.' } },
+  { eyebrow: 'Giám sát qua app', title: 'Giám sát mọi lúc qua app', text: 'Theo dõi tình trạng hệ thống, nước, dinh dưỡng và năng lượng thông qua ứng dụng, nhận cảnh báo và gợi ý chăm sóc.', cta: ['Xem các dòng ECOHUB', '/san-pham/#ecohub'],
+    img: { src: '', alt: 'Điện thoại mở ứng dụng VIO GREEN cạnh máy ECOHUB', dark: true,
+      brief: 'Điện thoại mở app VIO GREEN đặt cạnh máy ECOHUB. Góc nhìn hơi "techno": nền tối, ánh sáng xanh, màn hình app sáng rõ.' } },
+  { eyebrow: 'Dễ dùng mỗi ngày', title: 'Chạm để chăm sóc', text: 'Tưới tự động, quản lý dinh dưỡng và năng lượng mặt trời trong một hệ thống nhỏ gọn.', cta: ['Trải nghiệm AR', '/trai-nghiem-ar/'],
+    img: { src: '', alt: 'Tay người dùng chạm vào máy ECOHUB', dark: false,
+      brief: 'Cận cảnh bàn tay người dùng chạm vào máy ECOHUB (nút / bảng điều khiển), nền cây xanh mờ phía sau.' } },
 ];
 const trust = [['drop', 'Tưới tự động'], ['solar', 'Năng lượng mặt trời'], ['mobile', 'Giám sát qua app'], ['ar', 'Ướm thử bằng AR']] as const;
 const pains = [
@@ -42,24 +50,36 @@ const jsonLd = {
     <div aria-hidden="true" class="absolute inset-0 -z-10">
       <div class="absolute inset-0 animate-breath bg-[radial-gradient(ellipse_at_75%_40%,var(--color-brand-400)_0%,var(--color-brand)_38%,var(--color-brand-800)_75%)]"></div>
       <div class="absolute top-0 -left-1/4 h-full w-2/3 animate-sweep bg-[linear-gradient(100deg,transparent,rgb(255_255_255/.12),transparent)]"></div>
-      <div class="absolute top-1/2 right-[6%] hidden size-[30rem] -translate-y-1/2 text-white/10 lg:block"><Icon name="sprout" class="size-full" /></div>
       <div class="absolute -bottom-24 left-[38%] size-72 rotate-[30deg] text-leaf/15"><Icon name="leaf" class="size-full" /></div>
     </div>
-    <div class="container-x relative grid min-h-[min(78vh,640px)] items-center py-16 sm:py-20">
+    <div class="container-x relative grid min-h-[min(82vh,700px)] items-center pt-12 pb-20 sm:pt-16 lg:pb-24">
       {slides.map((s, i) => (
-        <div class:list={['col-start-1 row-start-1 max-w-2xl transition-all duration-700', i === 0 ? 'opacity-100' : 'pointer-events-none translate-y-4 opacity-0']}
+        <div class:list={['col-start-1 row-start-1 grid items-center gap-8 transition-all duration-700 lg:grid-cols-[5fr_7fr] lg:gap-14', i === 0 ? 'opacity-100' : 'pointer-events-none translate-y-4 opacity-0']}
           data-slide aria-hidden={i === 0 ? 'false' : 'true'} role="group" aria-roledescription="slide" aria-label={`${i + 1} / ${slides.length}`}>
-          <p class="eyebrow eyebrow-light">{s.eyebrow}</p>
-          {i === 0 ? <h1 class="text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl lg:text-6xl">{s.title}</h1>
-                   : <p class="text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl lg:text-6xl">{s.title}</p>}
-          <p class="mt-5 max-w-xl text-lg text-brand-100 sm:text-xl">{s.text}</p>
-          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a class="btn btn-light" href={s.cta[1]} tabindex={i ? -1 : undefined}>{s.cta[0]} <Icon name="arrowCircle" /></a>
-            <button class="btn btn-outline-light" type="button" data-open-chat tabindex={i ? -1 : undefined}><Icon name="chat" /> Hỏi MIO</button>
+          <div>
+            <p class="eyebrow eyebrow-light">{s.eyebrow}</p>
+            {i === 0 ? <h1 class="text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl xl:text-6xl">{s.title}</h1>
+                     : <p class="text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl xl:text-6xl">{s.title}</p>}
+            <p class="mt-5 max-w-xl text-lg text-brand-100 sm:text-xl">{s.text}</p>
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a class="btn btn-light" href={s.cta[1]} tabindex={i ? -1 : undefined}>{s.cta[0]} <Icon name="arrowCircle" /></a>
+              <button class="btn btn-outline-light" type="button" data-open-chat tabindex={i ? -1 : undefined}><Icon name="chat" /> Hỏi MIO</button>
+            </div>
+          </div>
+          <!-- Ảnh slide: ảnh thật (img.src) hoặc ảnh tạm ghi rõ nội dung cần chụp -->
+          <div class="breath aspect-[16/10] w-full shadow-lift ring-1 ring-white/15 lg:aspect-[5/4]">
+            {s.img.src
+              ? <img src={s.img.src} alt={s.img.alt} class="size-full object-cover" loading={i ? 'lazy' : 'eager'} />
+              : <div class:list={['ph size-full gap-3', s.img.dark && 'ph-dark hero-grid']} role="img" aria-label={`Ảnh tạm: ${s.img.alt}`}>
+                  <span class="absolute top-4 left-4 rounded-full bg-sun px-3 py-1 text-[11px] font-bold tracking-wider text-ink uppercase">Ảnh tạm</span>
+                  <span class="relative inline-flex size-14 items-center justify-center rounded-full bg-white/80 text-brand shadow-sm"><Icon name="camera" class="size-7" /></span>
+                  <strong class="relative text-lg font-bold">Ảnh cần chụp</strong>
+                  <span class="relative max-w-md text-sm leading-relaxed sm:text-base">{s.img.brief}</span>
+                </div>}
           </div>
         </div>
       ))}
-      <div class="absolute bottom-24 left-4 flex gap-2 sm:left-6 lg:left-8" role="tablist" aria-label="Chọn slide">
+      <div class="absolute bottom-8 left-4 flex gap-2 sm:left-6 lg:left-8" role="tablist" aria-label="Chọn slide">
         {slides.map((_, i) => (
           <button type="button" data-dot={i} aria-label={`Slide ${i + 1}`} aria-selected={i === 0 ? 'true' : 'false'} role="tab"
             class="h-1.5 w-8 rounded-full bg-white/35 transition-all duration-500 aria-selected:w-14 aria-selected:bg-white"></button>

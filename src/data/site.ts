@@ -54,7 +54,7 @@ export const site = {
     account: '19070857077015', // số để sao chép
     accountDisplay: '1907 0857 0770 15',
     holder: 'NGUYEN THUY LINH',
-    qr: '/assets/qr-chuyen-khoan.png', // file trong public/; thiếu file thì trang tự ẩn QR
+    qr: '/assets/qr-chuyen-khoan.webp', // cắt từ qr-chuyen-khoan.jpg (ảnh gốc khách gửi); thiếu file thì trang tự ẩn QR
   },
 
   // ---- Giá: chưa có giá thì hiển thị chữ này ----

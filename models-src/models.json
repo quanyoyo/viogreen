@@ -1,0 +1,27 @@
+{
+  "maxTriangles": 150000,
+  "materials": {
+    "body":   { "color": "#f1f1ec", "roughness": 0.85, "metalness": 0 },
+    "accent": { "color": "#355e3b", "roughness": 0.6,  "metalness": 0 },
+    "solar":  { "color": "#1c2b3c", "roughness": 0.3,  "metalness": 0.25 },
+    "foot":   { "color": "#2a302b", "roughness": 0.9,  "metalness": 0 }
+  },
+  "models": [
+    {
+      "out": "ecohub-mau",
+      "dir": ".",
+      "default": "body",
+      "parts": {
+        "Component2": "solar",
+        "Component3": "accent",
+        "Component20": "accent",
+        "Component15": "accent",
+        "Component17": "accent",
+        "Body25": "foot",
+        "Body26": "foot",
+        "Body27": "foot",
+        "Body28": "foot"
+      }
+    }
+  ]
+}

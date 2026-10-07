@@ -1,15 +1,20 @@
 // Xem 3D / AR bằng <model-viewer> (Google). Chỉ tải thư viện khi sản phẩm đã có file 3D.
-// Khai báo file trong src/data/products.ts: model: { glb: '/models/x10-sol.glb', usdz: '/models/x10-sol.usdz' }
+// Khai báo file trong src/data/products.ts: model: { glb: '/models/x10-sol.glb' } (usdz tuỳ chọn — không có thì model-viewer tự tạo cho iPhone).
+// File GLB tạo bằng `npm run models` từ STL trong models-src/ (xem scripts/stl-to-glb.mjs).
 import { clientProducts } from './data';
 import { $, $$, openLayer, closeLayer } from './ui';
 
 const MV_SRC = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js';
+// File GLB do `npm run models` xuất ra được nén meshopt → model-viewer cần bộ giải nén này
+const MESHOPT_SRC = 'https://cdn.jsdelivr.net/npm/meshoptimizer@1.3.0/meshopt_decoder.mjs';
 const bySlug = Object.fromEntries(clientProducts.map((p) => [p.slug, p]));
 const modal = $('[data-ar-modal]');
 let mvLoaded: Promise<void> | null = null;
 
 const loadModelViewer = () =>
   (mvLoaded ??= new Promise<void>((resolve, reject) => {
+    // Cấu hình phải có trước khi thư viện chạy
+    (self as unknown as { ModelViewerElement: Record<string, string> }).ModelViewerElement = { meshoptDecoderLocation: MESHOPT_SRC };
     const s = document.createElement('script');
     s.type = 'module';
     s.src = MV_SRC;

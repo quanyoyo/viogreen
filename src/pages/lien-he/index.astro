@@ -13,7 +13,7 @@ const info = [
   ['email', 'Hộp thư điện tử', site.email, `mailto:${site.email}`],
   ['pin', 'Trụ sở & Showroom', site.address, `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`],
   ['clock', 'Giờ làm việc', site.hours, ''],
-  ...(site.website ? [['globe', 'Website chính thức', site.website, site.website]] : []),
+  ...(site.website ? [['globe', 'Website chính thức', site.website.replace(/^https?:\/\//, ''), site.website]] : []),
 ] as [string, string, string, string][];
 ---
 <BaseLayout title="Liên hệ" active="contact" description="Liên hệ VIO GREEN để được tư vấn giải pháp chăm sóc cây thông minh ECOHUB cho ban công, sân thượng, văn phòng.">

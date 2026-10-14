@@ -145,7 +145,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
    - ✅ Firebase: `viogreen102@gmail.com` là **Owner**; Authorized domains có `viogreen.com`, `www.viogreen.com`, `viogreen.pages.dev` (đã kiểm tra 14/10).
    - ✅ **Pages → Custom domains** (14/10/2026): `viogreen.com` + `www.viogreen.com` đều Active, SSL bật. `http` tự chuyển `https`.
    - ✅ **Redirect Rule "www to viogreen.com"** (dashboard → viogreen.com → Rules): Wildcard pattern `https://www.viogreen.com/*` → `https://viogreen.com/${1}`, **301**, giữ query string. Đã kiểm tra: `www.viogreen.com/san-pham/?q=ecohub` → 301 `viogreen.com/san-pham/?q=ecohub`. (Pages `_redirects` không đổi được host nên phải dùng Redirect Rule.)
-   - Đã kiểm tra 14/10: `viogreen.com` mọi trang 200, trang lạ 404, canonical `https://viogreen.com/`, noindex (prelaunch); đặt đơn trên `www` OK (`VG-261014-JSMX`). Đăng nhập Google: chủ web tự kiểm tra (Browser pane của Claude chặn popup).
+   - Đã kiểm tra 14/10: `viogreen.com` mọi trang 200, trang lạ 404, canonical `https://viogreen.com/`, noindex (prelaunch); đặt đơn OK trên `www` (`VG-261014-JSMX`, chuyển khoản) và `viogreen.com` (`VG-261014-RBL4`, COD). Đăng nhập Google: chủ web tự kiểm tra (Browser pane của Claude chặn popup).
 8. **Ra mắt (bật cho Google tìm thấy):**
    1. `src/data/site.ts`: đổi `prelaunch: true` → `prelaunch: false`.
    2. Chạy `npm run check` rồi `npm run build`; kiểm tra `dist/index.html` **không còn** `<meta name="robots" content="noindex">` (các trang giỏ hàng, đặt hàng, tài khoản, quản trị vẫn giữ noindex – đúng).
@@ -155,7 +155,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
    - **Thẻ thanh toán Cloudflare:** đang là thẻ của quanyoyo (tên miền tự gia hạn sau 4 năm) → đổi sang thẻ của khách (Manage Account → Billing).
    - Đổi **Firebase Project support email** sang `viogreen102@gmail.com` (Project settings → General; và Authentication → Sign-in method → Google).
    - Thêm **UID của khách** vào Firestore `admins` (khách đăng nhập web → mở `/quan-tri/` để lấy UID → tạo document `admins/<UID>`).
-   - **Xoá đơn test** trong Firestore `orders` (đơn tên "TEST…", gồm `VG-261007-C7GX` và `VG-261014-JSMX`) – rules chặn xoá từ web.
+   - **Xoá đơn test** trong Firestore `orders` (đơn tên "TEST…", gồm `VG-261007-C7GX`, `VG-261014-JSMX`, `VG-261014-RBL4`) – rules chặn xoá từ web.
    - **App Check** chống spam form (đăng ký reCAPTCHA Enterprise / v3, bật enforce cho Firestore).
    - **Email báo đơn mới:** Cloud Function `onOrderCreated` (cần nâng gói **Blaze** + đặt Budget alert, email nhận + tài khoản gửi SMTP).
    - **Chính sách bảo mật** cập nhật theo cách lưu dữ liệu mới (Firebase, tài khoản khách; Nghị định 13/2023) – nội dung cần khách duyệt.

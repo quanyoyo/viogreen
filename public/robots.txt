@@ -3,3 +3,5 @@ Allow: /
 Disallow: /dang-nhap/
 Disallow: /tai-khoan/
 Disallow: /quan-tri/
+
+Sitemap: https://viogreen.com/sitemap-index.xml

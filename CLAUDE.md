@@ -27,7 +27,10 @@ Website giới thiệu và bán hàng cho **VIO GREEN ECOHUB**, hệ thống ch�
 - **Firebase** (project `viogreen-44a7f`, config trong `site.ts → firebase`): Auth (Google + Email/mật khẩu) + Firestore. Form đặt hàng/liên hệ/nhận tin/lead chatbot ghi vào Firestore (`src/scripts/forms.ts` → `fb.ts`). Quy tắc bảo mật: `firestore.rules` (dán vào Console, **không** tự deploy). Cloud Functions gửi email báo đơn: chưa làm (cần gói Blaze). Hosting **vẫn là Cloudflare Pages**.
 - **`src/scripts/fb.ts` kéo theo SDK ~540KB**: chỉ import tĩnh ở trang `/dang-nhap/`, `/tai-khoan/`, `/quan-tri/`; nơi khác dùng `await import('./fb')`. Không import tĩnh từ BaseLayout.
 - **AR:** `<model-viewer>`, chỉ tải khi sản phẩm có file 3D.
-- **Hosting:** Cloudflare Pages (build `npm run build`, output `dist`).
+- **Hosting:** Cloudflare Pages trong **tài khoản Cloudflare của khách** (`viogreen102@gmail.com`; quanyoyo là thành viên quyền Administrator). Build `npm run build`, output `dist`. Repo vẫn là `github.com/quanyoyo/viogreen`; **push lên `main` là tự deploy**.
+- **Tên miền chính:** `https://viogreen.com` (mua qua Cloudflare Registrar, 4 năm). `www.viogreen.com` phải 301 về `viogreen.com` (Redirect Rule trong dashboard, xem mục 8). URL gốc khai báo ở `astro.config.mjs → site` và `site.ts → website` (giữ hai chỗ khớp nhau).
+- **Sitemap:** `@astrojs/sitemap` → `/sitemap-index.xml` (bỏ các trang noindex, danh sách `NO_SITEMAP` trong `astro.config.mjs`); `robots.txt` có dòng `Sitemap:` và **không chặn trang nào**.
+- **Chế độ trước ra mắt:** `site.ts → prelaunch: true` = mọi trang có `<meta name="robots" content="noindex">`. Cách tắt: mục 8 "Ra mắt".
 - **Node:** 22 trở lên.
 
 ```bash
@@ -101,9 +104,9 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Thanh toán:** `paymentMethod` = `cod` | `bank` (đơn trước 07/10/2026 không có → hiển thị "—"). Nhãn hiển thị ở `order-view.ts → PAYMENT_LABEL`.
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
-## 7. Trạng thái (cập nhật 07/10/2026)
+## 7. Trạng thái (cập nhật 14/10/2026)
 
-**Đã xong:** 32 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop. Đang chạy thật ở https://viogreen.pages.dev.
+**Đã xong:** 32 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop. Đang chạy ở `https://www.viogreen.com` (Pages trong tài khoản khách); `https://viogreen.com` **chưa trỏ được** (xem mục 8 bước 7). Đang ở **chế độ trước ra mắt** (noindex toàn web).
 
 - **Trang:**
   - Trang chủ, Sản phẩm (nhóm, bộ lọc, tìm kiếm `?q=` không dấu)
@@ -126,7 +129,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 
 ## 8. Việc tiếp theo (theo thứ tự ưu tiên)
 
-1. ~~**Deploy bản xem thử**~~ **Xong 06/10/2026:** https://viogreen.pages.dev (Cloudflare Pages, repo `github.com/quanyoyo/viogreen`, nhánh `main` – push là tự build). Đã kiểm tra 28 trang + asset trả về 200, trang lạ trả 404, canonical đúng.
+1. ✅ **Deploy:** Cloudflare Pages đã chuyển sang **tài khoản Cloudflare của khách** (`viogreen102@gmail.com`) ngày 14/10/2026; project cũ trong tài khoản quanyoyo đã xoá. Repo vẫn `github.com/quanyoyo/viogreen`, push `main` là tự deploy. Link pages.dev của project mới: **chờ chủ web xác nhận** (`https://viogreen.pages.dev` vẫn trả 200 ngày 14/10 – chưa rõ là project mới hay cache). Tên miền: `viogreen.com` (chính) + `www.viogreen.com`.
 2. **Firebase** (thay cho Google Sheet; quyết định 06/10/2026). Lựa chọn đã chốt:
    - Đăng nhập: **Google + Email/mật khẩu** (không dùng SMS OTP). Đăng nhập là **tuỳ chọn** – khách vẫn đặt hàng không cần tài khoản.
    - Lịch sử đơn: đơn có `uid` nếu đặt khi đã đăng nhập; đơn khách vãng lai hiện trong lịch sử nếu **email đơn = email đã xác minh** của tài khoản.
@@ -137,14 +140,26 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 4. **AR:** `npm run models` (`scripts/stl-to-glb.mjs`) chuyển STL trong `models-src/` → GLB trong `public/models/`: mm→m, Z-up→Y-up, căn giữa + đáy chạm sàn, chất liệu theo `models-src/models.json` (`parts`: tên file STL → chất liệu), giảm đa giác khi vượt `maxTriangles`, nén meshopt, kiểm tra < 5MB. `ar.ts` khai báo bộ giải nén meshopt cho model-viewer. Chỉ cần `glb` (model-viewer tự tạo USDZ cho iPhone). **Hiện có:** 12 STL = các bộ phận của **1 máy** bản Sol (54×40×75,6 cm, tấm pin trên cột) → `public/models/ecohub-mau.glb` (466 KB, chưa commit, chưa gắn). **Chờ khách xác nhận** máy này là model nào trước khi đổi tên + gắn vào `products.ts`.
 5. ~~**Hero trang chủ 3 slide**~~ **Xong 07/10/2026** (`src/pages/index.astro` → `slides`): (1) máy trong góc xanh – "Smart Care for Urban Green Spaces", (2) điện thoại app + máy, nền tối kiểu techno – "Giám sát mọi lúc qua app", (3) tay chạm vào máy – "Chạm để chăm sóc". Chữ lấy từ nội dung sẵn có, không thêm thông số. Ảnh: đang là ảnh tạm (nhãn "Ảnh tạm" + mô tả ảnh cần chụp); có ảnh thật thì đặt vào `public/assets/` và điền `img.src`. Bố cục tham khảo hikari-mansion.com, smarthomesjapan.com, samsung.com/vn/smartthings (chữ trái – ảnh lớn phải; mobile ảnh dưới chữ).
 6. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc. Chỉ sửa trong `src/data/` và `public/`.
-7. **Khi có tên miền:** đổi `site` trong `astro.config.mjs`, thêm `@astrojs/sitemap`, gắn Custom domain trên Cloudflare, thêm tên miền vào Firebase Auth → Authorized domains.
-8. **Việc treo (chủ web / Claude làm khi được yêu cầu):**
-   - Đổi **Firebase support email** (Auth → Google provider; Project settings) sang `viogreen102@gmail.com` – chủ web làm trong Console.
-   - **Xoá đơn test** trong Firestore `orders` (đơn tên "TEST…", gồm `VG-261007-C7GX`) – chủ web xoá trong Console (rules chặn xoá từ web).
+7. **Tên miền `viogreen.com` (14/10/2026):**
+   - ✅ Code: `site` = `https://viogreen.com` (canonical, OG, JSON-LD, sitemap), `@astrojs/sitemap`, `Sitemap:` trong robots.txt, chế độ `prelaunch`.
+   - ✅ Firebase: `viogreen102@gmail.com` là **Owner**; Authorized domains có `viogreen.com`, `www.viogreen.com` và link pages.dev mới.
+   - ⏳ **`viogreen.com` chưa có bản ghi DNS** (14/10: chỉ `www` phân giải) → chủ web thêm `viogreen.com` vào Pages project → Custom domains.
+   - ⏳ **Redirect Rule `www` → `viogreen.com` (301)** trong dashboard Cloudflare (Rules → Redirect Rules, mẫu "Redirect from WWW to root"). Pages `_redirects` không đổi được host nên phải làm trong dashboard.
+   - Sau khi xong: kiểm tra `https://viogreen.com` + `https://www.viogreen.com` (trang chủ, sản phẩm, đăng nhập Google, đặt đơn), `curl -I https://www.viogreen.com/san-pham/` → `301` + `location: https://viogreen.com/san-pham/`.
+8. **Ra mắt (bật cho Google tìm thấy):**
+   1. `src/data/site.ts`: đổi `prelaunch: true` → `prelaunch: false`.
+   2. Chạy `npm run check` rồi `npm run build`; kiểm tra `dist/index.html` **không còn** `<meta name="robots" content="noindex">` (các trang giỏ hàng, đặt hàng, tài khoản, quản trị vẫn giữ noindex – đúng).
+   3. Commit + push `main` → Cloudflare tự deploy.
+   4. Google Search Console: thêm `viogreen.com` (xác minh bằng bản ghi DNS trong Cloudflare), gửi sitemap `https://viogreen.com/sitemap-index.xml`, yêu cầu lập chỉ mục trang chủ.
+   **Việc treo (bàn giao / chủ web làm trong Console):**
+   - **Thẻ thanh toán Cloudflare:** đang là thẻ của quanyoyo (tên miền tự gia hạn sau 4 năm) → đổi sang thẻ của khách (Manage Account → Billing).
+   - Đổi **Firebase Project support email** sang `viogreen102@gmail.com` (Project settings → General; và Authentication → Sign-in method → Google).
+   - Thêm **UID của khách** vào Firestore `admins` (khách đăng nhập web → mở `/quan-tri/` để lấy UID → tạo document `admins/<UID>`).
+   - **Xoá đơn test** trong Firestore `orders` (đơn tên "TEST…", gồm `VG-261007-C7GX`) – rules chặn xoá từ web.
    - **App Check** chống spam form (đăng ký reCAPTCHA Enterprise / v3, bật enforce cho Firestore).
    - **Email báo đơn mới:** Cloud Function `onOrderCreated` (cần nâng gói **Blaze** + đặt Budget alert, email nhận + tài khoản gửi SMTP).
    - **Chính sách bảo mật** cập nhật theo cách lưu dữ liệu mới (Firebase, tài khoản khách; Nghị định 13/2023) – nội dung cần khách duyệt.
-   - **Bàn giao tài khoản:** Firebase (thêm chủ web làm Owner), Cloudflare Pages + GitHub repo, tên miền – chuyển quyền sở hữu sang tài khoản của chủ web.
+   - Đã xong: Cloudflare Pages + tên miền ở tài khoản khách; Firebase Owner = `viogreen102@gmail.com`. Còn lại: GitHub repo vẫn ở `quanyoyo` (chuyển khi khách cần).
 9. **Sau v1 (chỉ làm khi được yêu cầu):**
    - Chatbot AI v2: Cloudflare Worker, trả lời chỉ dựa trên `chatbot-kb.ts`, `faq.ts`, `products.ts` và chính sách
    - Thanh toán online VNPay/MoMo
@@ -162,7 +177,6 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Thời hạn bảo hành tiêu chuẩn
   - Email/Zalo nhận thông báo đơn (cho bước email báo đơn)
 - **Thông tin doanh nghiệp:**
-  - Tên miền
   - Địa chỉ theo đơn vị hành chính mới
   - Tên công ty, MST
 - **Liên kết:** link Messenger, Zalo, Instagram (đang hiện icon mờ chưa có link).

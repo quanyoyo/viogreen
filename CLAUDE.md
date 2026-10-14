@@ -129,7 +129,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 
 ## 8. Việc tiếp theo (theo thứ tự ưu tiên)
 
-1. ✅ **Deploy:** Cloudflare Pages đã chuyển sang **tài khoản Cloudflare của khách** (`viogreen102@gmail.com`) ngày 14/10/2026; project cũ trong tài khoản quanyoyo đã xoá. Repo vẫn `github.com/quanyoyo/viogreen`, push `main` là tự deploy. Link pages.dev của project mới: **chờ chủ web xác nhận** – ngày 14/10 `https://viogreen.pages.dev` vẫn trả **bản build cũ** (canonical cũ) nên không phải project mới; Firebase Authorized domains cũng chỉ có `viogreen.pages.dev` → nhớ thêm link pages.dev mới. Tên miền: `viogreen.com` (chính) + `www.viogreen.com`.
+1. ✅ **Deploy:** Cloudflare Pages đã chuyển sang **tài khoản Cloudflare của khách** (`viogreen102@gmail.com`) ngày 14/10/2026; project cũ trong tài khoản quanyoyo đã xoá. Repo vẫn `github.com/quanyoyo/viogreen`, push `main` là tự deploy. Link pages.dev: **`https://viogreen.pages.dev`** (project mới, tạo lại bằng tài khoản khách; đã kiểm tra 14/10 trả bản build mới nhất; có trong Firebase Authorized domains). Tên miền: `viogreen.com` (chính) + `www.viogreen.com`.
 2. **Firebase** (thay cho Google Sheet; quyết định 06/10/2026). Lựa chọn đã chốt:
    - Đăng nhập: **Google + Email/mật khẩu** (không dùng SMS OTP). Đăng nhập là **tuỳ chọn** – khách vẫn đặt hàng không cần tài khoản.
    - Lịch sử đơn: đơn có `uid` nếu đặt khi đã đăng nhập; đơn khách vãng lai hiện trong lịch sử nếu **email đơn = email đã xác minh** của tài khoản.
@@ -142,7 +142,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 6. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc. Chỉ sửa trong `src/data/` và `public/`.
 7. **Tên miền `viogreen.com` (14/10/2026):**
    - ✅ Code: `site` = `https://viogreen.com` (canonical, OG, JSON-LD, sitemap), `@astrojs/sitemap`, `Sitemap:` trong robots.txt, chế độ `prelaunch`.
-   - ✅ Firebase: `viogreen102@gmail.com` là **Owner**; Authorized domains có `viogreen.com`, `www.viogreen.com` và link pages.dev mới.
+   - ✅ Firebase: `viogreen102@gmail.com` là **Owner**; Authorized domains có `viogreen.com`, `www.viogreen.com`, `viogreen.pages.dev` (đã kiểm tra 14/10).
    - ⏳ **`viogreen.com` chưa có bản ghi DNS** (14/10: chỉ `www` phân giải) → chủ web thêm `viogreen.com` vào Pages project → Custom domains.
    - ⏳ **Redirect Rule `www` → `viogreen.com` (301)** trong dashboard Cloudflare (Rules → Redirect Rules, mẫu "Redirect from WWW to root"). Pages `_redirects` không đổi được host nên phải làm trong dashboard.
    - Sau khi xong: kiểm tra `https://viogreen.com` + `https://www.viogreen.com` (trang chủ, sản phẩm, đăng nhập Google, đặt đơn), `curl -I https://www.viogreen.com/san-pham/` → `301` + `location: https://viogreen.com/san-pham/`.

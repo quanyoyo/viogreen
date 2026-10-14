@@ -129,7 +129,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 
 ## 8. Việc tiếp theo (theo thứ tự ưu tiên)
 
-1. ✅ **Deploy:** Cloudflare Pages đã chuyển sang **tài khoản Cloudflare của khách** (`viogreen102@gmail.com`) ngày 14/10/2026; project cũ trong tài khoản quanyoyo đã xoá. Repo vẫn `github.com/quanyoyo/viogreen`, push `main` là tự deploy. Link pages.dev của project mới: **chờ chủ web xác nhận** (`https://viogreen.pages.dev` vẫn trả 200 ngày 14/10 – chưa rõ là project mới hay cache). Tên miền: `viogreen.com` (chính) + `www.viogreen.com`.
+1. ✅ **Deploy:** Cloudflare Pages đã chuyển sang **tài khoản Cloudflare của khách** (`viogreen102@gmail.com`) ngày 14/10/2026; project cũ trong tài khoản quanyoyo đã xoá. Repo vẫn `github.com/quanyoyo/viogreen`, push `main` là tự deploy. Link pages.dev của project mới: **chờ chủ web xác nhận** – ngày 14/10 `https://viogreen.pages.dev` vẫn trả **bản build cũ** (canonical cũ) nên không phải project mới; Firebase Authorized domains cũng chỉ có `viogreen.pages.dev` → nhớ thêm link pages.dev mới. Tên miền: `viogreen.com` (chính) + `www.viogreen.com`.
 2. **Firebase** (thay cho Google Sheet; quyết định 06/10/2026). Lựa chọn đã chốt:
    - Đăng nhập: **Google + Email/mật khẩu** (không dùng SMS OTP). Đăng nhập là **tuỳ chọn** – khách vẫn đặt hàng không cần tài khoản.
    - Lịch sử đơn: đơn có `uid` nếu đặt khi đã đăng nhập; đơn khách vãng lai hiện trong lịch sử nếu **email đơn = email đã xác minh** của tài khoản.
@@ -155,7 +155,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
    - **Thẻ thanh toán Cloudflare:** đang là thẻ của quanyoyo (tên miền tự gia hạn sau 4 năm) → đổi sang thẻ của khách (Manage Account → Billing).
    - Đổi **Firebase Project support email** sang `viogreen102@gmail.com` (Project settings → General; và Authentication → Sign-in method → Google).
    - Thêm **UID của khách** vào Firestore `admins` (khách đăng nhập web → mở `/quan-tri/` để lấy UID → tạo document `admins/<UID>`).
-   - **Xoá đơn test** trong Firestore `orders` (đơn tên "TEST…", gồm `VG-261007-C7GX`) – rules chặn xoá từ web.
+   - **Xoá đơn test** trong Firestore `orders` (đơn tên "TEST…", gồm `VG-261007-C7GX` và `VG-261014-JSMX`) – rules chặn xoá từ web.
    - **App Check** chống spam form (đăng ký reCAPTCHA Enterprise / v3, bật enforce cho Firestore).
    - **Email báo đơn mới:** Cloud Function `onOrderCreated` (cần nâng gói **Blaze** + đặt Budget alert, email nhận + tài khoản gửi SMTP).
    - **Chính sách bảo mật** cập nhật theo cách lưu dữ liệu mới (Firebase, tài khoản khách; Nghị định 13/2023) – nội dung cần khách duyệt.

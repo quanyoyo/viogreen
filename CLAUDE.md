@@ -106,7 +106,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 
 ## 7. Trạng thái (cập nhật 14/10/2026)
 
-**Đã xong:** 32 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop. Đang chạy ở `https://www.viogreen.com` (Pages trong tài khoản khách); `https://viogreen.com` **chưa trỏ được** (xem mục 8 bước 7). Đang ở **chế độ trước ra mắt** (noindex toàn web).
+**Đã xong:** 32 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop. Đang chạy ở `https://viogreen.com` (Pages trong tài khoản khách; `www` 301 về đây; `viogreen.pages.dev` vẫn truy cập được). Đang ở **chế độ trước ra mắt** (noindex toàn web).
 
 - **Trang:**
   - Trang chủ, Sản phẩm (nhóm, bộ lọc, tìm kiếm `?q=` không dấu)
@@ -143,9 +143,9 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 7. **Tên miền `viogreen.com` (14/10/2026):**
    - ✅ Code: `site` = `https://viogreen.com` (canonical, OG, JSON-LD, sitemap), `@astrojs/sitemap`, `Sitemap:` trong robots.txt, chế độ `prelaunch`.
    - ✅ Firebase: `viogreen102@gmail.com` là **Owner**; Authorized domains có `viogreen.com`, `www.viogreen.com`, `viogreen.pages.dev` (đã kiểm tra 14/10).
-   - ⏳ **`viogreen.com` chưa có bản ghi DNS** (14/10: chỉ `www` phân giải) → chủ web thêm `viogreen.com` vào Pages project → Custom domains.
-   - ⏳ **Redirect Rule `www` → `viogreen.com` (301)** trong dashboard Cloudflare (Rules → Redirect Rules, mẫu "Redirect from WWW to root"). Pages `_redirects` không đổi được host nên phải làm trong dashboard.
-   - Sau khi xong: kiểm tra `https://viogreen.com` + `https://www.viogreen.com` (trang chủ, sản phẩm, đăng nhập Google, đặt đơn), `curl -I https://www.viogreen.com/san-pham/` → `301` + `location: https://viogreen.com/san-pham/`.
+   - ✅ **Pages → Custom domains** (14/10/2026): `viogreen.com` + `www.viogreen.com` đều Active, SSL bật. `http` tự chuyển `https`.
+   - ✅ **Redirect Rule "www to viogreen.com"** (dashboard → viogreen.com → Rules): Wildcard pattern `https://www.viogreen.com/*` → `https://viogreen.com/${1}`, **301**, giữ query string. Đã kiểm tra: `www.viogreen.com/san-pham/?q=ecohub` → 301 `viogreen.com/san-pham/?q=ecohub`. (Pages `_redirects` không đổi được host nên phải dùng Redirect Rule.)
+   - Đã kiểm tra 14/10: `viogreen.com` mọi trang 200, trang lạ 404, canonical `https://viogreen.com/`, noindex (prelaunch); đặt đơn trên `www` OK (`VG-261014-JSMX`). Đăng nhập Google: chủ web tự kiểm tra (Browser pane của Claude chặn popup).
 8. **Ra mắt (bật cho Google tìm thấy):**
    1. `src/data/site.ts`: đổi `prelaunch: true` → `prelaunch: false`.
    2. Chạy `npm run check` rồi `npm run build`; kiểm tra `dist/index.html` **không còn** `<meta name="robots" content="noindex">` (các trang giỏ hàng, đặt hàng, tài khoản, quản trị vẫn giữ noindex – đúng).

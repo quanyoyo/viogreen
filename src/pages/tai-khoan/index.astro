@@ -46,8 +46,8 @@ import { site, telHref } from '../../data/site';
             <form class="mt-4 space-y-3" data-profile novalidate>
               <label class="field">Họ và tên<input class="input" name="name" autocomplete="name" maxlength="100" /></label>
               <label class="field">Số điện thoại<input class="input" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" /></label>
-              <label class="field">Tỉnh / Thành phố<input class="input" name="province" autocomplete="address-level1" maxlength="100" /></label>
-              <label class="field">Phường / Xã<input class="input" name="ward" autocomplete="address-level2" maxlength="100" /></label>
+              <label class="field">Tỉnh / Thành phố<select class="input" name="province" autocomplete="address-level1" data-province disabled><option value="">Đang tải danh sách…</option></select></label>
+              <label class="field">Phường / Xã<select class="input" name="ward" autocomplete="address-level2" data-ward disabled><option value="">Chọn tỉnh / thành phố trước</option></select></label>
               <label class="field">Địa chỉ cụ thể<input class="input" name="address" autocomplete="street-address" maxlength="300" /></label>
               <button class="btn btn-primary w-full" type="submit">Lưu thông tin</button>
               <p class="form-msg text-center" data-form-msg role="status"></p>
@@ -62,6 +62,7 @@ import { site, telHref } from '../../data/site';
     import { currentUser, myOrders, getProfile, saveProfile, verifyEmail, logout, type Profile } from '../../scripts/fb';
     import { esc, badge, fmtTime, itemsHtml, totalText, paymentText } from '../../scripts/order-view';
     import { $, toast } from '../../scripts/ui';
+    import { setAddress } from '../../scripts/address';
 
     async function main() {
       const user = await currentUser();
@@ -114,9 +115,11 @@ import { site, telHref } from '../../data/site';
         const p = await getProfile(user.uid);
         const defaults: Profile = { name: user.displayName ?? '', ...p };
         Object.entries(defaults).forEach(([k, v]) => {
+          if (k === 'province' || k === 'ward') return;
           const el = form.elements.namedItem(k) as HTMLInputElement | null;
           if (el && typeof v === 'string') el.value = v;
         });
+        await setAddress(form, defaults.province, defaults.ward);
       } catch (err) { console.error(err); }
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -126,7 +129,7 @@ import { site, telHref } from '../../data/site';
         const btn = $<HTMLButtonElement>('button[type="submit"]', form)!;
         btn.disabled = true;
         try {
-          await saveProfile(user.uid, { name: f.name.trim(), phone, province: f.province.trim(), ward: f.ward.trim(), address: f.address.trim() });
+          await saveProfile(user.uid, { name: f.name.trim(), phone, province: (f.province ?? '').trim(), ward: (f.ward ?? '').trim(), address: (f.address ?? '').trim() });
           msg.textContent = 'Đã lưu!'; msg.dataset.state = 'ok';
         } catch (err) {
           console.error(err);

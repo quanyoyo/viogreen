@@ -32,8 +32,9 @@ import { site } from '../../data/site';
               <label class="field">Số điện thoại *<input class="input" name="phone" type="tel" required autocomplete="tel" inputmode="tel" /></label>
               <label class="field">Email<input class="input" name="email" type="email" autocomplete="email" />
                 <span class="text-xs font-normal text-muted">Nhập email để xem lại đơn này khi tạo tài khoản bằng cùng email.</span></label>
-              <label class="field">Tỉnh / Thành phố *<input class="input" name="province" required autocomplete="address-level1" placeholder="VD: Hà Nội" /></label>
-              <label class="field">Phường / Xã *<input class="input" name="ward" required autocomplete="address-level2" /></label>
+              <label class="field">Tỉnh / Thành phố *<select class="input" name="province" required autocomplete="address-level1" data-province disabled><option value="">Đang tải danh sách…</option></select></label>
+              <label class="field">Phường / Xã *<select class="input" name="ward" required autocomplete="address-level2" data-ward disabled><option value="">Chọn tỉnh / thành phố trước</option></select></label>
+              <p class="-mt-2 text-xs text-muted sm:col-span-2">Theo danh mục hành chính mới (34 tỉnh/thành, áp dụng từ 01/07/2025).</p>
               <label class="field sm:col-span-2">Địa chỉ cụ thể *<input class="input" name="address" required autocomplete="street-address" placeholder="Số nhà, ngõ, đường…" /></label>
             </div>
           </fieldset>

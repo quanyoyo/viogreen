@@ -4,6 +4,7 @@
 import { site } from '../data/site';
 import { readCart, clearCart, totals, productBySlug } from './cart';
 import { $, $$, toast } from './ui';
+import { setAddress } from './address';
 
 const SAVED = 'vg-customer';
 const PHONE_RE = /^(\+?84|0)\d{9,10}$/;
@@ -67,12 +68,16 @@ function validate(form: HTMLFormElement): boolean {
   return false;
 }
 
-const fill = (form: HTMLFormElement, values: Record<string, unknown>, onlyEmpty = false) =>
+const fill = (form: HTMLFormElement, values: Record<string, unknown>, onlyEmpty = false) => {
   Object.entries(values).forEach(([k, v]) => {
+    if (k === 'province' || k === 'ward') return; // ô chọn danh mục hành chính: điền qua setAddress bên dưới
     const el = form.elements.namedItem(k) as HTMLInputElement | null;
     if (!el || !('value' in el) || el.type === 'radio' || el.type === 'checkbox' || !v) return;
     if (!onlyEmpty || !el.value) el.value = String(v);
   });
+  const province = form.elements.namedItem('province') as HTMLSelectElement | null;
+  if (values.province && (!onlyEmpty || !province?.value)) setAddress(form, String(values.province), values.ward ? String(values.ward) : null);
+};
 
 /** Trang đặt hàng: điền sẵn thông tin + báo trạng thái đăng nhập */
 async function setupOrderForm(form: HTMLFormElement) {

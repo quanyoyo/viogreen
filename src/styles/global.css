@@ -129,6 +129,8 @@
   .field { @apply flex flex-col gap-1.5 text-sm font-semibold text-ink; }
   .input { @apply min-h-12 w-full rounded-xl border border-line bg-white px-4 py-3 text-base font-normal text-ink placeholder:text-muted/70 transition-colors duration-200 focus:border-brand focus:ring-4 focus:ring-brand-100 focus:outline-none; }
   .input:user-invalid { @apply border-red-500 ring-red-100; }
+  /* Ô chọn (tỉnh/thành, phường/xã…): mũi tên riêng, mờ khi chưa chọn được */
+  select.input { @apply cursor-pointer appearance-none bg-no-repeat pr-11 disabled:cursor-not-allowed disabled:bg-cream disabled:text-muted; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23355e3b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-position: right 1rem center; background-size: 1.1rem; }
   .form-msg { @apply min-h-5 text-sm font-medium; }
   .form-msg[data-state='ok'] { @apply text-brand; }
   .form-msg[data-state='error'] { @apply text-red-600; }

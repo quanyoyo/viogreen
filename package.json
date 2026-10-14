@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "models": "node scripts/stl-to-glb.mjs"
+    "models": "node scripts/stl-to-glb.mjs",
+    "dvhc": "node scripts/fetch-dvhc.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

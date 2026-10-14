@@ -52,13 +52,15 @@ src/
   components/            Header, Footer, ProductCard, PolicyStrip, CtaBand, SectionHead, Ph (ảnh tạm),
                          Chatbot, ArModal, ContactForm, Breadcrumbs, Logo, Social, Icon
   scripts/               ui.ts (reveal, carousel, menu), cart.ts, forms.ts, ar.ts, chatbot.ts, data.ts,
-                         fb.ts (Firebase: auth, đơn, lead, quản trị), order-view.ts (hiển thị đơn dùng chung)
+                         fb.ts (Firebase: auth, đơn, lead, quản trị), order-view.ts (hiển thị đơn dùng chung),
+                         address.ts (chọn Tỉnh/thành → Phường/xã)
   data/                  site.ts (cấu hình), products.ts (16 SP), faq.ts, chatbot-kb.ts
   content/policies/      van-chuyen, doi-tra, bao-hanh, bao-mat (.md; {{address}} {{email}}… thay từ site.ts)
   styles/global.css      design tokens + hiệu ứng
 firestore.rules          quy tắc bảo mật Firestore (dán vào Console → Firestore → Rules → Publish)
 public/                  favicon-48.png, apple-touch-icon.png, robots.txt, _headers,
-                         assets/ (logo.png, mio-*.webp), products/, models/
+                         assets/ (logo.png, mio-*.webp), products/, models/,
+                         data/dvhc.json (34 tỉnh/thành + 3.321 phường/xã – tạo bằng `npm run dvhc`)
 .claude/launch.json      cấu hình dev server cho Browser pane (tên "dev")
 ```
 
@@ -101,6 +103,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Dinh dưỡng (2)
   - VIO-Care (2)
 - **Bộ lọc ECOHUB:** diện tích (`<10` / `10-20`), nguồn điện (`solar` / `grid`), nguồn nước (`tank` / `direct`).
+- **Địa chỉ (từ 14/10/2026):** Tỉnh/thành và Phường/xã chọn từ danh sách theo **danh mục hành chính mới** (34 tỉnh/thành, 3.321 phường/xã/đặc khu, hiệu lực 01/07/2025; bỏ cấp quận/huyện). Dữ liệu `public/data/dvhc.json` tạo bằng `npm run dvhc` (`scripts/fetch-dvhc.mjs`, nguồn provinces.open-api.vn API v2; script tự kiểm tra đủ 34 / 3.321). Chỉ tải khi trang có `<select data-province>`: trang Đặt hàng, Tài khoản (hồ sơ), form Liên hệ (chỉ tỉnh). Lưu tên đầy đủ ("Thành phố Hà Nội", "Phường Ba Đình"). Địa chỉ cũ đã lưu ("Hà Nội", "Ba Đình") tự khớp gần đúng qua `setAddress()`; không khớp thì để trống cho khách chọn. Không tải được danh sách thì tự đổi về ô nhập tay.
 - **Thanh toán:** `paymentMethod` = `cod` | `bank` (đơn trước 07/10/2026 không có → hiển thị "—"). Nhãn hiển thị ở `order-view.ts → PAYMENT_LABEL`.
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
@@ -115,6 +118,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Đăng nhập, Tài khoản, Quản trị (Firebase – chủ web đã test: đặt đơn, liên hệ, lead, phân quyền OK)
 - **Hiệu ứng:** đủ theo mục 5. Carousel hero tự chạy, vuốt được, có chấm chuyển slide.
 - **Giỏ hàng:** lưu localStorage, có biến thể và số lượng, nhớ thông tin khách.
+- **Địa chỉ:** chọn Tỉnh/thành → Phường/xã theo danh mục mới 34 tỉnh (xem mục 6).
 - **Đặt hàng:** chọn thanh toán **COD (giao qua SPX Express)** hoặc **Chuyển khoản** → lưu `paymentMethod` (`cod`/`bank`) vào đơn. Chọn chuyển khoản thì trang thành công (`?tt=bank`) hiện QR + Techcombank / STK / chủ TK / nội dung = mã đơn, nút sao chép. Thông tin ngân hàng ở `site.payment`. QR: `public/assets/qr-chuyen-khoan.webp` (cắt từ ảnh gốc `qr-chuyen-khoan.jpg` khách gửi; thiếu file thì trang tự ẩn QR). Phương thức thanh toán hiện ở `/tai-khoan/` và `/quan-tri/`.
 - **Form:** gửi vào Firestore (xem mục 8 bước 2).
 - **Liên hệ & MXH:** email `viogreen102@gmail.com` (cả chính sách bảo mật qua `{{email}}`); Facebook, TikTok `@viogreen.vn`, YouTube `@VIOGREEN-vn`, Shopee có link; Messenger, Zalo, Instagram hiện icon mờ chưa có link.

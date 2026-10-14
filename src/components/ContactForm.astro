@@ -15,7 +15,7 @@ const areas = ['Dưới 10m²', '10–20m²', 'Trên 20m²', 'Chưa rõ'];
     <label class="field">Email<input class="input" name="email" type="email" autocomplete="email" placeholder="name@gmail.com" /></label>
     {compact
       ? <label class="field">Tên công ty<input class="input" name="company" autocomplete="organization" /></label>
-      : <label class="field">Khu vực<input class="input" name="province" autocomplete="address-level1" placeholder="VD: Hà Nội" /></label>}
+      : <label class="field">Khu vực<select class="input" name="province" autocomplete="address-level1" data-province disabled><option value="">Đang tải danh sách…</option></select></label>}
   </div>
 
   {!compact && (

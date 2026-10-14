@@ -26,7 +26,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {(noindex || site.prelaunch) && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#355e3b" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="vi_VN" />

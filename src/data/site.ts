@@ -22,6 +22,11 @@ export const site = {
   // Giờ làm việc cho chatbot (giờ Việt Nam). day: 1 = Thứ 2 … 6 = Thứ 7
   workingHours: { days: [1, 2, 3, 4, 5, 6], start: '08:00', end: '16:55' },
   website: 'https://viogreen.com', // tên miền chính – khớp `site` trong astro.config.mjs
+
+  // ---- Chế độ trước ra mắt ----
+  // true = mọi trang có <meta name="robots" content="noindex"> → Google chưa đưa web lên kết quả tìm kiếm.
+  // Ngày ra mắt: đổi thành false, chạy check + build, push lên main (xem CLAUDE.md mục "Ra mắt").
+  prelaunch: true,
   companyName: 'VIO GREEN', // Tên pháp lý + MST thêm khi có
 
   // ---- Mạng xã hội: để '' = icon vẫn hiện nhưng chưa có link ----

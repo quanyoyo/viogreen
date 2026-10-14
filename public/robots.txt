@@ -1,7 +1,6 @@
+# Không chặn trang nào: các trang riêng tư (giỏ hàng, đặt hàng, tài khoản, quản trị) đã có
+# <meta name="robots" content="noindex">; Google phải đọc được trang thì mới thấy thẻ noindex.
 User-agent: *
 Allow: /
-Disallow: /dang-nhap/
-Disallow: /tai-khoan/
-Disallow: /quan-tri/
 
 Sitemap: https://viogreen.com/sitemap-index.xml

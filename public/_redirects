@@ -1,0 +1,26 @@
+# Cloudflare Pages – chuyển hướng 301 (18/10/2026): đổi tên sản phẩm X10/X20/Hydro → Sol/Plus/Pro, ECOBOX X10/X20 → S/Pro,
+# bỏ 2 trang gói VIO-Care (bảo hành chọn ngay ở trang chi tiết máy ECOHUB).
+/san-pham/ecohub-x10-sol/ /san-pham/ecohub-sol/ 301
+/san-pham/ecohub-x10-grid/ /san-pham/ecohub-grid/ 301
+/san-pham/ecohub-x10-hydro-sol/ /san-pham/ecohub-sol-plus/ 301
+/san-pham/ecohub-x10-hydro-grid/ /san-pham/ecohub-grid-plus/ 301
+/san-pham/ecohub-x20-sol/ /san-pham/ecohub-sol-pro/ 301
+/san-pham/ecohub-x20-grid/ /san-pham/ecohub-grid-pro/ 301
+/san-pham/bio-tank-x10/ /san-pham/bio-tank-s/ 301
+/san-pham/bio-tank-x20/ /san-pham/bio-tank-pro/ 301
+/san-pham/aqua-tank-x10/ /san-pham/aqua-tank-s/ 301
+/san-pham/aqua-tank-x20/ /san-pham/aqua-tank-pro/ 301
+/san-pham/vio-care-6m/ /san-pham/ 301
+/san-pham/vio-care-12m/ /san-pham/ 301
+/san-pham/ecohub-x10-sol /san-pham/ecohub-sol/ 301
+/san-pham/ecohub-x10-grid /san-pham/ecohub-grid/ 301
+/san-pham/ecohub-x10-hydro-sol /san-pham/ecohub-sol-plus/ 301
+/san-pham/ecohub-x10-hydro-grid /san-pham/ecohub-grid-plus/ 301
+/san-pham/ecohub-x20-sol /san-pham/ecohub-sol-pro/ 301
+/san-pham/ecohub-x20-grid /san-pham/ecohub-grid-pro/ 301
+/san-pham/bio-tank-x10 /san-pham/bio-tank-s/ 301
+/san-pham/bio-tank-x20 /san-pham/bio-tank-pro/ 301
+/san-pham/aqua-tank-x10 /san-pham/aqua-tank-s/ 301
+/san-pham/aqua-tank-x20 /san-pham/aqua-tank-pro/ 301
+/san-pham/vio-care-6m /san-pham/ 301
+/san-pham/vio-care-12m /san-pham/ 301

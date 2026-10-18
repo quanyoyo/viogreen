@@ -1,12 +1,14 @@
 // ============================================================
-//  DỮ LIỆU SẢN PHẨM — nguồn: "Thông tin làm web.docx"
+//  DỮ LIỆU SẢN PHẨM — nguồn: "Thông tin làm web.docx" (bản 18/10/2026: tên Sol / Plus / Pro, ECOBOX S / Plus / Pro)
+//  Mô tả lấy từ tài liệu, đã bỏ các ghi chú nội bộ ("Lưu ý kỹ thuật… chưa được xác nhận", "Thông tin cần xác nhận").
 //  price: null  => hiển thị "Liên hệ" (site.priceFallback)
-//  images: []   => hiển thị khung ảnh tạm. Đặt ảnh vào public/products/ rồi ghi '/products/ten-anh.jpg'
-//  model: null  => nút AR hiện "Đang cập nhật". Khi có file 3D: { glb: '/models/x10-sol.glb', usdz: '/models/x10-sol.usdz' }
+//  images: []   => hiển thị khung ảnh tạm. Đặt ảnh vào public/products/ rồi ghi '/products/ten-anh.webp'
+//  model: null  => nút AR hiện "Đang cập nhật". Khi có file 3D: { glb: '/models/ecohub-sol.glb' }
+//  Đổi slug → nhớ thêm dòng chuyển hướng 301 trong public/_redirects.
 // ============================================================
 
-export type CategoryKey = 'ecohub' | 'ecobox' | 'irrigation' | 'nutrition' | 'service';
-export type Area = '<10' | '10-20';
+export type CategoryKey = 'ecohub' | 'ecobox' | 'irrigation' | 'nutrition';
+export type Plants = '<15' | '<30';
 export type Power = 'solar' | 'grid';
 export type Water = 'tank' | 'direct';
 
@@ -16,16 +18,17 @@ export interface Product {
   shortName: string;
   edition?: string;
   category: CategoryKey;
-  area?: Area;
+  plants?: Plants;
   power?: Power;
   water?: Water;
   fits?: string;
   hasAR: boolean;
   summary: string;
   description: string[];
+  highlights?: { title: string; items: string[] };
   accessories: string[];
   specs: [string, string][];
-  variants?: { label: string; options: string[] };
+  variants?: { label: string; options: string[]; hint?: string };
   note?: string;
   price: number | null;
   images: string[];
@@ -34,275 +37,369 @@ export interface Product {
 
 export const categories: { key: CategoryKey; label: string; short: string }[] = [
   { key: 'ecohub', label: 'Hệ thống ECOHUB', short: 'ECOHUB' },
-  { key: 'ecobox', label: 'Hộp chứa ECOBOX', short: 'ECOBOX' },
+  { key: 'ecobox', label: 'Bình chứa ECOBOX', short: 'ECOBOX' },
   { key: 'irrigation', label: 'Phụ kiện tưới', short: 'Phụ kiện tưới' },
   { key: 'nutrition', label: 'Dinh dưỡng Bio-Nutri', short: 'Dinh dưỡng' },
-  { key: 'service', label: 'Gói bảo hành VIO-Care', short: 'Dịch vụ' },
 ];
 
-export const areaLabels: Record<Area, string> = { '<10': 'Dưới 10m²', '10-20': '10–20m²' };
+// Số lượng cây thay cho diện tích (khách yêu cầu 18/10/2026): dưới 10 m² → dưới 15 cây; 10–20 m² → dưới 30 cây
+export const plantLabels: Record<Plants, string> = { '<15': 'Dưới 15 cây', '<30': 'Dưới 30 cây' };
 export const powerLabels: Record<Power, string> = { solar: 'Năng lượng mặt trời', grid: 'Điện lưới' };
 export const waterLabels: Record<Water, string> = { tank: 'Bình chứa nước', direct: 'Nước trực tiếp' };
 
-const ecohubCommonX10 = ['bio-tank-x10', 'aqua-tank-x10', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
-const ecohubCommonX20 = ['bio-tank-x20', 'aqua-tank-x20', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
-const ecohubDirectX10 = ['bio-tank-x10', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
+// Gói bảo hành chọn ở trang chi tiết máy ECOHUB (lưu vào đơn như một biến thể). 12 tháng = tiêu chuẩn.
+export const warrantyOptions = ['Bảo hành 12 tháng', 'Bảo hành 18 tháng', 'Bảo hành 24 tháng'];
+const warranty = { label: 'Gói bảo hành', options: warrantyOptions, hint: 'Bảo hành tiêu chuẩn 12 tháng. Nhân viên sẽ xác nhận gói bảo hành cùng đơn hàng.' };
+
+const accS = ['bio-tank-s', 'aqua-tank-s', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
+const accPlus = ['bio-tank-plus', 'aqua-tank-plus', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
+const accPro = ['bio-tank-pro', 'aqua-tank-pro', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
+const ecoboxNote = 'Chỉ sử dụng nước hoặc dịch xử lý phù hợp với hướng dẫn kỹ thuật của VIO GREEN và đảm bảo vệ sinh hộp chứa trong quá trình sử dụng.';
 
 type Raw = Partial<Product> & Pick<Product, 'slug' | 'name' | 'shortName' | 'category' | 'summary' | 'description'>;
 
 const raw: Raw[] = [
   // ---------------- ECOHUB ----------------
   {
-    slug: 'ecohub-x10-sol',
-    name: 'VIO GREEN ECOHUB X10 Sol – Solar Edition',
-    shortName: 'ECOHUB X10 Sol',
+    slug: 'ecohub-sol',
+    name: 'VIO GREEN ECOHUB Sol – Solar Edition',
+    shortName: 'ECOHUB Sol',
     edition: 'Solar Edition',
     category: 'ecohub',
-    area: '<10', power: 'solar', water: 'tank',
+    plants: '<15', power: 'solar', water: 'tank',
     hasAR: true,
-    summary: 'Hệ thống chăm sóc cây thông minh cho không gian dưới 10m², vận hành bằng năng lượng mặt trời.',
+    summary: 'Hệ thống chăm sóc cây đô thị dùng năng lượng mặt trời, cho ban công và góc trồng cây nhỏ.',
     description: [
-      'VIO GREEN ECOHUB X10 Sol – Solar Edition là hệ thống chăm sóc cây thông minh dành cho không gian xanh dưới 10m², sử dụng năng lượng mặt trời để hỗ trợ vận hành. Sản phẩm được phát triển cho nhu cầu chăm sóc cây trong môi trường đô thị, nơi người dùng thường có diện tích trồng cây hạn chế nhưng không có nhiều thời gian theo dõi và tưới cây thủ công mỗi ngày.',
-      'ECOHUB X10 Sol tích hợp giải pháp tưới, quản lý nước và dinh dưỡng trong một hệ thống nhỏ gọn, hỗ trợ cung cấp nước và dưỡng chất cho cây theo điều kiện chăm sóc. Thay vì phụ thuộc hoàn toàn vào thao tác tưới thủ công, hệ thống giúp giảm bớt công việc chăm sóc lặp lại và tạo sự thuận tiện hơn trong quá trình duy trì không gian xanh.',
-      'Sản phẩm phù hợp với các khu vực như ban công, sân thượng hoặc những không gian trồng cây đô thị có diện tích dưới 10m². ECOHUB X10 Sol là lựa chọn dành cho người dùng muốn duy trì cây xanh ổn định, đồng thời tận dụng nguồn năng lượng mặt trời trong quá trình vận hành.',
+      'VIO GREEN ECOHUB Sol – Solar Edition là hệ thống chăm sóc cây đô thị sử dụng năng lượng mặt trời để hỗ trợ vận hành. Sản phẩm hướng đến những người dùng sống tại đô thị, có nhu cầu duy trì không gian xanh nhưng không có nhiều thời gian để tưới và chăm sóc cây thủ công mỗi ngày.',
+      'ECOHUB Sol được định hướng tích hợp giải pháp tưới nước và hỗ trợ quản lý việc bổ sung dinh dưỡng cho cây trong cùng một hệ thống. Sản phẩm giúp giảm các thao tác chăm sóc lặp lại, tạo sự thuận tiện hơn trong quá trình duy trì cây xanh tại nhà.',
+      'ECOHUB Sol phù hợp với những không gian trồng cây có diện tích dưới 10 m², chẳng hạn ban công căn hộ hoặc khu vực trồng cây nhỏ. Việc sử dụng năng lượng mặt trời hướng đến tận dụng nguồn năng lượng tái tạo trong quá trình vận hành.',
     ],
-    accessories: ecohubCommonX10,
-    note: 'Phạm vi sử dụng, cấu hình lắp đặt và lượng nước/dinh dưỡng cần được thực hiện theo hướng dẫn kỹ thuật của VIO GREEN và nhu cầu thực tế của từng loại cây.',
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Sử dụng năng lượng mặt trời để hỗ trợ vận hành.',
+      'Hướng đến nhu cầu tưới và chăm sóc cây trong không gian đô thị.',
+      'Hỗ trợ giảm các thao tác tưới cây thủ công.',
+      'Phù hợp với cấu hình lắp đặt có quy mô nhỏ theo định vị sản phẩm.',
+    ] },
+    accessories: accS,
+    variants: warranty,
+    images: ['/products/ecohub-sol.webp'],
   },
   {
-    slug: 'ecohub-x10-grid',
-    name: 'VIO GREEN ECOHUB X10 Grid – Electric Edition',
-    shortName: 'ECOHUB X10 Grid',
+    slug: 'ecohub-grid',
+    name: 'VIO GREEN ECOHUB Grid – Electric Edition',
+    shortName: 'ECOHUB Grid',
     edition: 'Electric Edition',
     category: 'ecohub',
-    area: '<10', power: 'grid', water: 'tank',
+    plants: '<15', power: 'grid', water: 'tank',
     hasAR: true,
-    summary: 'Hệ thống chăm sóc cây thông minh cho không gian dưới 10m², dùng nguồn điện trực tiếp.',
+    summary: 'Hệ thống chăm sóc cây dùng nguồn điện trực tiếp, cho ban công và sân thượng nhỏ có sẵn ổ điện.',
     description: [
-      'VIO GREEN ECOHUB X10 Grid – Electric Edition là hệ thống chăm sóc cây thông minh dành cho không gian xanh dưới 10m², sử dụng nguồn điện trực tiếp để vận hành. Sản phẩm hướng đến người dùng đô thị muốn tự động hóa một phần quá trình chăm sóc cây, đặc biệt tại các khu vực có sẵn nguồn điện và diện tích trồng cây nhỏ.',
-      'ECOHUB X10 Grid tích hợp giải pháp tưới và quản lý dinh dưỡng trong một hệ thống, hỗ trợ đưa nước và dưỡng chất đến khu vực cây trồng thông qua hệ thống dẫn và đầu tưới. Việc tự động hóa quá trình chăm sóc giúp giảm sự phụ thuộc vào thao tác tưới thủ công hằng ngày, đồng thời tạo sự thuận tiện hơn cho người dùng bận rộn.',
-      'Sản phẩm phù hợp với ban công, sân thượng và các khu vực trồng cây có diện tích dưới 10m². Với nguồn điện trực tiếp, ECOHUB X10 Grid phù hợp với những vị trí đã có hệ thống điện ổn định và cần một giải pháp chăm sóc cây thuận tiện, liên tục.',
+      'VIO GREEN ECOHUB Grid – Electric Edition là hệ thống chăm sóc cây sử dụng nguồn điện trực tiếp để vận hành, hướng đến người dùng đô thị muốn đơn giản hóa quá trình tưới cây và bổ sung dinh dưỡng.',
+      'Hệ thống được định hướng hỗ trợ dẫn nước hoặc dung dịch tưới qua hệ thống ống và đầu tưới phù hợp, giúp phân phối nước đến khu vực cây trồng theo cấu hình lắp đặt. Nhờ đó, người dùng có thể giảm sự phụ thuộc vào việc tưới cây thủ công thường xuyên.',
+      'ECOHUB Grid phù hợp với các khu vực như ban công căn hộ, sân thượng nhỏ hoặc không gian trồng cây đô thị có sẵn nguồn điện, dành cho khu vực xanh dưới 10 m².',
     ],
-    accessories: ecohubCommonX10,
-    note: 'Sản phẩm cần được lắp đặt và sử dụng theo hướng dẫn của VIO GREEN, đồng thời đảm bảo điều kiện nguồn điện phù hợp với yêu cầu kỹ thuật của hệ thống.',
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Sử dụng nguồn điện trực tiếp.',
+      'Hỗ trợ tổ chức việc tưới cây thông qua hệ thống dẫn nước và đầu tưới.',
+      'Hướng đến việc giảm thời gian chăm sóc cây thủ công.',
+      'Phù hợp với không gian trồng cây nhỏ có điều kiện cấp điện phù hợp.',
+    ] },
+    accessories: accS,
+    variants: warranty,
+    images: ['/products/ecohub-grid.webp'],
   },
   {
-    slug: 'ecohub-x10-hydro-sol',
-    name: 'VIO GREEN ECOHUB X10 Hydro Sol – Solar & Direct Water Edition',
-    shortName: 'ECOHUB X10 Hydro Sol',
+    slug: 'ecohub-sol-plus',
+    name: 'VIO GREEN ECOHUB Sol Plus – Solar & Direct Water Edition',
+    shortName: 'ECOHUB Sol Plus',
     edition: 'Solar & Direct Water Edition',
     category: 'ecohub',
-    area: '<10', power: 'solar', water: 'direct',
+    plants: '<15', power: 'solar', water: 'direct',
     hasAR: true,
-    summary: 'Kết hợp năng lượng mặt trời và nguồn nước trực tiếp cho không gian dưới 10m².',
+    summary: 'Kết hợp năng lượng mặt trời và kết nối nguồn nước trực tiếp, cho ban công, sân thượng nhỏ.',
     description: [
-      'VIO GREEN ECOHUB X10 Hydro Sol – Solar & Direct Water Edition là hệ thống chăm sóc cây thông minh dành cho không gian dưới 10m², kết hợp sử dụng năng lượng mặt trời với nguồn nước trực tiếp. Sản phẩm được thiết kế nhằm đơn giản hóa quá trình chăm sóc cây tại các không gian đô thị có sẵn nguồn nước và cần giảm thao tác tưới thủ công.',
-      'Hệ thống hỗ trợ đưa nước trực tiếp từ nguồn cấp đến khu vực trồng cây thông qua hệ thống tưới, đồng thời kết hợp giải pháp quản lý dinh dưỡng để hỗ trợ nhu cầu chăm sóc cây. Việc sử dụng nguồn nước trực tiếp giúp giảm nhu cầu phụ thuộc vào bình chứa nước riêng trong cấu hình phù hợp, trong khi năng lượng mặt trời hỗ trợ quá trình vận hành của hệ thống.',
-      'ECOHUB X10 Hydro Sol phù hợp với ban công, sân thượng và các khu vực cây xanh dưới 10m² có thể kết nối với nguồn nước trực tiếp. Đây là lựa chọn phù hợp cho người dùng muốn kết hợp tự động hóa chăm sóc cây với việc tận dụng nguồn năng lượng mặt trời.',
+      'VIO GREEN ECOHUB Sol Plus – Solar & Direct Water Edition là phiên bản kết hợp năng lượng mặt trời với khả năng kết nối nguồn nước trực tiếp, hướng đến nhu cầu chăm sóc cây trong các không gian đô thị có điều kiện cấp nước phù hợp.',
+      'Sản phẩm được định hướng hỗ trợ đưa nước từ nguồn cấp đến khu vực trồng cây thông qua hệ thống tưới. Tùy theo cấu hình thực tế, hệ thống có thể kết hợp với giải pháp quản lý dinh dưỡng để hỗ trợ quá trình chăm sóc cây.',
+      'Việc kết nối nguồn nước trực tiếp có thể giúp giảm nhu cầu chuẩn bị và bổ sung nước vào bình chứa chính trong những cấu hình được thiết kế phù hợp. Năng lượng mặt trời được sử dụng để hỗ trợ vận hành hệ thống.',
+      'ECOHUB Sol Plus phù hợp với ban công, sân thượng hoặc khu vực trồng cây dưới 10 m² có điều kiện kết nối nguồn nước trực tiếp.',
     ],
-    accessories: ecohubDirectX10,
-    note: 'Sản phẩm yêu cầu điều kiện kết nối nguồn nước phù hợp. Việc lắp đặt và vận hành cần tuân thủ hướng dẫn kỹ thuật của VIO GREEN.',
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Kết hợp năng lượng mặt trời và nguồn nước trực tiếp.',
+      'Hỗ trợ đưa nước đến khu vực trồng cây thông qua hệ thống tưới.',
+      'Hướng đến việc giảm thao tác tưới cây thủ công.',
+      'Phù hợp với các không gian nhỏ có điều kiện kết nối nguồn nước.',
+    ] },
+    accessories: accPlus,
+    variants: warranty,
   },
   {
-    slug: 'ecohub-x10-hydro-grid',
-    name: 'VIO GREEN ECOHUB X10 Hydro Grid – Electric & Direct Water Edition',
-    shortName: 'ECOHUB X10 Hydro Grid',
+    slug: 'ecohub-grid-plus',
+    name: 'VIO GREEN ECOHUB Grid Plus – Electric & Direct Water Edition',
+    shortName: 'ECOHUB Grid Plus',
     edition: 'Electric & Direct Water Edition',
     category: 'ecohub',
-    area: '<10', power: 'grid', water: 'direct',
+    plants: '<15', power: 'grid', water: 'direct',
     hasAR: true,
-    summary: 'Dùng điện trực tiếp và nước trực tiếp – vận hành ổn định cho không gian dưới 10m².',
+    summary: 'Dùng điện trực tiếp và nước trực tiếp – cho không gian nhỏ có sẵn cả nguồn điện và nguồn nước.',
     description: [
-      'VIO GREEN ECOHUB X10 Hydro Grid – Electric & Direct Water Edition là hệ thống chăm sóc cây thông minh dành cho không gian dưới 10m², sử dụng điện trực tiếp và kết nối với nguồn nước trực tiếp. Sản phẩm phù hợp với những khu vực trồng cây đô thị có sẵn cả nguồn điện và nguồn nước, giúp đơn giản hóa quá trình tưới và chăm sóc cây.',
-      'ECOHUB X10 Hydro Grid hỗ trợ đưa nước từ nguồn cấp trực tiếp đến khu vực trồng cây thông qua hệ thống tưới, đồng thời kết hợp quản lý dinh dưỡng để hỗ trợ quá trình chăm sóc. Hệ thống giúp giảm các thao tác tưới cây thủ công lặp lại, đặc biệt phù hợp với người dùng bận rộn hoặc thường xuyên không có mặt tại nhà.',
-      'Sản phẩm có thể được sử dụng cho ban công, sân thượng và các khu vực xanh dưới 10m² có điều kiện kết nối điện và nước phù hợp. Đây là giải pháp hướng đến sự thuận tiện và ổn định trong quá trình chăm sóc cây đô thị.',
+      'VIO GREEN ECOHUB Grid Plus – Electric & Direct Water Edition là hệ thống chăm sóc cây sử dụng nguồn điện trực tiếp và kết nối nguồn nước trực tiếp. Sản phẩm hướng đến các khu vực trồng cây đô thị có sẵn cả nguồn điện và nguồn nước, giúp đơn giản hóa quá trình tưới cây.',
+      'Hệ thống được định hướng hỗ trợ đưa nước từ nguồn cấp đến khu vực trồng cây thông qua đường ống và đầu tưới tương thích. Tùy cấu hình thực tế, hệ thống có thể kết hợp với các phụ kiện quản lý dinh dưỡng nhằm hỗ trợ quá trình chăm sóc cây.',
+      'ECOHUB Grid Plus phù hợp với ban công căn hộ, sân thượng hoặc khu vực trồng cây nhỏ có điều kiện kết nối điện và nước, với phạm vi sử dụng dưới 10 m².',
     ],
-    accessories: ecohubDirectX10,
-    note: 'Cần đảm bảo nguồn điện và nguồn nước đáp ứng yêu cầu kỹ thuật trước khi lắp đặt.',
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Sử dụng nguồn điện trực tiếp.',
+      'Kết nối với nguồn nước trực tiếp theo cấu hình phù hợp.',
+      'Hỗ trợ phân phối nước qua hệ thống tưới.',
+      'Hướng đến việc giảm thao tác tưới thủ công tại các không gian đô thị nhỏ.',
+    ] },
+    // Tài liệu ghi "Aqua-Tank Pro" cho Grid Plus – hiểu là Aqua-Tank Plus (Aqua-Tank Plus ghi tương thích Sol Plus, Grid Plus)
+    accessories: accPlus,
+    variants: warranty,
+    note: 'Việc lắp đặt phải tuân thủ hướng dẫn kỹ thuật của sản phẩm.',
   },
   {
-    slug: 'ecohub-x20-sol',
-    name: 'VIO GREEN ECOHUB X20 Sol – Solar Edition',
-    shortName: 'ECOHUB X20 Sol',
+    slug: 'ecohub-sol-pro',
+    name: 'VIO GREEN ECOHUB Sol Pro – Solar Edition',
+    shortName: 'ECOHUB Sol Pro',
     edition: 'Solar Edition',
     category: 'ecohub',
-    area: '10-20', power: 'solar', water: 'tank',
+    plants: '<30', power: 'solar', water: 'tank',
     hasAR: true,
-    summary: 'Hệ thống chăm sóc cây thông minh cho không gian 10–20m², vận hành bằng năng lượng mặt trời.',
+    summary: 'Bản năng lượng mặt trời cho không gian xanh lớn hơn: sân thượng, ban công lớn, nhiều chậu cây.',
     description: [
-      'VIO GREEN ECOHUB X20 Sol – Solar Edition là hệ thống chăm sóc cây thông minh dành cho không gian xanh từ 10–20m², sử dụng năng lượng mặt trời để hỗ trợ vận hành. Sản phẩm được phát triển cho các khu vực trồng cây đô thị có quy mô lớn hơn dòng X10 nhưng vẫn cần một giải pháp chăm sóc thuận tiện và giảm thao tác thủ công.',
-      'ECOHUB X20 Sol tích hợp giải pháp tưới và quản lý dinh dưỡng trong một hệ thống, hỗ trợ cung cấp nước và dưỡng chất đến khu vực cây trồng. Hệ thống giúp người dùng giảm thời gian dành cho các công việc chăm sóc lặp lại, đồng thời tận dụng nguồn năng lượng mặt trời trong quá trình vận hành.',
-      'Sản phẩm phù hợp với sân thượng, ban công lớn hoặc các khu vực cây xanh có diện tích từ 10–20m². Đây là lựa chọn phù hợp cho người dùng đô thị muốn duy trì không gian xanh có quy mô lớn hơn mà vẫn hướng đến phương thức chăm sóc thuận tiện và tiết kiệm nguồn lực.',
+      'VIO GREEN ECOHUB Sol Pro – Solar Edition là hệ thống chăm sóc cây sử dụng năng lượng mặt trời để hỗ trợ vận hành, hướng đến những không gian trồng cây đô thị có quy mô lớn hơn dòng Sol tiêu chuẩn.',
+      'Sản phẩm được định hướng hỗ trợ tưới nước và quản lý việc bổ sung dinh dưỡng cho cây thông qua hệ thống tưới và các phụ kiện tương thích. Việc tự động hóa một phần quá trình chăm sóc giúp người dùng giảm thời gian dành cho các thao tác lặp lại, đặc biệt tại những khu vực có nhiều chậu cây.',
+      'ECOHUB Sol Pro phù hợp với các không gian xanh từ 10–20 m², chẳng hạn sân thượng, ban công lớn hoặc khu vực trồng cây tại nhà.',
     ],
-    accessories: ecohubCommonX20,
-    note: 'Cấu hình lắp đặt và nhu cầu nước/dinh dưỡng cần được xác định dựa trên diện tích và loại cây thực tế.',
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Sử dụng năng lượng mặt trời để hỗ trợ vận hành.',
+      'Hướng đến không gian trồng cây có quy mô lớn hơn dòng Sol.',
+      'Hỗ trợ tổ chức việc tưới và bổ sung dinh dưỡng theo cấu hình.',
+      'Phù hợp với các khu vực có nhiều cây cần được chăm sóc thường xuyên.',
+    ] },
+    accessories: accPro,
+    variants: warranty,
   },
   {
-    slug: 'ecohub-x20-grid',
-    name: 'VIO GREEN ECOHUB X20 Grid – Electric Edition',
-    shortName: 'ECOHUB X20 Grid',
+    slug: 'ecohub-grid-pro',
+    name: 'VIO GREEN ECOHUB Grid Pro – Electric Edition',
+    shortName: 'ECOHUB Grid Pro',
     edition: 'Electric Edition',
     category: 'ecohub',
-    area: '10-20', power: 'grid', water: 'tank',
+    plants: '<30', power: 'grid', water: 'tank',
     hasAR: true,
-    summary: 'Hệ thống chăm sóc cây thông minh cho không gian 10–20m², dùng nguồn điện trực tiếp.',
+    summary: 'Bản điện lưới cho không gian xanh lớn hơn có sẵn nguồn điện: sân thượng, ban công lớn.',
     description: [
-      'VIO GREEN ECOHUB X20 Grid – Electric Edition là hệ thống chăm sóc cây thông minh dành cho không gian xanh từ 10–20m², sử dụng nguồn điện trực tiếp. Sản phẩm hướng đến những không gian trồng cây có diện tích lớn hơn dòng X10 và có sẵn nguồn điện để vận hành hệ thống.',
-      'ECOHUB X20 Grid hỗ trợ tự động hóa quá trình tưới và quản lý dinh dưỡng, giúp nước và dưỡng chất được phân phối đến khu vực cây trồng thông qua hệ thống dẫn và đầu tưới. Nhờ đó, người dùng có thể giảm bớt các thao tác chăm sóc thủ công và duy trì không gian xanh thuận tiện hơn trong sinh hoạt hằng ngày.',
-      'Sản phẩm phù hợp với sân thượng, ban công lớn và các khu vực cây xanh từ 10–20m². ECOHUB X20 Grid đặc biệt phù hợp với người dùng muốn quản lý nhiều cây trong cùng một khu vực bằng một hệ thống chăm sóc tích hợp.',
+      'VIO GREEN ECOHUB Grid Pro – Electric Edition là hệ thống chăm sóc cây sử dụng nguồn điện trực tiếp, hướng đến các khu vực trồng cây đô thị có quy mô lớn hơn dòng Grid tiêu chuẩn.',
+      'Sản phẩm được định hướng hỗ trợ dẫn và phân phối nước đến các vị trí trồng cây thông qua hệ thống ống và đầu tưới tương thích. Khi được lắp đặt với cấu hình phù hợp, hệ thống có thể hỗ trợ quá trình quản lý việc tưới và bổ sung dinh dưỡng cho nhiều chậu cây trong cùng một khu vực.',
+      'ECOHUB Grid Pro phù hợp với các không gian xanh từ 10–20 m², chẳng hạn sân thượng hoặc ban công lớn có sẵn nguồn điện.',
     ],
-    accessories: ecohubCommonX20,
-    note: 'Sản phẩm sử dụng nguồn điện trực tiếp và cần được lắp đặt theo yêu cầu kỹ thuật của VIO GREEN.',
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Sử dụng nguồn điện trực tiếp.',
+      'Hướng đến khu vực trồng cây có quy mô lớn hơn dòng Grid tiêu chuẩn.',
+      'Hỗ trợ phân phối nước qua hệ thống dẫn và đầu tưới.',
+      'Giúp giảm các thao tác tưới cây thủ công lặp lại.',
+    ] },
+    accessories: accPro,
+    variants: warranty,
   },
 
   // ---------------- ECOBOX ----------------
   {
-    slug: 'bio-tank-x10',
-    name: 'VIO GREEN ECOBOX Bio-Tank X10',
-    shortName: 'Bio-Tank X10',
+    slug: 'bio-tank-s',
+    name: 'VIO GREEN ECOBOX Bio-Tank S',
+    shortName: 'Bio-Tank S',
     category: 'ecobox',
-    fits: 'ECOHUB X10',
-    summary: 'Hộp chứa phân sinh học cỡ tiêu chuẩn cho hệ thống ECOHUB X10 (dưới 10m²).',
+    fits: 'ECOHUB Sol, Grid',
+    summary: 'Bình chứa dung dịch dinh dưỡng cho cấu hình ECOHUB Sol và Grid.',
     description: [
-      'VIO GREEN ECOBOX Bio-Tank X10 là hộp chứa phân sinh học cỡ tiêu chuẩn dành cho hệ thống ECOHUB sử dụng trong không gian dưới 10m². Sản phẩm có chức năng lưu trữ và hỗ trợ cung cấp nguồn dinh dưỡng sinh học cho hệ thống chăm sóc cây, giúp quá trình bổ sung dinh dưỡng trở nên thuận tiện và đồng bộ hơn.',
-      'Bio-Tank X10 được sử dụng cùng cấu hình ECOHUB X10 phù hợp, hỗ trợ hệ thống quản lý dinh dưỡng cho cây trong quá trình vận hành. Hộp có thể được thay thế hoặc bổ sung theo nhu cầu sử dụng và chu kỳ chăm sóc thực tế.',
-      'Sản phẩm phù hợp với người dùng ECOHUB X10 cần bổ sung hoặc thay thế hộp chứa phân sinh học.',
+      'VIO GREEN ECOBOX Bio-Tank S là bình hoặc hộp chứa dung dịch dinh dưỡng dành cho cấu hình hệ thống ECOHUB tương thích. Sản phẩm được định hướng phục vụ việc lưu trữ và hỗ trợ cấp dung dịch dinh dưỡng cho cây trong quá trình vận hành.',
+      'Bio-Tank S hướng đến các cấu hình có quy mô nhỏ, giúp việc chuẩn bị và bổ sung dung dịch dinh dưỡng trở nên thuận tiện hơn khi hệ thống được thiết kế hỗ trợ chức năng này.',
     ],
-    note: 'Chỉ sử dụng loại dinh dưỡng và cấu hình được VIO GREEN khuyến nghị; thực hiện việc thay thế theo hướng dẫn kỹ thuật của sản phẩm.',
+    highlights: { title: 'Công dụng', items: [
+      'Lưu trữ dung dịch dinh dưỡng theo cấu hình tương thích.',
+      'Hỗ trợ cấp dung dịch cho hệ thống khi thiết kế thực tế có tích hợp chức năng.',
+      'Có thể sử dụng để thay thế hoặc bổ sung bình chứa theo nhu cầu.',
+    ] },
+    accessories: ['ecohub-sol', 'ecohub-grid'],
+    note: ecoboxNote,
   },
   {
-    slug: 'bio-tank-x20',
-    name: 'VIO GREEN ECOBOX Bio-Tank X20',
-    shortName: 'Bio-Tank X20',
+    slug: 'bio-tank-plus',
+    name: 'VIO GREEN ECOBOX Bio-Tank Plus',
+    shortName: 'Bio-Tank Plus',
     category: 'ecobox',
-    fits: 'ECOHUB X20',
-    summary: 'Hộp chứa phân sinh học cỡ lớn cho hệ thống ECOHUB X20 (10–20m²).',
+    fits: 'ECOHUB Sol Plus, Grid Plus',
+    summary: 'Bình chứa dung dịch dinh dưỡng cho cấu hình ECOHUB Sol Plus và Grid Plus.',
     description: [
-      'VIO GREEN ECOBOX Bio-Tank X20 là hộp chứa phân sinh học cỡ lớn dành cho hệ thống ECOHUB sử dụng trong không gian từ 10–20m². Sản phẩm được thiết kế để lưu trữ và hỗ trợ cung cấp nguồn dinh dưỡng sinh học cho hệ thống chăm sóc cây, phù hợp với nhu cầu vận hành ở quy mô lớn hơn dòng X10.',
-      'Bio-Tank X20 hỗ trợ quá trình quản lý dinh dưỡng trong hệ thống ECOHUB X20, giúp người dùng thuận tiện hơn trong việc bổ sung và thay thế nguồn dinh dưỡng cho cây. Sản phẩm là phụ kiện thay thế/bổ sung dành cho cấu hình tương thích.',
-      'Phù hợp với người dùng ECOHUB X20 và các hệ thống có cấu hình tương ứng.',
+      'VIO GREEN ECOBOX Bio-Tank Plus là bình hoặc hộp chứa dung dịch dinh dưỡng dành cho cấu hình ECOHUB tương thích.',
+      'Sản phẩm hướng đến việc hỗ trợ lưu trữ và bổ sung dung dịch dinh dưỡng cho hệ thống chăm sóc cây. Bình chứa có thể được sử dụng để thay thế hoặc bổ sung cho cấu hình tương thích theo nhu cầu vận hành.',
     ],
-    note: 'Việc sử dụng và thay thế cần thực hiện theo hướng dẫn của VIO GREEN để đảm bảo hệ thống hoạt động đúng cấu hình.',
+    highlights: { title: 'Công dụng', items: [
+      'Lưu trữ dung dịch dinh dưỡng theo thiết kế được hỗ trợ.',
+      'Hỗ trợ việc bổ sung dinh dưỡng trong quá trình chăm sóc cây.',
+      'Phục vụ cấu hình ECOHUB được xác nhận tương thích.',
+    ] },
+    accessories: ['ecohub-sol-plus', 'ecohub-grid-plus'],
+    note: ecoboxNote,
   },
   {
-    slug: 'aqua-tank-x10',
-    name: 'VIO GREEN ECOBOX Aqua-Tank X10',
-    shortName: 'Aqua-Tank X10',
+    slug: 'bio-tank-pro',
+    name: 'VIO GREEN ECOBOX Bio-Tank Pro',
+    shortName: 'Bio-Tank Pro',
     category: 'ecobox',
-    fits: 'ECOHUB X10',
-    summary: 'Hộp chứa nước/dịch xử lý cỡ tiêu chuẩn cho hệ thống ECOHUB X10.',
+    fits: 'ECOHUB Sol Pro, Grid Pro',
+    summary: 'Bình chứa ECOBOX cho cấu hình ECOHUB Sol Pro và Grid Pro – thông tin chi tiết đang cập nhật.',
     description: [
-      'VIO GREEN ECOBOX Aqua-Tank X10 là hộp chứa nước/dịch xử lý cỡ tiêu chuẩn dành cho hệ thống ECOHUB X10. Sản phẩm có chức năng lưu trữ và hỗ trợ cung cấp nước hoặc dịch xử lý cho hệ thống chăm sóc cây, phù hợp với những cấu hình ECOHUB sử dụng nguồn nước từ bình chứa.',
-      'Aqua-Tank X10 giúp người dùng chủ động chuẩn bị nguồn nước cho quá trình chăm sóc cây mà không cần thực hiện việc tưới thủ công thường xuyên. Hộp có thể được sử dụng, bổ sung hoặc thay thế tùy theo cấu hình và nhu cầu thực tế của hệ thống.',
-      'Sản phẩm phù hợp với ECOHUB X10 và các cấu hình tương thích.',
+      'VIO GREEN ECOBOX Bio-Tank Pro là bình chứa thuộc dòng ECOBOX, dùng cho cấu hình ECOHUB Sol Pro và ECOHUB Grid Pro.',
+      'Thông tin chi tiết về công dụng, dung tích và kích thước đang được VIO GREEN cập nhật. Bạn vui lòng liên hệ để được tư vấn cấu hình phù hợp.',
     ],
-    note: 'Chỉ sử dụng nước hoặc dịch xử lý phù hợp với hướng dẫn kỹ thuật của VIO GREEN và đảm bảo vệ sinh hộp chứa trong quá trình sử dụng.',
+    accessories: ['ecohub-sol-pro', 'ecohub-grid-pro'],
+    note: ecoboxNote,
   },
   {
-    slug: 'aqua-tank-x20',
-    name: 'VIO GREEN ECOBOX Aqua-Tank X20',
-    shortName: 'Aqua-Tank X20',
+    slug: 'aqua-tank-s',
+    name: 'VIO GREEN ECOBOX Aqua-Tank S',
+    shortName: 'Aqua-Tank S',
     category: 'ecobox',
-    fits: 'ECOHUB X20',
-    summary: 'Hộp chứa nước/dịch xử lý cỡ lớn cho hệ thống ECOHUB X20.',
+    fits: 'ECOHUB Sol, Grid',
+    summary: 'Bình chứa nước cho cấu hình ECOHUB Sol và Grid dùng nguồn chứa riêng.',
     description: [
-      'VIO GREEN ECOBOX Aqua-Tank X20 là hộp chứa nước/dịch xử lý cỡ lớn dành cho hệ thống ECOHUB X20. Sản phẩm hỗ trợ lưu trữ và cung cấp nước hoặc dịch xử lý cho hệ thống chăm sóc cây, đáp ứng nhu cầu sử dụng ở các không gian xanh từ 10–20m².',
-      'Aqua-Tank X20 giúp người dùng chủ động chuẩn bị nguồn nước cho hệ thống, đồng thời hỗ trợ quá trình tưới và chăm sóc cây theo cấu hình ECOHUB tương ứng. Đây là phụ kiện phù hợp cho người dùng cần thay thế hoặc bổ sung hộp chứa nước trong quá trình sử dụng.',
-      'Sản phẩm tương thích với cấu hình ECOHUB X20 phù hợp.',
+      'VIO GREEN ECOBOX Aqua-Tank S là bình chứa nước hoặc dung dịch phù hợp với cấu hình ECOHUB sử dụng nguồn chứa riêng. Sản phẩm hướng đến việc giúp người dùng chuẩn bị nguồn nước phục vụ quá trình tưới cây theo cấu hình hệ thống.',
+      'Aqua-Tank S có thể được sử dụng như phụ kiện bổ sung hoặc thay thế khi hệ thống được thiết kế tương thích. Việc sử dụng bình chứa giúp người dùng chủ động chuẩn bị nguồn nước tại khu vực trồng cây mà không nhất thiết phải kết nối nguồn cấp nước trực tiếp.',
     ],
-    note: 'Dung dịch sử dụng trong hộp cần tuân thủ hướng dẫn của VIO GREEN; không tự ý sử dụng các loại dung dịch không được khuyến nghị.',
+    highlights: { title: 'Công dụng', items: [
+      'Lưu trữ nước theo cấu hình hệ thống tương thích.',
+      'Hỗ trợ cung cấp nước cho quá trình tưới cây.',
+      'Có thể thay thế hoặc bổ sung khi cần thiết.',
+    ] },
+    accessories: ['ecohub-sol', 'ecohub-grid'],
+    note: ecoboxNote,
+  },
+  {
+    slug: 'aqua-tank-plus',
+    name: 'VIO GREEN ECOBOX Aqua-Tank Plus',
+    shortName: 'Aqua-Tank Plus',
+    category: 'ecobox',
+    fits: 'ECOHUB Sol Plus, Grid Plus',
+    summary: 'Bình chứa nước cho cấu hình ECOHUB Sol Plus và Grid Plus.',
+    description: [
+      'VIO GREEN ECOBOX Aqua-Tank Plus là bình chứa nước hoặc dung dịch dành cho cấu hình ECOHUB tương thích. Sản phẩm hướng đến nhu cầu chuẩn bị và lưu trữ nguồn nước phục vụ hệ thống tưới tại các khu vực trồng cây đô thị.',
+      'Aqua-Tank Plus có thể được sử dụng để thay thế hoặc bổ sung bình chứa khi cần thiết, giúp người dùng chủ động hơn trong quá trình vận hành hệ thống chăm sóc cây.',
+    ],
+    highlights: { title: 'Công dụng', items: [
+      'Lưu trữ nước cho cấu hình tương thích.',
+      'Hỗ trợ cung cấp nước cho hệ thống tưới.',
+      'Phục vụ các cấu hình ECOHUB được xác nhận phù hợp.',
+    ] },
+    accessories: ['ecohub-sol-plus', 'ecohub-grid-plus'],
+    note: ecoboxNote,
+  },
+  {
+    slug: 'aqua-tank-pro',
+    name: 'VIO GREEN ECOBOX Aqua-Tank Pro',
+    shortName: 'Aqua-Tank Pro',
+    category: 'ecobox',
+    fits: 'ECOHUB Sol Pro, Grid Pro',
+    summary: 'Bình chứa nước cho cấu hình ECOHUB Sol Pro và Grid Pro.',
+    description: [
+      'VIO GREEN ECOBOX Aqua-Tank Pro là bình chứa nước hoặc dung dịch dành cho cấu hình ECOHUB Pro tương thích. Sản phẩm hướng đến nhu cầu chuẩn bị và lưu trữ nguồn nước phục vụ hệ thống tưới tại các khu vực trồng cây đô thị.',
+      'Aqua-Tank Pro có thể được sử dụng để thay thế hoặc bổ sung bình chứa khi cần thiết, giúp người dùng chủ động hơn trong quá trình vận hành hệ thống chăm sóc cây.',
+    ],
+    highlights: { title: 'Công dụng', items: [
+      'Lưu trữ nước cho cấu hình tương thích.',
+      'Hỗ trợ cung cấp nước cho hệ thống tưới.',
+      'Phục vụ các cấu hình ECOHUB được xác nhận phù hợp.',
+    ] },
+    accessories: ['ecohub-sol-pro', 'ecohub-grid-pro'],
+    note: ecoboxNote,
   },
 
   // ---------------- PHỤ KIỆN TƯỚI ----------------
   {
     slug: 'bio-dripper',
-    name: 'VIO GREEN Bio-Dripper – Bộ 10 đầu tưới nhỏ giọt định lượng',
+    name: 'VIO GREEN Bio-Dripper – Bộ 10 đầu tưới nhỏ giọt',
     shortName: 'Bio-Dripper (bộ 10)',
     category: 'irrigation',
     fits: 'Mọi dòng ECOHUB',
-    summary: 'Bộ 10 đầu tưới nhỏ giọt, điều chỉnh được lưu lượng, đưa nước/dịch đến từng gốc cây.',
+    summary: 'Bộ 10 đầu tưới nhỏ giọt, đưa nước hoặc dung dịch tưới đến từng gốc cây, chậu cây.',
     specs: [['Quy cách', '01 bộ gồm 10 đầu tưới nhỏ giọt']],
     description: [
-      'VIO GREEN Bio-Dripper là bộ 10 đầu tưới nhỏ giọt dùng để phân phối nước hoặc dịch sinh học trực tiếp đến từng gốc cây/chậu cảnh. Sản phẩm được thiết kế để hỗ trợ tưới nhỏ giọt có kiểm soát, giúp nguồn nước hoặc dịch dinh dưỡng được đưa đến đúng vị trí cần thiết thay vì tưới dàn trải trên toàn bộ bề mặt.',
-      'Đầu tưới có khả năng điều chỉnh lưu lượng, cho phép người dùng điều chỉnh lượng nước/dịch phù hợp với cấu hình hệ thống và nhu cầu chăm sóc cây. Bio-Dripper có thể được sử dụng cùng hệ thống ECOHUB và kết nối thông qua VIO GREEN Hose.',
-      'Phù hợp với chậu cây, khu vực trồng cây và hệ thống chăm sóc cây đô thị.',
+      'VIO GREEN Bio-Dripper là bộ đầu tưới nhỏ giọt được thiết kế để phân phối nước hoặc dung dịch tưới đến từng vị trí trồng cây. Sản phẩm hướng đến việc đưa nước đến khu vực gốc cây hoặc chậu cây thông qua hệ thống ống dẫn, giúp bố trí điểm tưới phù hợp với cách sắp xếp cây trồng.',
+      'Bio-Dripper có thể kết hợp với ống VIO GREEN Hose và hệ thống ECOHUB tương thích. Việc sử dụng đầu tưới nhỏ giọt giúp xây dựng hệ thống tưới theo từng điểm, thay vì phải tưới thủ công riêng lẻ từng chậu.',
     ],
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Dùng để phân phối nước hoặc dung dịch tưới đến vị trí cây trồng.',
+      'Có thể lắp đặt theo từng chậu hoặc từng điểm tưới.',
+      'Kết nối với hệ thống ống dẫn tương thích.',
+      'Hướng đến việc tổ chức tưới cây thuận tiện hơn.',
+    ] },
     accessories: ['vio-green-hose'],
-    note: 'Lưu lượng thực tế phụ thuộc vào cấu hình hệ thống và điều kiện vận hành; cần lắp đặt đúng hướng dẫn để đảm bảo hiệu quả phân phối nước/dịch.',
   },
   {
     slug: 'vio-green-hose',
-    name: 'VIO GREEN Hose 6/8/10 mm – Ống dây tưới nhỏ giọt',
+    name: 'VIO GREEN Hose 6/8/10 mm – Ống dẫn tưới nhỏ giọt',
     shortName: 'VIO GREEN Hose',
     category: 'irrigation',
     fits: 'Mọi dòng ECOHUB',
     variants: { label: 'Đường kính', options: ['6 mm', '8 mm', '10 mm'] },
-    summary: 'Ống dây dẫn nước và dịch sinh học, kết nối ECOHUB với từng vị trí tưới.',
+    specs: [['Quy cách', '6 mm, 8 mm và 10 mm']],
+    summary: 'Ống dẫn nước hoặc dung dịch tưới, kết nối ECOHUB với đầu tưới và từng vị trí cây trồng.',
     description: [
-      'VIO GREEN Hose 6/8/10 mm là ống dây dẫn nước và dịch sinh học được sử dụng trong hệ thống tưới của VIO GREEN. Sản phẩm đóng vai trò kết nối giữa hệ thống ECOHUB với các vị trí tưới, giúp đưa nước hoặc dịch dinh dưỡng đến từng khu vực cây trồng.',
-      'Tùy theo cấu hình, VIO GREEN Hose có thể được sử dụng làm dây dẫn nhánh đến từng gốc cây/chậu cảnh, dây dẫn chính cho hệ thống chăm sóc không gian nhỏ dưới 10m² hoặc dây dẫn trục chính cho hệ thống có diện tích 10–20m².',
-      'Thiết kế dạng ống dẫn giúp hệ thống có thể triển khai linh hoạt theo bố trí thực tế của khu vực trồng cây. Sản phẩm có thể kết hợp với Bio-Dripper và các phụ kiện tưới tương thích của VIO GREEN.',
+      'VIO GREEN Hose là dòng ống dẫn nước hoặc dung dịch tưới sử dụng trong hệ thống chăm sóc cây VIO GREEN. Sản phẩm có chức năng kết nối hệ thống ECOHUB với các đầu tưới và vị trí cây trồng, hỗ trợ dẫn nước theo bố trí thực tế.',
+      'Tùy theo đường kính và cấu hình lắp đặt, ống có thể được sử dụng làm đường dẫn chính hoặc đường dẫn nhánh đến các chậu cây. Sản phẩm được định hướng kết hợp với Bio-Dripper và các phụ kiện tưới tương thích để xây dựng hệ thống tưới phù hợp với không gian xanh đô thị.',
     ],
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Dẫn nước hoặc dung dịch tưới đến vị trí cây trồng.',
+      'Hỗ trợ kết nối giữa hệ thống và các đầu tưới.',
+      'Có thể bố trí theo đường dẫn chính hoặc nhánh.',
+      'Có các cỡ đường kính 6 mm, 8 mm và 10 mm.',
+    ] },
     accessories: ['bio-dripper'],
-    note: 'Cần xác nhận đúng đường kính ống và cấu hình trước khi mua; lắp đặt theo sơ đồ kỹ thuật của hệ thống để đảm bảo khả năng kết nối và dẫn nước phù hợp.',
+    note: 'Các cỡ ống không mặc định thay thế trực tiếp cho nhau – vui lòng chọn đúng đường kính theo cấu hình hệ thống hoặc liên hệ để được tư vấn.',
   },
 
   // ---------------- DINH DƯỠNG ----------------
   {
     slug: 'bio-nutri-25g',
-    name: 'VIO GREEN Bio-Nutri – Phân bón sinh học gói 25g',
-    shortName: 'Bio-Nutri 25g',
+    name: 'VIO GREEN Bio-Nutri – Phân bón sinh học gói 25 g',
+    shortName: 'Bio-Nutri 25 g',
     category: 'nutrition',
     fits: 'Mọi dòng ECOHUB',
-    specs: [['Quy cách', '01 gói 25g']],
-    summary: 'Phân bón sinh học dạng gói lẻ 25g, dễ bảo quản, dễ chia theo từng chu kỳ chăm sóc.',
+    specs: [['Quy cách', '01 gói 25 g']],
+    summary: 'Dinh dưỡng cho cây đóng gói 25 g – tiện bảo quản và chuẩn bị cho từng lần sử dụng.',
     description: [
-      'VIO GREEN Bio-Nutri 25g là phân bón sinh học dạng gói lẻ, được thiết kế để bổ sung dinh dưỡng cho cây trong hệ thống chăm sóc VIO GREEN. Quy cách 25g giúp người dùng dễ bảo quản, dễ sử dụng và thuận tiện trong việc chuẩn bị lượng dinh dưỡng theo từng chu kỳ chăm sóc.',
-      'Bio-Nutri có thể được sử dụng cùng hệ thống ECOHUB theo cấu hình phù hợp, hỗ trợ quá trình quản lý và bổ sung dinh dưỡng cho cây. Dạng gói lẻ phù hợp với người dùng muốn chủ động thay thế hoặc bổ sung dinh dưỡng định kỳ mà không cần mở toàn bộ lượng sản phẩm cùng lúc.',
+      'VIO GREEN Bio-Nutri 25 g là sản phẩm dinh dưỡng cho cây được đóng gói theo đơn vị 25 g, hướng đến nhu cầu bổ sung dinh dưỡng trong quá trình chăm sóc cây trồng.',
+      'Quy cách gói nhỏ giúp người dùng thuận tiện trong việc bảo quản và chuẩn bị sản phẩm cho từng lần sử dụng. Bio-Nutri có thể được sử dụng cùng hệ thống ECOHUB theo cấu hình phù hợp.',
+      'Sản phẩm được định hướng trở thành một phần trong giải pháp chăm sóc cây của VIO GREEN, hỗ trợ người dùng tổ chức việc bổ sung dinh dưỡng thuận tiện hơn.',
     ],
-    note: 'Liều lượng, cách pha/trộn, tần suất sử dụng và đối tượng cây trồng cần thực hiện theo hướng dẫn chính thức của VIO GREEN. Không tự ý tăng liều lượng khi chưa có hướng dẫn kỹ thuật.',
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Quy cách gói 25 g.',
+      'Hướng đến việc bổ sung dinh dưỡng cho cây trồng.',
+      'Có thể kết hợp với hệ thống ECOHUB khi cấu hình và hướng dẫn sử dụng cho phép.',
+      'Thuận tiện cho việc bảo quản và sử dụng theo từng gói.',
+    ] },
+    note: 'Sử dụng theo nhãn sản phẩm và hướng dẫn chính thức của VIO GREEN. Không tự ý tăng liều lượng hoặc sử dụng theo cách chưa được hướng dẫn.',
   },
   {
     slug: 'bio-nutri-multi-pack',
-    name: 'VIO GREEN Bio-Nutri – Hộp phân bón sinh học Multi-Pack',
+    name: 'VIO GREEN Bio-Nutri – Multi-Pack',
     shortName: 'Bio-Nutri Multi-Pack',
     category: 'nutrition',
     fits: 'Mọi dòng ECOHUB',
-    specs: [['Quy cách', 'Hộp nhiều gói lẻ theo quy cách đóng gói chính thức của VIO GREEN']],
-    summary: 'Hộp nhiều gói lẻ – dự trữ dinh dưỡng cho nhiều chu kỳ chăm sóc.',
+    specs: [['Quy cách', 'Hộp nhiều gói (số gói trong hộp đang cập nhật)']],
+    summary: 'Hộp nhiều gói Bio-Nutri riêng lẻ – dự trữ dinh dưỡng cho nhiều lần chăm sóc cây.',
     description: [
-      'VIO GREEN Bio-Nutri Multi-Pack là hộp phân bón sinh học gồm nhiều gói lẻ, được thiết kế để đáp ứng nhu cầu sử dụng dinh dưỡng định kỳ cho hệ thống chăm sóc cây VIO GREEN. Quy cách Multi-Pack giúp người dùng chủ động dự trữ lượng phân bón cần thiết cho nhiều chu kỳ chăm sóc, đồng thời thuận tiện trong việc bảo quản và sử dụng từng gói theo nhu cầu.',
-      'Bio-Nutri Multi-Pack phù hợp với người dùng ECOHUB muốn duy trì nguồn dinh dưỡng ổn định trong quá trình chăm sóc cây. Các gói lẻ có thể được sử dụng theo chu kỳ và liều lượng được khuyến nghị, giúp việc bổ sung dinh dưỡng trở nên đơn giản và dễ kiểm soát hơn.',
+      'VIO GREEN Bio-Nutri Multi-Pack là quy cách đóng gói gồm nhiều gói Bio-Nutri riêng lẻ, hướng đến người dùng có nhu cầu dự trữ sản phẩm dinh dưỡng để sử dụng trong nhiều lần chăm sóc cây.',
+      'Việc đóng gói thành nhiều gói nhỏ giúp người dùng thuận tiện trong việc bảo quản và lấy sản phẩm theo từng lần sử dụng. Multi-Pack phù hợp với người dùng ECOHUB muốn chủ động chuẩn bị nguồn dinh dưỡng cho quá trình chăm sóc cây.',
     ],
+    highlights: { title: 'Đặc điểm chính', items: [
+      'Đóng gói nhiều gói Bio-Nutri riêng lẻ.',
+      'Hỗ trợ dự trữ sản phẩm cho các lần sử dụng tiếp theo.',
+      'Thuận tiện cho việc bảo quản và sử dụng theo từng gói.',
+      'Có thể kết hợp với ECOHUB theo hướng dẫn và cấu hình phù hợp.',
+    ] },
     note: 'Bảo quản sản phẩm theo hướng dẫn trên bao bì và sử dụng đúng liều lượng được khuyến nghị.',
-  },
-
-  // ---------------- DỊCH VỤ ----------------
-  {
-    slug: 'vio-care-6m',
-    name: 'VIO GREEN VIO-Care – Gói bảo hành mở rộng 6 tháng',
-    shortName: 'VIO-Care 6 tháng',
-    category: 'service',
-    specs: [['Thời hạn', '6 tháng theo điều kiện của gói dịch vụ']],
-    summary: 'Gói bảo hành mở rộng 6 tháng cho sản phẩm VIO GREEN đủ điều kiện.',
-    description: [
-      'VIO GREEN VIO-Care 6M là gói dịch vụ bảo hành mở rộng trong thời gian 6 tháng dành cho sản phẩm VIO GREEN đủ điều kiện áp dụng. Gói dịch vụ được xây dựng nhằm hỗ trợ khách hàng yên tâm hơn trong quá trình sử dụng sản phẩm và duy trì khả năng vận hành ổn định trong thời gian dài hơn.',
-      'VIO-Care 6M cung cấp quyền lợi bảo hành và/hoặc bảo dưỡng theo phạm vi, điều kiện và chính sách dịch vụ hiện hành của VIO GREEN. Gói dịch vụ có thể được áp dụng cho sản phẩm đủ điều kiện theo quy định tại thời điểm mua hàng.',
-    ],
-    note: 'Gói bảo hành không mặc nhiên áp dụng cho mọi trường hợp hư hỏng. Các trường hợp được bảo hành, loại trừ bảo hành, phương thức tiếp nhận và phạm vi hỗ trợ thực hiện theo chính sách VIO-Care chính thức của VIO GREEN.',
-  },
-  {
-    slug: 'vio-care-12m',
-    name: 'VIO GREEN VIO-Care – Gói bảo hành mở rộng 12 tháng',
-    shortName: 'VIO-Care 12 tháng',
-    category: 'service',
-    specs: [['Thời hạn', '12 tháng theo điều kiện của gói dịch vụ']],
-    summary: 'Gói bảo hành mở rộng 12 tháng cho khách hàng sử dụng lâu dài.',
-    description: [
-      'VIO GREEN VIO-Care 12M là gói dịch vụ bảo hành mở rộng trong thời gian 12 tháng dành cho sản phẩm VIO GREEN đủ điều kiện áp dụng. Đây là gói dịch vụ dành cho khách hàng có nhu cầu sử dụng sản phẩm trong thời gian dài và mong muốn có thêm thời gian hỗ trợ bảo hành/bảo dưỡng sau thời hạn tiêu chuẩn.',
-      'VIO-Care 12M hỗ trợ quyền lợi bảo hành và/hoặc bảo dưỡng theo phạm vi và điều kiện được VIO GREEN quy định. Gói dịch vụ giúp khách hàng chủ động hơn trong việc duy trì và xử lý các vấn đề kỹ thuật thuộc phạm vi được bảo hành trong thời gian hiệu lực.',
-    ],
-    note: 'Quyền lợi, phạm vi bảo hành, trường hợp loại trừ, phương thức tiếp nhận và các điều kiện áp dụng được thực hiện theo chính sách VIO-Care chính thức của VIO GREEN.',
   },
 ];
 
@@ -324,8 +421,8 @@ export const formatPrice = (p: Product, fallback = 'Liên hệ') =>
   p.price ? new Intl.NumberFormat('vi-VN').format(p.price) + ' ₫' : fallback;
 
 export const productTags = (p: Product): string[] => {
-  if (p.category === 'ecohub' && p.area && p.power && p.water)
-    return [areaLabels[p.area], powerLabels[p.power], waterLabels[p.water]];
+  if (p.category === 'ecohub' && p.plants && p.power && p.water)
+    return [plantLabels[p.plants], powerLabels[p.power], waterLabels[p.water]];
   if (p.fits) return ['Dùng cho ' + p.fits.replace(/^Mọi/, 'mọi')];
   return [];
 };
@@ -336,7 +433,7 @@ export const clientProducts = products.map((p) => ({
   name: p.name,
   shortName: p.shortName,
   category: p.category,
-  area: p.area ?? null,
+  plants: p.plants ?? null,
   power: p.power ?? null,
   water: p.water ?? null,
   price: p.price,

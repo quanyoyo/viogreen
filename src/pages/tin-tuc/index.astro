@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { posts, fmtDate } from '../../data/blog';
+// Chưa có bài: trang vẫn tồn tại nhưng noindex, không có trong menu/sitemap (xem astro.config.mjs)
+---
+<BaseLayout title="Tin tức" active="news" noindex={posts.length === 0}
+  description="Blog và tin tức từ VIO GREEN: kinh nghiệm chăm cây đô thị, cách dùng ECOHUB và cập nhật sản phẩm.">
+  <Breadcrumbs items={[['Tin tức']]} />
+  <section class="bg-cream py-12 sm:py-16">
+    <div class="container-x max-w-3xl text-center" data-reveal>
+      <p class="eyebrow">Blog & tin tức</p>
+      <h1 class="h-display">Góc chia sẻ từ VIO GREEN</h1>
+      <p class="mt-3 text-muted sm:text-lg">Kinh nghiệm chăm cây đô thị, cách dùng ECOHUB và những cập nhật mới từ VIO GREEN.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container-x">
+      {posts.length === 0
+        ? <p class="mx-auto max-w-xl rounded-2xl bg-cream p-8 text-center text-muted">Bài viết đang được cập nhật. Bạn quay lại sau nhé!</p>
+        : <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((p, i) => (
+              <article class="card card-hover group relative flex flex-col overflow-hidden" data-reveal style={`--d:${(i % 3) * 80}ms`}>
+                {p.cover && <img src={p.cover} alt="" class="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" loading="lazy" />}
+                <div class="flex flex-1 flex-col gap-2 p-5">
+                  <p class="flex items-center gap-1.5 text-xs text-muted"><Icon name="calendar" class="size-3.5" />{fmtDate(p.date)}</p>
+                  <h2 class="text-lg leading-snug font-bold"><a href={`/tin-tuc/${p.slug}/`} class="after:absolute after:inset-0 hover:text-brand">{p.title}</a></h2>
+                  <p class="line-clamp-3 text-sm text-muted">{p.excerpt}</p>
+                </div>
+              </article>
+            ))}
+          </div>}
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>

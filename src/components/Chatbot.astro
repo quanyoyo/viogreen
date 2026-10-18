@@ -7,28 +7,39 @@ import { site, telHref } from '../data/site';
   <a href={telHref} aria-label={`Gọi ${site.phone}`} class="relative inline-flex size-12 items-center justify-center rounded-full bg-white text-brand shadow-lift ring-1 ring-line transition-transform hover:scale-105 sm:hidden">
     <Icon name="phone" class="size-5" />
   </a>
+  <!-- Lời chào nổi cạnh MIO: hiện mỗi lần vào web / tải lại trang; khách bấm × thì không hiện lại khi chuyển trang -->
+  <div class="absolute right-full bottom-12 mr-1 w-[min(15rem,calc(100vw-7rem))] translate-y-2 opacity-0 transition-all duration-300 data-[show]:translate-y-0 data-[show]:opacity-100 sm:bottom-16"
+    data-mio-hint hidden>
+    <div class="relative rounded-2xl rounded-br-md border border-brand-200 bg-white px-4 py-3 text-sm leading-snug text-ink shadow-lift">
+      <button type="button" data-open-chat class="text-left">Xin chào, mình là <b class="text-brand">MIO</b>! 👋<br />MIO giúp gì cho bạn?</button>
+      <button type="button" aria-label="Tắt lời chào" data-mio-hint-close class="absolute -top-2.5 -right-2.5 inline-flex size-6 items-center justify-center rounded-full bg-ink text-white shadow ring-2 ring-white hover:bg-brand-800">
+        <Icon name="close" class="size-3.5" />
+      </button>
+    </div>
+  </div>
   <!-- MIO đứng toàn thân, nhún nhẹ; bấm vào mở khung chat -->
   <button type="button" data-open-chat aria-label="Mở trợ lý MIO" title="Chat với MIO" class="group relative -mb-1 block rounded-3xl pb-2 transition-transform duration-300 ease-(--ease-soft) hover:-translate-y-1">
     <span aria-hidden="true" class="absolute bottom-0.5 left-1/2 h-3 w-3/5 -translate-x-1/2 animate-mio-shadow rounded-[50%] bg-ink/30 blur-[3px]"></span>
-    <img src={site.mio.stand} alt="" width="231" height="280" class="relative h-[75px] w-auto animate-mio-float drop-shadow-[0_6px_10px_rgb(53_94_59/0.3)] sm:h-24" />
+    <img src={site.mio.stand} alt="" width="231" height="280" class="relative h-[75px] w-auto animate-mio-float drop-shadow-[0_6px_10px_rgb(3_119_0/0.3)] sm:h-24" />
   </button>
 </div>
 
-<section class="fixed inset-x-0 bottom-0 z-[55] flex h-[min(88dvh,640px)] translate-y-4 flex-col overflow-hidden rounded-t-3xl bg-white opacity-0 shadow-2xl ring-1 ring-line transition-all duration-300 data-[open]:translate-y-0 data-[open]:opacity-100 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[400px] sm:rounded-3xl"
+<section class="fixed inset-x-0 bottom-0 z-[55] flex h-[min(88dvh,660px)] translate-y-4 flex-col overflow-hidden rounded-t-3xl bg-white opacity-0 shadow-2xl ring-1 ring-line transition-all duration-300 data-[open]:translate-y-0 data-[open]:opacity-100 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[400px] sm:rounded-3xl"
   data-chat hidden aria-label="Trợ lý MIO" role="dialog">
-  <header class="flex items-center gap-3 bg-brand px-4 py-3.5 text-white">
-    <img src={site.mio.head} alt="" width="44" height="44" class="size-11 shrink-0 rounded-full bg-white object-cover" />
+  <header class="flex items-center gap-3 border-b border-line bg-white px-4 py-3">
+    <img src={site.mio.head} alt="" width="40" height="40" class="size-10 shrink-0 rounded-full bg-cream object-cover ring-1 ring-brand-100" />
     <div class="min-w-0 flex-1 leading-tight">
-      <strong class="block truncate">MIO – Trợ lý VIO GREEN</strong>
-      <span class="flex items-center gap-1.5 text-xs text-brand-100" data-chat-status><i class="size-2 rounded-full bg-leaf"></i><span>Đang sẵn sàng tư vấn</span></span>
+      <strong class="flex items-center gap-1.5 truncate text-ink"><Icon name="sparkles" class="size-4 text-brand" /> MIO – Trợ lý VIO GREEN</strong>
+      <span class="mt-0.5 flex items-center gap-1.5 text-xs text-muted" data-chat-status><i class="size-2 rounded-full bg-leaf"></i><span>Đang sẵn sàng tư vấn</span></span>
     </div>
-    <button type="button" aria-label="Làm mới cuộc trò chuyện" data-chat-reset class="inline-flex size-9 items-center justify-center rounded-full hover:bg-white/15"><Icon name="refresh" class="size-4" /></button>
-    <button type="button" aria-label="Đóng" data-chat-close class="inline-flex size-9 items-center justify-center rounded-full hover:bg-white/15"><Icon name="close" class="size-5" /></button>
+    <button type="button" aria-label="Làm mới cuộc trò chuyện" title="Làm mới" data-chat-reset class="inline-flex size-9 items-center justify-center rounded-full text-muted hover:bg-brand-50 hover:text-brand"><Icon name="refresh" class="size-4" /></button>
+    <button type="button" aria-label="Đóng" data-chat-close class="inline-flex size-9 items-center justify-center rounded-full text-muted hover:bg-brand-50 hover:text-brand"><Icon name="close" class="size-5" /></button>
   </header>
-  <div class="flex-1 space-y-3 overflow-y-auto bg-cream px-4 py-4" data-chat-log aria-live="polite"></div>
+  <div class="flex-1 space-y-3 overflow-y-auto bg-[linear-gradient(to_bottom,white,var(--color-cream))] px-4 py-4" data-chat-log aria-live="polite"></div>
   <div class="scrollbar-none flex gap-2 overflow-x-auto border-t border-line bg-white px-3 py-2.5" data-chat-chips></div>
   <form class="flex items-center gap-2 border-t border-line bg-white p-3" data-chat-form>
     <input type="text" name="msg" placeholder="Nhập câu hỏi của bạn…" autocomplete="off" aria-label="Nhập câu hỏi" maxlength="300" class="input min-h-11 rounded-full py-2" />
     <button type="submit" aria-label="Gửi" class="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-white transition-colors hover:bg-brand-700"><Icon name="send" class="size-5" /></button>
   </form>
+  <p class="bg-white px-4 pb-2.5 text-center text-[11px] leading-snug text-muted">MIO trả lời theo thông tin có sẵn của VIO GREEN và có thể chưa đầy đủ. Xem <a href="/chinh-sach/van-chuyen/" class="underline hover:text-brand">Chính sách</a> · <a href="/lien-he/" class="underline hover:text-brand">Liên hệ</a></p>
 </section>

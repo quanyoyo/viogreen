@@ -39,7 +39,10 @@ npm run dev      # http://localhost:4321
 npm run check    # astro check (type + template)
 npm run build    # xuất ra dist/
 npm run preview
+npm run images   # ảnh gốc images-src/ → WebP trong public/ (scripts/optimize-images.mjs)
 ```
+
+- **Ảnh gốc khách gửi:** `images-src/` (không commit; bản gốc ở Google Drive "Ảnh làm web"). Đã đổi tên cho rõ nghĩa. Danh sách ảnh nào → file nào trong `public/` khai báo ở `scripts/optimize-images.mjs`; ảnh máy Sol có nền "ô cờ" giả in liền → script tự tô trắng (`clearChecker`).
 
 ## 4. Cấu trúc thư mục
 
@@ -47,32 +50,37 @@ npm run preview
 src/
   pages/                 index, san-pham/(index|[slug]), gio-hang, dat-hang, dat-hang-thanh-cong,
                          gioi-thieu, trai-nghiem-ar, lien-he, chinh-sach/[slug], 404,
+                         tin-tuc/(index|[slug]) (blog – ẩn khỏi menu/sitemap khi chưa có bài),
                          dang-nhap, tai-khoan, quan-tri (3 trang này dùng Firebase, noindex)
-  layouts/BaseLayout.astro   head/SEO, Header, Footer, Chatbot, AR modal
-  components/            Header, Footer, ProductCard, PolicyStrip, CtaBand, SectionHead, Ph (ảnh tạm),
-                         Chatbot, ArModal, ContactForm, Breadcrumbs, Logo, Social, Icon
+  layouts/BaseLayout.astro   head/SEO, Header, NoticeBar, Footer, Chatbot, AR modal
+  components/            Header, NoticeBar (chữ chạy ngang), Footer, ProductCard, PolicyStrip, CtaBand, SectionHead,
+                         Ph (ảnh tạm), Chatbot, ArModal, ContactForm, Breadcrumbs, Logo, Social, Icon
   scripts/               ui.ts (reveal, carousel, menu), cart.ts, forms.ts, ar.ts, chatbot.ts, data.ts,
                          fb.ts (Firebase: auth, đơn, lead, quản trị), order-view.ts (hiển thị đơn dùng chung),
                          address.ts (chọn Tỉnh/thành → Phường/xã)
-  data/                  site.ts (cấu hình), products.ts (16 SP), faq.ts, chatbot-kb.ts
+  data/                  site.ts (cấu hình, notice, weather), products.ts (16 SP), faq.ts, chatbot-kb.ts (+ quickQuestions),
+                         reviews.ts (đánh giá THẬT – trống = ẩn), blog.ts (đọc src/content/blog)
   content/policies/      van-chuyen, doi-tra, bao-hanh, bao-mat (.md; {{address}} {{email}}… thay từ site.ts)
+  content/blog/          bài viết .md (mẫu: _mau-bai-viet.md; file "_…" hoặc draft: true không hiện)
   styles/global.css      design tokens + hiệu ứng
 firestore.rules          quy tắc bảo mật Firestore (dán vào Console → Firestore → Rules → Publish)
-public/                  favicon-48.png, apple-touch-icon.png, robots.txt, _headers,
-                         assets/ (logo.png, mio-*.webp), products/, models/,
+public/                  favicon-48.png, apple-touch-icon.png, robots.txt, _headers, _redirects (301 slug cũ),
+                         assets/ (logo.png, mio-*.webp, hero-1..3, bia-1, banner-san-pham, ecohub-sol-va-grid – có bản -800),
+                         products/ (ecohub-sol.webp, ecohub-grid.webp), models/,
                          data/dvhc.json (34 tỉnh/thành + 3.321 phường/xã – tạo bằng `npm run dvhc`)
 .claude/launch.json      cấu hình dev server cho Browser pane (tên "dev")
 ```
 
 ## 5. Design system
 
-- **Nguồn thiết kế:** Figma file `QuAedwzzxIiw4feFi7PJWX`. Màu, layout và nội dung lấy từ Figma.
-- **Màu:** xanh chủ đạo `#355e3b`, nền kem `#fcfbf7`, chữ đậm `#181e19`, nền thông số xanh nhạt. Ảnh tạm dùng component `Ph`.
+- **Nguồn thiết kế:** Figma file `QuAedwzzxIiw4feFi7PJWX`. Layout và nội dung lấy từ Figma; các sửa đổi sau đó theo "Thông tin làm web.docx".
+- **Màu (đổi 18/10/2026 theo yêu cầu khách):** xanh chủ đạo (primary) `#037700` (thang `brand-50…900` pha từ màu này), nền "be" cũ → `#ebf2e3` (`cream`, `cream-200`), chữ đậm `#1b2a1c`. Token trong `src/styles/global.css`. Ảnh tạm dùng component `Ph`.
 - **Font:** Inter.
 - **Phong cách và hiệu ứng** (tham khảo banhcaynguvi.com, *chỉ lấy cảm giác và chuyển động, không lấy màu*):
   - reveal khi cuộn: fade-up 28px, stagger
   - Ken Burns "breath" 12s và light sweep trên ảnh hero
-  - nút chat nổi = MIO đứng toàn thân (cao 75px mobile / 96px desktop), nhún nhẹ `animate-mio-float` + bóng chân `animate-mio-shadow` (không còn pill xanh + chữ "MIO giúp gì cho bạn?")
+  - nút chat nổi = MIO đứng toàn thân (cao 75px mobile / 96px desktop), nhún nhẹ `animate-mio-float` + bóng chân `animate-mio-shadow`; bong bóng lời chào "Xin chào, mình là MIO! MIO giúp gì cho bạn?" cạnh MIO (xem mục 7 Chatbot)
+  - chữ chạy ngang dưới menu (`NoticeBar`, `animate-marquee`, dừng khi rê chuột); menu: mục đang mở là khung trắng viền xanh
   - hover thẻ: nổi lên, bóng mềm màu xanh, đổi viền; easing `cubic-bezier(.25,.8,.25,1)` khoảng 0.35s
   - eyebrow chữ hoa giãn chữ, số thứ tự 01–0n, icon trong vòng tròn viền mảnh
 - **Responsive:** Figma chỉ có bản desktop 1440px, bản mobile tự chuyển đổi. Phải dùng tốt ở 360px.
@@ -96,20 +104,24 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - `price: null` → hiển thị "Liên hệ"; giỏ hàng ghi "Nhân viên sẽ báo giá".
 - `images: []` → hiển thị ảnh tạm. Ảnh thật đặt trong `public/products/`.
 - `model: null` → nút "Thử với AR" hiện "Đang cập nhật". File 3D đặt trong `public/models/`, dạng `{ glb, usdz }`.
-- **Sản phẩm (16)** chia 5 nhóm:
-  - ECOHUB (6, đều có AR): X10 Sol, X10 Grid, X10 Hydro Sol, X10 Hydro Grid, X20 Sol, X20 Grid
-  - ECOBOX (4)
+- **Sản phẩm (16)** chia 4 nhóm (đổi tên 18/10/2026 theo tài liệu mới; slug cũ có 301 trong `public/_redirects`):
+  - ECOHUB (6, đều có AR): Sol, Grid, Sol Plus, Grid Plus (nước trực tiếp), Sol Pro, Grid Pro (không gian lớn). Cũ: X10 → bỏ chữ X10, Hydro → Plus, X20 → Pro.
+  - ECOBOX (6): Bio-Tank S/Plus/Pro, Aqua-Tank S/Plus/Pro (S ↔ Sol/Grid, Plus ↔ Sol Plus/Grid Plus, Pro ↔ Sol Pro/Grid Pro)
   - Phụ kiện tưới (2): Bio-Dripper, Hose 6/8/10mm có biến thể
   - Dinh dưỡng (2)
-  - VIO-Care (2)
-- **Bộ lọc ECOHUB:** diện tích (`<10` / `10-20`), nguồn điện (`solar` / `grid`), nguồn nước (`tank` / `direct`).
+  - ~~VIO-Care (2)~~ đã bỏ: bảo hành chọn ngay ở trang chi tiết máy ECOHUB (`variants` = `warrantyOptions`: 12 / 18 / 24 tháng, lưu vào đơn như biến thể "Bảo hành 18 tháng").
+- **Mô tả SP** lấy từ tài liệu, đã bỏ ghi chú nội bộ ("Lưu ý kỹ thuật… chưa được xác nhận", "Thông tin cần xác nhận", "Theo định vị trong tài liệu hiện tại"). `highlights` = Đặc điểm chính / Công dụng.
+- **Số lượng cây thay cho diện tích:** `plants` = `<15` ("Dưới 15 cây", máy cho không gian dưới 10 m²) / `<30` ("Dưới 30 cây", 10–20 m²). Form liên hệ: Dưới 15 / 20 / 30 / Trên 30 cây / Chưa rõ (vẫn lưu trường `area` của lead).
+- **Bộ lọc ECOHUB:** số lượng cây (`<15` / `<30`), nguồn điện (`solar` / `grid`), nguồn nước (`tank` / `direct`).
 - **Địa chỉ (từ 14/10/2026):** Tỉnh/thành và Phường/xã chọn từ danh sách theo **danh mục hành chính mới** (34 tỉnh/thành, 3.321 phường/xã/đặc khu, hiệu lực 01/07/2025; bỏ cấp quận/huyện). Dữ liệu `public/data/dvhc.json` tạo bằng `npm run dvhc` (`scripts/fetch-dvhc.mjs`, nguồn provinces.open-api.vn API v2; script tự kiểm tra đủ 34 / 3.321). Chỉ tải khi trang có `<select data-province>`: trang Đặt hàng, Tài khoản (hồ sơ), form Liên hệ (chỉ tỉnh). Lưu tên đầy đủ ("Thành phố Hà Nội", "Phường Ba Đình"). Địa chỉ cũ đã lưu ("Hà Nội", "Ba Đình") tự khớp gần đúng qua `setAddress()`; không khớp thì để trống cho khách chọn. Không tải được danh sách thì tự đổi về ô nhập tay.
 - **Thanh toán:** `paymentMethod` = `cod` | `bank` (đơn trước 07/10/2026 không có → hiển thị "—"). Nhãn hiển thị ở `order-view.ts → PAYMENT_LABEL`.
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
 ## 7. Trạng thái (cập nhật 18/10/2026)
 
-**Đã xong:** 32 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop. Đang chạy ở `https://viogreen.com` (Pages trong tài khoản khách; `www` 301 về đây; `viogreen.pages.dev` vẫn truy cập được). Đang ở **chế độ trước ra mắt** (noindex toàn web).
+**Đã xong:** 33 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop.
+
+**Đợt sửa 18/10/2026 theo "Thông tin làm web.docx" (bản mới, khách chọn phương án đề xuất):** màu #037700 / #ebf2e3; chữ chạy ngang (`site.notice`); menu: khung cho mục đang mở, nút "Chọn ECOHUB" → "Tư vấn ngay" (mở chat); hero 3 ảnh thật + lớp phủ + thẻ thời tiết/giờ Hà Nội (Open-Meteo, `site.weather`), slide 1 "Chăm sóc thông minh cho không gian xanh đô thị", eyebrow "VIO GREEN", "Chạm để chăm sóc" 1 dòng; nội dung trang chủ 1–4 thay theo tài liệu; trang Sản phẩm: banner ảnh + "ECOHUB – Thiết bị chăm sóc cây thông minh.", lọc theo số cây, bỏ mục VIO-Care; chọn gói bảo hành ở trang chi tiết; "Đặt hàng ECOHUB" → "Mua ngay"; Giới thiệu: hero ảnh nền kiểu tatagarden (Ảnh bìa 1, giữ chữ VIO GREEN), CTA tiếng Việt; AR: "Khám phá ECOHUB trong không gian của bạn."; Liên hệ: "Cùng nhau vun trồng lối sống xanh." + ảnh; footer "Chính sách bảo mật thông tin" 1 dòng; `site.tagline` đổi sang tiếng Việt; đánh giá + blog dựng sẵn, tự ẩn khi chưa có nội dung thật. Đang chạy ở `https://viogreen.com` (Pages trong tài khoản khách; `www` 301 về đây; `viogreen.pages.dev` vẫn truy cập được). Đang ở **chế độ trước ra mắt** (noindex toàn web).
 
 - **Trang:**
   - Trang chủ, Sản phẩm (nhóm, bộ lọc, tìm kiếm `?q=` không dấu)
@@ -124,8 +136,10 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Liên hệ & MXH:** email `viogreen102@gmail.com` (cả chính sách bảo mật qua `{{email}}`); Facebook, TikTok `@viogreen.vn`, YouTube `@VIOGREEN-vn`, Shopee có link; Messenger, Zalo, Instagram hiện icon mờ chưa có link.
 - **AR:** modal với `<model-viewer>`. **Chưa gắn file 3D** (`public/models/` trống).
 - **Chatbot MIO v1:**
+  - Bong bóng lời chào cạnh MIO: hiện mỗi lần vào web / tải lại trang; khách bấm × hoặc đã mở chat → không hiện lại khi chuyển trang trong phiên (sessionStorage `vg-mio-hint-off`)
+  - Mở chat: màn hình chào (MIO + "Câu hỏi thường gặp" soạn sẵn ở `chatbot-kb.ts → quickQuestions`), dòng lưu ý cuối khung
   - Nút gợi ý: Tư vấn chọn máy, Phụ kiện, Giao hàng, Đổi trả, Bảo hành, Gặp nhân viên
-  - Tư vấn chọn máy qua 3 câu hỏi
+  - Tư vấn chọn máy qua 3 câu hỏi (số cây → nguồn điện → nguồn nước; trên 30 cây → xin SĐT)
   - Trả lời FAQ và chính sách theo từ khoá
   - Không hiểu câu hỏi thì xin tên và SĐT, lưu vào Firestore `leads` (type `chat-lead`)
   - Báo ngoài giờ làm việc
@@ -142,7 +156,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
    - **Mỗi lần sửa `firestore.rules`:** báo chủ web dán lại vào Console → Publish **trước khi push** code dùng trường mới. Viết rule tương thích cả bản web cũ lẫn mới (trường mới để tuỳ chọn).
 3. ~~**Ảnh MIO**~~ **Xong 06–07/10/2026:** đã tách nền. Trong `public/assets/`: `mio.webp` (toàn thân 640px), `mio-stand.webp` (toàn thân 280px – nút chat nổi), `mio-head-128.webp` (avatar trong khung chat), `mio-head-512.png` (bản gốc phần đầu). Favicon: `public/favicon-48.png`, `apple-touch-icon.png` (đầu MIO). Đường dẫn khai báo ở `site.mio`. `favicon.svg` cũ không còn dùng.
 4. **AR:** `npm run models` (`scripts/stl-to-glb.mjs`) chuyển STL trong `models-src/` → GLB trong `public/models/`: mm→m, Z-up→Y-up, căn giữa + đáy chạm sàn, chất liệu theo `models-src/models.json` (`parts`: tên file STL → chất liệu), giảm đa giác khi vượt `maxTriangles`, nén meshopt, kiểm tra < 5MB. `ar.ts` khai báo bộ giải nén meshopt cho model-viewer. Chỉ cần `glb` (model-viewer tự tạo USDZ cho iPhone). **Hiện có:** 12 STL = các bộ phận của **1 máy** bản Sol (54×40×75,6 cm, tấm pin trên cột) → `public/models/ecohub-mau.glb` (466 KB, chưa commit, chưa gắn). **Chờ khách xác nhận** máy này là model nào trước khi đổi tên + gắn vào `products.ts`.
-5. ~~**Hero trang chủ 3 slide**~~ **Xong 07/10/2026** (`src/pages/index.astro` → `slides`): (1) máy trong góc xanh – "Smart Care for Urban Green Spaces", (2) điện thoại app + máy, nền tối kiểu techno – "Giám sát mọi lúc qua app", (3) tay chạm vào máy – "Chạm để chăm sóc". Chữ lấy từ nội dung sẵn có, không thêm thông số. Ảnh: đang là ảnh tạm (nhãn "Ảnh tạm" + mô tả ảnh cần chụp); có ảnh thật thì đặt vào `public/assets/` và điền `img.src`. Bố cục tham khảo hikari-mansion.com, smarthomesjapan.com, samsung.com/vn/smartthings (chữ trái – ảnh lớn phải; mobile ảnh dưới chữ).
+5. ~~**Hero trang chủ 3 slide**~~ **Xong 07/10/2026** (`src/pages/index.astro` → `slides`): (1) máy trong góc xanh – "Smart Care for Urban Green Spaces", (2) điện thoại app + máy, nền tối kiểu techno – "Giám sát mọi lúc qua app", (3) tay chạm vào máy – "Chạm để chăm sóc". Chữ lấy từ nội dung sẵn có, không thêm thông số. Bố cục tham khảo hikari-mansion.com, smarthomesjapan.com, samsung.com/vn/smartthings (chữ trái – ảnh lớn phải; mobile ảnh dưới chữ). **18/10/2026:** đã thay ảnh thật khách gửi (`hero-1..3.webp`); ảnh chiếm 64% bên phải, mờ dần sang trái vì máy đứng phía trái ảnh. Slide 2/3 vẫn giữ chữ "Giám sát qua app" / "Chạm để chăm sóc" dù ảnh mới là cảnh ban công / sảnh.
 6. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc. Chỉ sửa trong `src/data/` và `public/`.
 7. **Tên miền `viogreen.com` (14/10/2026):**
    - ✅ Code: `site` = `https://viogreen.com` (canonical, OG, JSON-LD, sitemap), `@astrojs/sitemap`, `Sitemap:` trong robots.txt, chế độ `prelaunch`.
@@ -172,19 +186,24 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 ## 9. Chờ khách (không tự điền)
 
 - **Sản phẩm:**
-  - Giá 16 SP; giá Hose theo từng cỡ và độ dài
+  - Giá 16 SP; giá Hose theo từng cỡ và độ dài; phí gói bảo hành 18 / 24 tháng (nếu có)
   - Số gói trong Bio-Nutri Multi-Pack
   - Thông số kỹ thuật từng ECOHUB; phụ kiện **đi kèm** trong hộp từng model
   - Model nào có cảm biến / kết nối app
-- **Thanh toán:**
-  - Thời hạn bảo hành tiêu chuẩn
+  - Mô tả **Bio-Tank Pro** (tài liệu chưa có: công dụng, dung tích, kích thước) – web đang ghi "đang cập nhật"
+  - Xác nhận Grid Plus dùng **Aqua-Tank Plus** (tài liệu ghi "Aqua-Tank Pro", web hiểu là Plus)
+  - Ảnh riêng cho Sol Plus, Grid Plus, Sol Pro, Grid Pro và các phụ kiện (hiện chỉ Sol, Grid có ảnh)
+- **Bảo hành / vận chuyển:**
+  - ✅ Bảo hành tiêu chuẩn 12 tháng (khách ghi trong thanh chữ chạy 18/10/2026)
+  - Dòng chữ chạy "Giao hàng miễn phí từ 2.000.000đ" rộng hơn chính sách vận chuyển (chỉ miễn phí ở Hà Nội) – chờ khách quyết có sửa chữ không
   - Email/Zalo nhận thông báo đơn (cho bước email báo đơn)
 - **Thông tin doanh nghiệp:**
   - Địa chỉ theo đơn vị hành chính mới
   - Tên công ty, MST
 - **Liên kết:** link Messenger, Zalo, Instagram (đang hiện icon mờ chưa có link).
 - **Nội dung 5 trang chưa có** (đang ẩn khỏi footer): Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
-- **Hình ảnh và file:** ảnh sản phẩm, ảnh 3 slide hero, file 3D (GLB + USDZ) kèm bảng file ↔ model, logo gốc SVG/PNG, đánh giá khách hàng thật.
+- **Hình ảnh và file:** ảnh sản phẩm còn thiếu (xem trên), file 3D (GLB) kèm bảng file ↔ model, logo gốc SVG/PNG. Ảnh `nha-phu-cay-xanh-750px.jpg` (Drive) chưa dùng – nhỏ và có vẻ là ảnh trên mạng.
+- **Đánh giá khách hàng thật** → điền vào `src/data/reviews.ts` (mục tự hiện). **Bài blog** → file .md trong `src/content/blog/` (menu "Tin tức" tự hiện).
 - **Ô trống trong bảng phí vận chuyển** (Figma để trống): hiện đang hiển thị "—".
 
 ## 10. Ghi chú

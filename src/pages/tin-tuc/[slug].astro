@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { posts, fmtDate, type Post } from '../../data/blog';
+import { site } from '../../data/site';
+
+export function getStaticPaths() {
+  return posts.map((p) => ({ params: { slug: p.slug }, props: { post: p } }));
+}
+const { post } = Astro.props as { post: Post };
+const html = await post.mod.compiledContent();
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.excerpt,
+  datePublished: post.date,
+  publisher: { '@type': 'Organization', name: site.name },
+  ...(post.cover ? { image: new URL(post.cover, Astro.site).href } : {}),
+};
+---
+<BaseLayout title={post.title} description={post.excerpt} active="news" jsonLd={jsonLd}>
+  <Breadcrumbs items={[['Tin tức', '/tin-tuc/'], [post.title]]} />
+  <article class="section pt-10 sm:pt-12">
+    <div class="container-x max-w-3xl">
+      <p class="flex items-center gap-1.5 text-sm text-muted"><Icon name="calendar" class="size-4" />{fmtDate(post.date)}</p>
+      <h1 class="h-display mt-3">{post.title}</h1>
+      <p class="mt-4 text-lg text-muted">{post.excerpt}</p>
+      {post.cover && <img src={post.cover} alt="" class="mt-8 aspect-[16/9] w-full rounded-card object-cover" />}
+      <div class="prose-vg mt-8" set:html={html} />
+      <a class="link-arrow mt-10" href="/tin-tuc/"><Icon name="arrowLeft" /> Tất cả bài viết</a>
+    </div>
+  </article>
+  <CtaBand />
+</BaseLayout>

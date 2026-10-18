@@ -1,5 +1,5 @@
 // Xem 3D / AR bằng <model-viewer> (Google). Chỉ tải thư viện khi sản phẩm đã có file 3D.
-// Khai báo file trong src/data/products.ts: model: { glb: '/models/x10-sol.glb' } (usdz tuỳ chọn — không có thì model-viewer tự tạo cho iPhone).
+// Khai báo file trong src/data/products.ts: model: { glb: '/models/ecohub-sol.glb' } (usdz tuỳ chọn — không có thì model-viewer tự tạo cho iPhone).
 // File GLB tạo bằng `npm run models` từ STL trong models-src/ (xem scripts/stl-to-glb.mjs).
 import { clientProducts } from './data';
 import { $, $$, openLayer, closeLayer } from './ui';

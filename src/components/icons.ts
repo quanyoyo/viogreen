@@ -54,12 +54,28 @@ import logout from 'lucide-static/icons/log-out.svg?raw';
 import lock from 'lucide-static/icons/lock.svg?raw';
 import copy from 'lucide-static/icons/copy.svg?raw';
 import wallet from 'lucide-static/icons/wallet.svg?raw';
+import cloudSun from 'lucide-static/icons/cloud-sun.svg?raw';
+import cloud from 'lucide-static/icons/cloud.svg?raw';
+import cloudFog from 'lucide-static/icons/cloud-fog.svg?raw';
+import cloudDrizzle from 'lucide-static/icons/cloud-drizzle.svg?raw';
+import cloudRain from 'lucide-static/icons/cloud-rain.svg?raw';
+import cloudLightning from 'lucide-static/icons/cloud-lightning.svg?raw';
+import cloudSnow from 'lucide-static/icons/cloud-snow.svg?raw';
+import star from 'lucide-static/icons/star.svg?raw';
+import newspaper from 'lucide-static/icons/newspaper.svg?raw';
+import calendar from 'lucide-static/icons/calendar.svg?raw';
+import cpu from 'lucide-static/icons/cpu.svg?raw';
+import chart from 'lucide-static/icons/chart-line.svg?raw';
+import ai from 'lucide-static/icons/brain-circuit.svg?raw';
+import sliders from 'lucide-static/icons/sliders-horizontal.svg?raw';
 
 const lucide = {
   leaf, search, help, cart, menu, close, sparkles, chevronRight, chevronDown, phone, clock, pin, email,
   truck, warranty, exchange, support, ar, arrowCircle, arrowRight, arrowLeft, camera, bag, drop, solar,
   mobile, sprout, home, hourglass, maximize, settings, product, science, warning, minus, plus, info, box,
   user, check, quote, layers, move, chat, send, refresh, tree, globe, trash, mouse, logout, lock, copy, wallet,
+  cloudSun, cloud, cloudFog, cloudDrizzle, cloudRain, cloudLightning, cloudSnow, star, newspaper, calendar,
+  cpu, chart, ai, sliders,
 };
 
 const brand = (path: string) =>

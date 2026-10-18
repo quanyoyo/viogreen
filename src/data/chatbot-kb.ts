@@ -26,9 +26,9 @@ export const kb: KbEntry[] = [
   },
   {
     id: 'warranty',
-    keys: ['bao hanh', 'sua chua', 'hong', 'hu hong', 'khong chay', 'loi may', 'vio-care', 'vio care', 'bao duong'],
-    answer: 'Bảo hành áp dụng cho sản phẩm chính hãng còn hạn, nguyên trạng, chưa tự ý sửa chữa. Thời gian xử lý tiêu chuẩn trong 7 ngày làm việc. Lỗi nhà sản xuất trong 15 ngày đầu được đổi mới. Muốn kéo dài bảo hành, bạn có thể chọn gói VIO-Care 6 hoặc 12 tháng.',
-    links: [['Chính sách bảo hành', '/chinh-sach/bao-hanh/'], ['Gói VIO-Care', '/san-pham/#service']],
+    keys: ['bao hanh', 'sua chua', 'hong', 'hu hong', 'khong chay', 'loi may', 'vio-care', 'vio care', 'bao duong', 'goi bao hanh'],
+    answer: 'Máy ECOHUB được bảo hành tiêu chuẩn 12 tháng; bạn có thể chọn gói bảo hành 18 hoặc 24 tháng ngay ở trang sản phẩm khi đặt hàng. Bảo hành áp dụng cho sản phẩm chính hãng còn hạn, nguyên trạng, chưa tự ý sửa chữa. Thời gian xử lý tiêu chuẩn trong 7 ngày làm việc. Lỗi nhà sản xuất trong 15 ngày đầu được đổi mới.',
+    links: [['Chính sách bảo hành', '/chinh-sach/bao-hanh/'], ['Xem các dòng ECOHUB', '/san-pham/#ecohub']],
   },
   {
     id: 'privacy',
@@ -43,8 +43,9 @@ export const kb: KbEntry[] = [
   },
   {
     id: 'payment',
-    keys: ['thanh toan', 'chuyen khoan', 'tra gop', 'cod', 'tien mat', 'the'],
-    answer: 'Hiện web chưa thanh toán trực tuyến. Sau khi bạn gửi đơn, nhân viên VIO GREEN sẽ gọi xác nhận sản phẩm, phí vận chuyển và hướng dẫn hình thức thanh toán phù hợp.',
+    keys: ['thanh toan', 'chuyen khoan', 'tra gop', 'cod', 'tien mat', 'the', 'hinh thuc thanh toan'],
+    answer: `Khi đặt hàng bạn chọn một trong hai cách:\n• COD – thanh toán khi nhận hàng, giao qua ${site.payment.codCarrier}.\n• Chuyển khoản ${site.payment.bank} – số tài khoản và mã QR hiện ngay sau khi gửi đơn, nội dung chuyển khoản là mã đơn.\nNhân viên VIO GREEN sẽ gọi xác nhận sản phẩm và phí vận chuyển trước khi giao.`,
+    links: [['Xem sản phẩm', '/san-pham/']],
   },
   {
     id: 'how-order',
@@ -77,9 +78,23 @@ export const kb: KbEntry[] = [
   },
   {
     id: 'difference',
-    keys: ['khac nhau', 'khac gi', 'so sanh', 'x10 va x20', 'sol va grid', 'hydro la gi', 'nen chon'],
-    answer: 'Các phiên bản ECOHUB khác nhau ở 3 điểm:\n• X10 cho không gian dưới 10m², X20 cho 10–20m².\n• Sol dùng năng lượng mặt trời, Grid dùng điện lưới.\n• Bản Hydro nối thẳng nguồn nước, bản thường dùng bình chứa (Aqua-Tank).\nMIO có thể hỏi bạn 3 câu để gợi ý đúng model nhé!',
+    keys: ['khac nhau', 'khac gi', 'so sanh', 'sol va grid', 'plus la gi', 'pro la gi', 'ban pro', 'ban plus', 'nen chon'],
+    answer: 'Các phiên bản ECOHUB khác nhau ở 3 điểm:\n• Sol, Grid, Sol Plus, Grid Plus cho dưới 15 cây (không gian dưới 10m²); Sol Pro, Grid Pro cho dưới 30 cây (10–20m²).\n• Sol dùng năng lượng mặt trời, Grid dùng điện lưới.\n• Bản Plus nối thẳng nguồn nước; các bản còn lại dùng bình chứa (Aqua-Tank).\nMIO có thể hỏi bạn 3 câu để gợi ý đúng model nhé!',
   },
+];
+
+/** Câu hỏi soạn sẵn hiện ở màn hình chào của khung chat (bấm là trả lời ngay).
+ *  kb = id trong `kb` ở trên; faq = vị trí câu trong src/data/faq.ts; action: pick = hỏi 3 câu chọn máy, lead = xin SĐT. */
+export const quickQuestions: { q: string; kb?: string; faq?: number; action?: 'pick' | 'lead' }[] = [
+  { q: 'Nên chọn ECOHUB nào cho không gian của tôi?', action: 'pick' },
+  { q: 'Hệ thống có tự động tưới hoàn toàn không?', faq: 1 },
+  { q: 'Tôi có cần biết về chăm cây để sử dụng không?', faq: 2 },
+  { q: 'Bảo hành bao lâu?', kb: 'warranty' },
+  { q: 'Phí vận chuyển thế nào?', kb: 'ship-fee' },
+  { q: 'Giao hàng mất bao lâu?', kb: 'ship-time' },
+  { q: 'Có những hình thức thanh toán nào?', kb: 'payment' },
+  { q: 'Chính sách đổi trả thế nào?', kb: 'return' },
+  { q: 'Gặp nhân viên tư vấn', action: 'lead' },
 ];
 
 export const greetings = ['xin chao', 'chao', 'hello', 'hi', 'alo', 'hey', 'chao ban', 'chao mio'];

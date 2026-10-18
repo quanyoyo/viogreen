@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "models": "node scripts/stl-to-glb.mjs",
-    "dvhc": "node scripts/fetch-dvhc.mjs"
+    "dvhc": "node scripts/fetch-dvhc.mjs",
+    "images": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

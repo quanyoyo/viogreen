@@ -1,22 +1,21 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
-import Ph from '../../components/Ph.astro';
 import SectionHead from '../../components/SectionHead.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import PolicyStrip from '../../components/PolicyStrip.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import { products, inCategory, categories, areaLabels, powerLabels, waterLabels, type CategoryKey } from '../../data/products';
+import { products, inCategory, categories, plantLabels, powerLabels, waterLabels, type CategoryKey } from '../../data/products';
 
 const filters = [
-  ['area', 'Diện tích', areaLabels],
+  ['plants', 'Số lượng cây', plantLabels],
   ['power', 'Nguồn điện', powerLabels],
   ['water', 'Nguồn nước', waterLabels],
 ] as const;
 
 const sections: { key: CategoryKey; title: string; sub: string; cols: string; tint: boolean }[] = [
-  { key: 'ecobox', title: 'Hộp chứa ECOBOX', sub: 'Hộp chứa dinh dưỡng và nước – thay thế hoặc bổ sung theo cấu hình X10 / X20.', cols: 'sm:grid-cols-2 lg:grid-cols-4', tint: true },
+  { key: 'ecobox', title: 'Bình chứa ECOBOX', sub: 'Bình chứa dinh dưỡng (Bio-Tank) và nước (Aqua-Tank) – thay thế hoặc bổ sung theo cấu hình S / Plus / Pro.', cols: 'sm:grid-cols-2 lg:grid-cols-3', tint: true },
   { key: 'irrigation', title: 'Phụ kiện tưới', sub: 'Đầu tưới nhỏ giọt và ống dẫn để đưa nước, dinh dưỡng đến từng gốc cây.', cols: 'sm:grid-cols-2 lg:max-w-4xl lg:mx-auto', tint: false },
 ];
 const nutriInfo = [
@@ -27,20 +26,20 @@ const nutriInfo = [
 ] as const;
 ---
 <BaseLayout title="Sản phẩm" active="products"
-  description="Hệ thống chăm sóc cây thông minh ECOHUB X10, X20, hộp chứa ECOBOX, phụ kiện tưới, phân bón Bio-Nutri và gói bảo hành VIO-Care.">
+  description="Hệ thống chăm sóc cây thông minh ECOHUB Sol, Grid, Plus, Pro, bình chứa ECOBOX, phụ kiện tưới và phân bón Bio-Nutri.">
   <Breadcrumbs items={[['Sản phẩm']]} />
 
-  <!-- HERO -->
-  <section class="overflow-hidden bg-cream py-12 sm:py-16">
-    <div class="container-x grid items-center gap-10 lg:grid-cols-2">
-      <div class="order-2 grid grid-cols-[0.8fr_1fr_0.8fr] items-center gap-3 lg:order-1" aria-hidden="true">
-        <div class="overflow-hidden rounded-3xl opacity-80"><Ph title="X10" label="" ratio="3/4" /></div>
-        <div class="breath shadow-lift"><Ph title="ECOHUB" ratio="3/4" /></div>
-        <div class="overflow-hidden rounded-3xl opacity-80"><Ph title="X20" label="" ratio="3/4" /></div>
-      </div>
-      <div class="order-1 lg:order-2" data-reveal>
+  <!-- HERO: ảnh banner (nửa phải mờ trắng) – chữ đặt bên phải -->
+  <section class="relative isolate overflow-hidden bg-white">
+    <div class="relative aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto">
+      <img src="/assets/banner-san-pham.webp" srcset="/assets/banner-san-pham-800.webp 800w, /assets/banner-san-pham.webp 1680w" sizes="100vw"
+        alt="Máy VIO GREEN ECOHUB bên các luống rau trên sân thượng" class="size-full animate-breath object-cover object-left" fetchpriority="high" />
+      <div aria-hidden="true" class="absolute inset-0 bg-[linear-gradient(to_top,white,transparent_35%)] lg:bg-[linear-gradient(to_left,rgb(255_255_255/.96)_0%,rgb(255_255_255/.9)_40%,rgb(255_255_255/.55)_52%,transparent_68%)]"></div>
+    </div>
+    <div class="container-x relative grid lg:min-h-[480px] lg:grid-cols-[1.35fr_1fr] lg:items-center">
+      <div class="-mt-6 pb-12 lg:col-start-2 lg:mt-0 lg:py-16" data-reveal>
         <p class="eyebrow">Sản phẩm VIO GREEN</p>
-        <h1 class="h-display">ECOHUB Smart Plant Care System</h1>
+        <h1 class="h-display">ECOHUB – Thiết bị chăm sóc cây thông minh.</h1>
         <p class="mt-4 text-lg text-muted">Hệ thống chăm sóc cây trồng đô thị thông minh tích hợp toàn diện các công nghệ tiên tiến.</p>
         <nav aria-label="Nhóm sản phẩm" class="mt-6 flex flex-wrap gap-2">
           {categories.map((c) => <a class="chip" href={`#${c.key}`}>{c.short}</a>)}
@@ -73,7 +72,7 @@ const nutriInfo = [
     <!-- ECOHUB + bộ lọc -->
     <section class="section scroll-mt-28" id="ecohub">
       <div class="container-x">
-        <SectionHead eyebrow="Hệ thống ECOHUB" title="Chọn ECOHUB phù hợp không gian của bạn" sub="6 phiên bản theo diện tích, nguồn điện và nguồn nước. Tất cả đều xem được bằng AR." />
+        <SectionHead eyebrow="Hệ thống ECOHUB" title="Chọn ECOHUB phù hợp không gian của bạn" sub="6 phiên bản theo số lượng cây, nguồn điện và nguồn nước. Tất cả đều xem được bằng AR." />
         <div class="card mb-8 grid gap-4 p-5 sm:p-6 lg:grid-cols-3" data-filters data-reveal>
           {filters.map(([name, label, map]) => (
             <div role="group" aria-label={label}>
@@ -124,13 +123,6 @@ const nutriInfo = [
         <div class="grid gap-6 text-ink sm:grid-cols-2">{inCategory('nutrition').map((p, i) => <ProductCard p={p} delay={i * 80} />)}</div>
       </div>
     </section>
-
-    <section class="section scroll-mt-28 bg-cream" id="service">
-      <div class="container-x">
-        <SectionHead eyebrow="Gói bảo hành VIO-Care" title="Các gói bảo hành VIO-Care" sub="Gia hạn bảo hành/bảo dưỡng cho sản phẩm VIO GREEN đủ điều kiện." />
-        <div class="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2">{inCategory('service').map((p, i) => <ProductCard p={p} delay={i * 80} />)}</div>
-      </div>
-    </section>
   </div>
 
   <PolicyStrip />
@@ -141,7 +133,7 @@ const nutriInfo = [
   // Bộ lọc ECOHUB + tìm kiếm ?q=
   const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]+/g, ' ').trim();
 
-  const state: Record<string, string> = { area: '', power: '', water: '' };
+  const state: Record<string, string> = { plants: '', power: '', water: '' };
   const grid = document.querySelector<HTMLElement>('[data-filter-grid]');
   const empty = document.querySelector<HTMLElement>('[data-filter-empty]');
   const applyFilters = () => {

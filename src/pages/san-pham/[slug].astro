@@ -7,7 +7,7 @@ import ProductCard from '../../components/ProductCard.astro';
 import PolicyStrip from '../../components/PolicyStrip.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import { products, bySlug, categoryOf, formatPrice, productTags, areaLabels, powerLabels, waterLabels, type Product } from '../../data/products';
+import { products, bySlug, categoryOf, formatPrice, productTags, plantLabels, powerLabels, waterLabels, type Product } from '../../data/products';
 import { site, telHref } from '../../data/site';
 
 export function getStaticPaths() {
@@ -18,8 +18,9 @@ const cat = categoryOf(p);
 const tags = productTags(p);
 
 const specs: [string, string][] = [];
-if (p.category === 'ecohub' && p.area && p.power && p.water) {
-  specs.push(['Diện tích phù hợp', areaLabels[p.area]], ['Nguồn điện', powerLabels[p.power]], ['Nguồn nước', waterLabels[p.water]], ['Phiên bản', p.edition ?? '']);
+if (p.category === 'ecohub' && p.plants && p.power && p.water) {
+  specs.push(['Số lượng cây phù hợp', plantLabels[p.plants]], ['Nguồn điện', powerLabels[p.power]], ['Nguồn nước', waterLabels[p.water]], ['Phiên bản', p.edition ?? ''],
+    ['Bảo hành', '12 tháng (có gói 18 và 24 tháng)']);
 }
 if (p.fits) specs.push(['Tương thích', p.fits]);
 specs.push(...p.specs);
@@ -49,7 +50,7 @@ const jsonLd = {
       <!-- Ảnh -->
       <div data-reveal>
         <div class="relative overflow-hidden rounded-card border border-brand-200">
-          {p.images[0] ? <img src={p.images[0]} alt={p.name} class="aspect-square w-full object-cover" /> : <Ph title={p.shortName} ratio="1/1" label="Ảnh sản phẩm đang cập nhật" />}
+          {p.images[0] ? <img src={p.images[0]} alt={p.name} class="aspect-square w-full bg-white object-contain p-6" /> : <Ph title={p.shortName} ratio="1/1" label="Ảnh sản phẩm đang cập nhật" />}
           {p.hasAR && (
             <button type="button" data-ar={p.slug} class="btn btn-light absolute bottom-4 left-4 min-h-11 px-4 py-2"><Icon name="ar" /> Thử với AR</button>
           )}
@@ -78,6 +79,7 @@ const jsonLd = {
               <dd class="flex flex-wrap gap-2" role="radiogroup" aria-label={p.variants.label}>
                 {p.variants.options.map((o, i) => <button type="button" class="chip" role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-variant={o}>{o}</button>)}
               </dd>
+              {p.variants.hint && <dd class="mt-2 text-xs text-muted">{p.variants.hint}</dd>}
             </div>
           )}
           <div>
@@ -111,6 +113,14 @@ const jsonLd = {
       <div data-reveal>
         <h2 class="flex items-center gap-2 text-xl font-bold text-brand sm:text-2xl"><Icon name="info" class="size-6" /> Mô tả chi tiết sản phẩm</h2>
         <div class="mt-5 space-y-4 leading-7 text-ink/90">{p.description.map((d) => <p>{d}</p>)}</div>
+        {p.highlights && (
+          <div class="mt-7">
+            <h3 class="font-bold text-brand">{p.highlights.title}</h3>
+            <ul class="mt-3 space-y-2.5">
+              {p.highlights.items.map((t) => <li class="flex gap-2.5 leading-relaxed text-ink/90"><Icon name="check" class="mt-1 size-4 shrink-0 text-brand" />{t}</li>)}
+            </ul>
+          </div>
+        )}
         {p.note && (
           <div class="mt-6 flex gap-3 rounded-2xl border border-sun/50 bg-sun/10 p-4 text-sm">
             <Icon name="warning" class="mt-0.5 size-5 shrink-0 text-[#a37813]" />
@@ -127,7 +137,7 @@ const jsonLd = {
         </div>
         {acc.length > 0 && (
           <div>
-            <h3 class="font-bold">Phụ kiện tương thích</h3>
+            <h3 class="font-bold">{p.category === 'ecobox' ? 'Dùng cho máy' : 'Phụ kiện tương thích'}</h3>
             <ul class="mt-3 space-y-2">
               {acc.map((a) => <li><a href={`/san-pham/${a.slug}/`} class="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-medium text-brand hover:bg-brand-50"><Icon name="box" class="size-4" /> {a.shortName}</a></li>)}
             </ul>

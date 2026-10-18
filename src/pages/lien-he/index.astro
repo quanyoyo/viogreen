@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
-import Ph from '../../components/Ph.astro';
 import Social from '../../components/Social.astro';
 import ContactForm from '../../components/ContactForm.astro';
 import PolicyStrip from '../../components/PolicyStrip.astro';
@@ -22,16 +21,16 @@ const info = [
   <!-- Băng ảnh -->
   <section class="overflow-hidden pt-10 sm:pt-14" aria-hidden="true">
     <div class="container-x grid grid-cols-[0.7fr_1.4fr_0.7fr] items-center gap-4">
-      <div class="overflow-hidden rounded-3xl opacity-70"><Ph ratio="4/3" label="" /></div>
-      <div class="breath shadow-lift"><Ph title="Let's Grow Green Together" ratio="16/10" label="Ảnh không gian xanh đang cập nhật" /></div>
-      <div class="overflow-hidden rounded-3xl opacity-70"><Ph ratio="4/3" label="" /></div>
+      <div class="aspect-[4/3] overflow-hidden rounded-3xl opacity-80"><img src="/assets/bia-1-800.webp" alt="" class="size-full object-cover" loading="lazy" /></div>
+      <div class="breath aspect-[16/10] shadow-lift"><img src="/assets/hero-2.webp" srcset="/assets/hero-2-800.webp 800w, /assets/hero-2.webp 1680w" sizes="(min-width: 1280px) 640px, 50vw" alt="" class="size-full object-cover" /></div>
+      <div class="aspect-[4/3] overflow-hidden rounded-3xl opacity-80"><img src="/assets/hero-3-800.webp" alt="" class="size-full object-cover object-left" loading="lazy" /></div>
     </div>
   </section>
 
   <section class="section pt-12 sm:pt-16">
     <div class="container-x">
       <div class="mx-auto mb-12 max-w-3xl text-center" data-reveal>
-        <h1 class="h-display">Let's Grow Green Together</h1>
+        <h1 class="h-display">Cùng nhau vun trồng lối sống xanh.</h1>
         <p class="mt-4 text-lg text-muted">Bạn đã sẵn sàng mang thiên nhiên xanh mát vào không gian sống của mình? Hãy để lại thông tin, đội ngũ chuyên gia VIO GREEN sẽ đồng hành cùng bạn hiện thực hóa khu vườn mơ ước.</p>
       </div>
 

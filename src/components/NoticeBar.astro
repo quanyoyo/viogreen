@@ -1,0 +1,23 @@
+---
+// Thanh chữ chạy ngang dưới menu (kiểu notice). Nội dung: site.notice
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+import type { IconName } from './icons';
+// Lặp đủ dài để phủ màn hình rộng; cả dải được nhân đôi để chạy vòng liền mạch (keyframes marquee: 0 → -50%)
+const group = [...site.notice, ...site.notice, ...site.notice];
+---
+<div class="group overflow-hidden border-b border-brand-100 bg-cream text-brand-800" role="region" aria-label="Thông báo">
+  <p class="sr-only">{site.notice.map((n) => n.text).join(' · ')}</p>
+  <div class="flex w-max animate-marquee group-hover:[animation-play-state:paused]" aria-hidden="true">
+    {[0, 1].map(() => (
+      <ul class="flex shrink-0 items-center">
+        {group.map((n) => (
+          <li class="flex items-center gap-2 px-6 py-2 text-[13px] font-medium whitespace-nowrap sm:text-sm">
+            <Icon name={n.icon as IconName} class="size-4 shrink-0 text-brand" />{n.text}
+            <span class="ml-6 size-1 rounded-full bg-brand-300"></span>
+          </li>
+        ))}
+      </ul>
+    ))}
+  </div>
+</div>

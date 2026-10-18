@@ -3,7 +3,8 @@ import Icon from './Icon.astro';
 interface Props { source: string; compact?: boolean }
 const { source, compact = false } = Astro.props;
 const spaces = ['Ban công', 'Sân thượng', 'Căn hộ', 'Văn phòng', 'Quán cà phê', 'Khác'];
-const areas = ['Dưới 10m²', '10–20m²', 'Trên 20m²', 'Chưa rõ'];
+// Số lượng cây thay cho diện tích (khách yêu cầu 18/10/2026). Vẫn lưu vào trường `area` của lead.
+const areas = ['Dưới 15 cây', 'Dưới 20 cây', 'Dưới 30 cây', 'Trên 30 cây', 'Chưa rõ'];
 ---
 <form class="space-y-5" data-form="contact" novalidate>
   <input type="hidden" name="source" value={source} />
@@ -31,7 +32,7 @@ const areas = ['Dưới 10m²', '10–20m²', 'Trên 20m²', 'Chưa rõ'];
         </div>
       </fieldset>
       <fieldset>
-        <legend class="mb-2 text-sm font-semibold">Diện tích không gian của bạn</legend>
+        <legend class="mb-2 text-sm font-semibold">Số lượng cây của bạn</legend>
         <div class="flex flex-wrap gap-2">
           {areas.map((a) => (
             <label class="chip cursor-pointer has-[:checked]:border-brand has-[:checked]:bg-brand has-[:checked]:text-white has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-brand-100">
@@ -44,7 +45,7 @@ const areas = ['Dưới 10m²', '10–20m²', 'Trên 20m²', 'Chưa rõ'];
   )}
 
   <label class="field">{compact ? 'Lời nhắn' : 'Lời nhắn / Yêu cầu chi tiết'}
-    <textarea class="input min-h-32 resize-y" name="message" rows="4" placeholder="Chia sẻ thêm về không gian hoặc yêu cầu cụ thể của bạn: diện tích, đã có nguồn điện/nước chưa…"></textarea>
+    <textarea class="input min-h-32 resize-y" name="message" rows="4" placeholder="Chia sẻ thêm về không gian hoặc yêu cầu cụ thể của bạn: số lượng cây, đã có nguồn điện/nước chưa…"></textarea>
   </label>
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
     <button class="btn btn-primary sm:min-w-56" type="submit">{compact ? 'Đăng ký tư vấn' : 'Gửi yêu cầu'} <Icon name="send" /></button>

@@ -6,7 +6,8 @@ import Social from './Social.astro';
 const year = new Date().getFullYear();
 ---
 <footer class="bg-cream-200 text-ink">
-  <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.3fr_1.4fr]">
+  <!-- Cột Chính sách / Hỗ trợ rộng theo chữ (auto) để "Chính sách bảo mật thông tin" nằm 1 dòng -->
+  <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.2fr_auto_auto_1.2fr_1.3fr] lg:gap-8 xl:gap-10">
     <div class="space-y-4">
       <Logo size="lg" />
       <p class="max-w-xs text-sm text-muted">Giải pháp chăm sóc không gian xanh đô thị – kết nối công nghệ, con người và thiên nhiên.</p>
@@ -15,7 +16,7 @@ const year = new Date().getFullYear();
     <div>
       <h3 class="mb-4 font-bold text-brand">Chính sách</h3>
       <ul class="space-y-2.5 text-sm">
-        {policyPages.map((p) => <li><a href={`/chinh-sach/${p.slug}/`} class="text-muted transition-colors hover:text-brand">{p.title}</a></li>)}
+        {policyPages.map((p) => <li><a href={`/chinh-sach/${p.slug}/`} class="whitespace-nowrap text-muted transition-colors hover:text-brand">{p.title}</a></li>)}
       </ul>
     </div>
     <div>

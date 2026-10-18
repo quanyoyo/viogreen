@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { site } from '../data/site';
 import { clientProducts } from '../data/products';
 import Header from '../components/Header.astro';
+import NoticeBar from '../components/NoticeBar.astro';
 import Footer from '../components/Footer.astro';
 import ArModal from '../components/ArModal.astro';
 import Chatbot from '../components/Chatbot.astro';
@@ -27,7 +28,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {(noindex || site.prelaunch) && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#355e3b" />
+    <meta name="theme-color" content="#037700" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="vi_VN" />
     <meta property="og:site_name" content={site.name} />
@@ -46,6 +47,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   <body class="flex min-h-dvh flex-col">
     <a href="#main" class="sr-only z-[100] rounded-full bg-brand px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">Bỏ qua tới nội dung</a>
     <Header active={active} />
+    <NoticeBar />
     <main id="main" class="flex-1"><slot /></main>
     <Footer />
     <ArModal />

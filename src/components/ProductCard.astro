@@ -12,11 +12,11 @@ const searchText = [p.name, p.shortName, p.summary, categoryOf(p).label].join(' 
 ---
 <article class="card card-hover group relative flex flex-col overflow-hidden"
   data-reveal={reveal ? '' : undefined} style={delay ? `--d:${delay}ms` : undefined}
-  data-product={p.slug} data-cat={p.category} data-area={p.area} data-power={p.power} data-water={p.water}
+  data-product={p.slug} data-cat={p.category} data-plants={p.plants} data-power={p.power} data-water={p.water}
   data-search={searchText}>
   <a href={href} tabindex="-1" aria-hidden="true" class="block overflow-hidden">
     <div class="transition-transform duration-700 group-hover:scale-[1.04]">
-      {p.images[0] ? <img src={p.images[0]} alt="" loading="lazy" class="aspect-[4/3] w-full object-cover" /> : <Ph title={p.shortName} ratio="4/3" />}
+      {p.images[0] ? <img src={p.images[0]} alt="" loading="lazy" class="aspect-[4/3] w-full bg-white object-contain p-4" /> : <Ph title={p.shortName} ratio="4/3" />}
     </div>
   </a>
   {p.hasAR && (

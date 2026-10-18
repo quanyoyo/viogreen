@@ -3,7 +3,7 @@
 // ============================================================
 export const site = {
   name: 'VIO GREEN',
-  tagline: 'Smart Care for Urban Green Spaces',
+  tagline: 'Chăm sóc thông minh cho không gian xanh đô thị',
   description:
     'VIO GREEN ECOHUB – hệ thống chăm sóc cây thông minh cho ban công, sân thượng và không gian xanh đô thị: tưới tự động, quản lý dinh dưỡng, năng lượng mặt trời.',
   lang: 'vi',
@@ -64,6 +64,17 @@ export const site = {
 
   // ---- Giá: chưa có giá thì hiển thị chữ này ----
   priceFallback: 'Liên hệ',
+
+  // ---- Thanh chữ chạy ngang dưới menu (mọi trang). Icon: tên trong src/components/icons.ts ----
+  // Nội dung khách gửi 18/10/2026. Lưu ý: chính sách vận chuyển chỉ miễn phí đơn từ 2 triệu ở Hà Nội.
+  notice: [
+    { icon: 'warranty', text: 'Bảo hành 12 tháng' },
+    { icon: 'truck', text: 'Giao hàng miễn phí từ 2.000.000đ' },
+    { icon: 'support', text: 'Tư vấn miễn phí' },
+  ],
+
+  // ---- Thời tiết + giờ trên ảnh hero trang chủ (Open-Meteo, miễn phí, không cần khoá) ----
+  weather: { label: 'Hà Nội', lat: 21.0285, lon: 105.8542 },
 };
 
 export const telHref = 'tel:' + site.phone.replace(/\s/g, '');

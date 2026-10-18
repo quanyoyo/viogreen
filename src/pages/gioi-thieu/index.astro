@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
-import Ph from '../../components/Ph.astro';
 import PolicyStrip from '../../components/PolicyStrip.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
@@ -9,21 +8,28 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 <BaseLayout title="Giới thiệu" active="about" description="Câu chuyện thương hiệu, tầm nhìn và sứ mệnh của VIO GREEN – giải pháp không gian xanh đô thị thông minh.">
   <Breadcrumbs items={[['Giới thiệu']]} />
 
-  <section class="relative isolate overflow-hidden bg-brand-800 py-20 text-white sm:py-28">
+  <!-- Hero kiểu ảnh nền + lớp phủ xanh, chữ bên trái (tham khảo hiệu ứng tatagarden.vn) -->
+  <section class="relative isolate overflow-hidden bg-brand-900 text-white">
     <div aria-hidden="true" class="absolute inset-0 -z-10">
-      <div class="absolute inset-0 animate-breath bg-[radial-gradient(ellipse_at_80%_30%,var(--color-brand-400)_0%,var(--color-brand)_40%,var(--color-brand-800)_78%)]"></div>
-      <div class="absolute top-0 -left-1/4 h-full w-2/3 animate-sweep bg-[linear-gradient(100deg,transparent,rgb(255_255_255/.12),transparent)]"></div>
-      <div class="absolute -right-16 bottom-0 hidden size-[26rem] text-white/10 md:block"><Icon name="tree" class="size-full" /></div>
+      <img src="/assets/bia-1.webp" srcset="/assets/bia-1-800.webp 800w, /assets/bia-1.webp 1680w" sizes="100vw" alt="" class="size-full animate-breath object-cover" fetchpriority="high" />
+      <div class="absolute inset-0 bg-[linear-gradient(to_right,rgb(1_54_0/.92)_0%,rgb(1_54_0/.72)_40%,rgb(1_54_0/.25)_75%,rgb(1_54_0/.1))]"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(to_top,rgb(1_54_0/.6),transparent_40%)]"></div>
+      <div class="absolute top-0 -left-1/4 h-full w-2/3 animate-sweep bg-[linear-gradient(100deg,transparent,rgb(255_255_255/.08),transparent)]"></div>
     </div>
-    <div class="container-x max-w-3xl" data-reveal>
-      <p class="eyebrow eyebrow-light">Về VIO GREEN</p>
-      <h1 class="text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl">Công nghệ thông minh. Không gian xanh. Cuộc sống dễ dàng hơn.</h1>
-      <p class="mt-5 text-lg text-brand-100">VIO GREEN phát triển các giải pháp chăm sóc không gian xanh đô thị, kết nối công nghệ với thiên nhiên để giúp việc sống xanh trở nên đơn giản, thuận tiện và bền vững hơn.</p>
-      <a class="btn btn-light mt-8" href="/san-pham/">Khám phá ngay <Icon name="arrowCircle" /></a>
+    <div class="container-x py-20 sm:py-28 lg:py-32" data-reveal>
+      <div class="max-w-2xl">
+        <p class="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-[0.18em] uppercase backdrop-blur"><span class="size-1.5 rounded-full bg-sun"></span>Về VIO GREEN</p>
+        <h1 class="text-4xl leading-[1.1] font-extrabold tracking-tight sm:text-5xl lg:text-6xl">Công nghệ thông minh. <span class="text-sun">Không gian xanh.</span> Cuộc sống dễ dàng hơn.</h1>
+        <p class="mt-6 max-w-xl text-lg text-white/85">VIO GREEN phát triển các giải pháp chăm sóc không gian xanh đô thị, kết nối công nghệ với thiên nhiên để giúp việc sống xanh trở nên đơn giản, thuận tiện và bền vững hơn.</p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a class="btn btn-light" href="/san-pham/">Khám phá ngay <Icon name="arrowCircle" /></a>
+          <a class="btn btn-outline-light backdrop-blur" href="#cau-chuyen">Khám phá câu chuyện <Icon name="arrowRight" /></a>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section scroll-mt-28" id="cau-chuyen">
     <div class="container-x grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
       <div data-reveal>
         <p class="eyebrow">Câu chuyện thương hiệu</p>
@@ -36,9 +42,9 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
         <a class="btn btn-primary mt-8" href="/san-pham/">Khám phá ngay <Icon name="arrowCircle" /></a>
       </div>
       <div class="grid grid-cols-3 items-center gap-3" data-reveal style="--d:120ms" aria-hidden="true">
-        <div class="translate-y-6 overflow-hidden rounded-3xl"><Ph ratio="3/4" label="" /></div>
-        <div class="breath shadow-lift"><Ph title="VIO GREEN" ratio="3/4" /></div>
-        <div class="-translate-y-6 overflow-hidden rounded-3xl"><Ph ratio="3/4" label="" /></div>
+        <div class="aspect-[3/4] translate-y-6 overflow-hidden rounded-3xl"><img src="/assets/hero-2-800.webp" alt="" class="size-full object-cover" loading="lazy" /></div>
+        <div class="breath aspect-[3/4] shadow-lift"><img src="/assets/hero-1-800.webp" alt="" class="size-full object-cover object-[30%_center]" loading="lazy" /></div>
+        <div class="aspect-[3/4] -translate-y-6 overflow-hidden rounded-3xl"><img src="/assets/hero-3-800.webp" alt="" class="size-full object-cover object-left" loading="lazy" /></div>
       </div>
     </div>
   </section>
@@ -61,5 +67,5 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
   </section>
 
   <PolicyStrip />
-  <CtaBand title="Smart Urban Green Solutions" sub="“Smart Care for Urban Green Spaces.”" />
+  <CtaBand title="Giải pháp xanh thông minh cho đô thị." sub="“Chăm sóc thông minh cho không gian xanh đô thị.”" />
 </BaseLayout>

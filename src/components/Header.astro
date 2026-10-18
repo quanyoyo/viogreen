@@ -1,9 +1,12 @@
 ---
-import { nav, site, telHref } from '../data/site';
+import { nav as baseNav, site, telHref } from '../data/site';
+import { posts } from '../data/blog';
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
 interface Props { active?: string }
 const { active = '' } = Astro.props;
+// Mục "Tin tức" chỉ hiện khi đã có bài viết
+const nav = posts.length ? [...baseNav.slice(0, 3), { href: '/tin-tuc/', label: 'Tin tức', key: 'news' }, ...baseNav.slice(3)] : baseNav;
 ---
 <header class="sticky top-0 z-40 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85" data-header>
   <!-- Thanh trên: logo, tìm kiếm, hỗ trợ, giỏ hàng -->
@@ -32,20 +35,21 @@ const { active = '' } = Astro.props;
   <!-- Thanh menu xanh (desktop) -->
   <nav aria-label="Điều hướng chính" class="hidden bg-brand lg:block">
     <div class="container-x flex items-stretch justify-between">
-      <ul class="flex items-stretch">
+      <ul class="flex items-stretch gap-1 py-1.5">
         {nav.map((n) => (
           <li class="flex">
+            <!-- Mục đang mở: khung trắng có viền xanh -->
             <a href={n.href} aria-current={active === n.key ? 'page' : undefined}
-              class:list={['relative flex items-center px-6 py-3.5 text-sm font-semibold tracking-wider uppercase transition-colors duration-300',
-                active === n.key ? 'bg-white text-brand' : 'text-white/90 hover:bg-white/10 hover:text-white']}>
+              class:list={['relative flex items-center rounded-lg border-2 px-5 py-2 text-sm font-semibold tracking-wider uppercase transition-colors duration-300',
+                active === n.key ? 'border-brand-200 bg-white text-brand shadow-[inset_0_0_0_1px_var(--color-brand)]' : 'border-transparent text-white/90 hover:border-white/30 hover:bg-white/10 hover:text-white']}>
               {n.label}
             </a>
           </li>
         ))}
       </ul>
-      <a href="/san-pham/#ecohub" class="my-1.5 inline-flex items-center gap-2 self-center rounded-full bg-white px-5 py-2 text-sm font-semibold text-brand transition-all duration-300 hover:-translate-y-0.5 hover:shadow-soft">
-        <Icon name="sparkles" class="size-4" /> Chọn ECOHUB
-      </a>
+      <button type="button" data-open-chat class="my-1.5 inline-flex items-center gap-2 self-center rounded-full bg-white px-5 py-2 text-sm font-semibold text-brand transition-all duration-300 hover:-translate-y-0.5 hover:shadow-soft">
+        <Icon name="chat" class="size-4" /> Tư vấn ngay
+      </button>
     </div>
   </nav>
 </header>

@@ -1,33 +1,35 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
-import Ph from '../components/Ph.astro';
 import SectionHead from '../components/SectionHead.astro';
 import ProductCard from '../components/ProductCard.astro';
 import ContactForm from '../components/ContactForm.astro';
 import { inCategory } from '../data/products';
 import { faq } from '../data/faq';
+import { reviews } from '../data/reviews';
+import { posts, fmtDate } from '../data/blog';
 import { site } from '../data/site';
 
-// Hero 3 slide theo mục "Trang ảnh đầu" (Thông tin làm web.docx). Chữ lấy từ nội dung sẵn có, không thêm thông số.
-// img.brief = mô tả ảnh cần chụp (hiện trên ảnh tạm). Có ảnh thật: thêm img.src = '/assets/hero-1.webp'…
+// Hero 3 slide (ảnh khách gửi 18/10/2026, gốc trong images-src/ → `npm run images`).
+// Ảnh nằm nửa phải và mờ dần sang trái (máy đứng bên trái ảnh nên không bị chữ che). nowrap = tiêu đề 1 dòng.
 const slides = [
-  { eyebrow: 'VIO GREEN ECOHUB', title: 'Smart Care for Urban Green Spaces', text: 'Chăm sóc không gian xanh đô thị bằng công nghệ thông minh.', cta: ['Khám phá ngay', '/san-pham/'],
-    img: { src: '', alt: 'Máy ECOHUB trong góc ban công xanh tươi', dark: false,
-      brief: 'Máy ECOHUB đặt trong góc ban công / sân thượng nhiều cây xanh tươi tốt, ánh sáng tự nhiên, máy là tâm điểm.' } },
+  { eyebrow: 'VIO GREEN', title: 'Chăm sóc thông minh cho không gian xanh đô thị', text: 'Một hệ thống gọn gàng. Nhiều tiện ích chăm sóc cây.', cta: ['Khám phá ngay', '/san-pham/'],
+    img: { src: '/assets/hero-1.webp', alt: 'Hai máy VIO GREEN ECOHUB trên sân thượng nhiều cây xanh lúc hoàng hôn' } },
   { eyebrow: 'Giám sát qua app', title: 'Giám sát mọi lúc qua app', text: 'Theo dõi tình trạng hệ thống, nước, dinh dưỡng và năng lượng thông qua ứng dụng, nhận cảnh báo và gợi ý chăm sóc.', cta: ['Xem các dòng ECOHUB', '/san-pham/#ecohub'],
-    img: { src: '', alt: 'Điện thoại mở ứng dụng VIO GREEN cạnh máy ECOHUB', dark: true,
-      brief: 'Điện thoại mở app VIO GREEN đặt cạnh máy ECOHUB. Góc nhìn hơi "techno": nền tối, ánh sáng xanh, màn hình app sáng rõ.' } },
-  { eyebrow: 'Dễ dùng mỗi ngày', title: 'Chạm để chăm sóc', text: 'Tưới tự động, quản lý dinh dưỡng và năng lượng mặt trời trong một hệ thống nhỏ gọn.', cta: ['Trải nghiệm AR', '/trai-nghiem-ar/'],
-    img: { src: '', alt: 'Tay người dùng chạm vào máy ECOHUB', dark: false,
-      brief: 'Cận cảnh bàn tay người dùng chạm vào máy ECOHUB (nút / bảng điều khiển), nền cây xanh mờ phía sau.' } },
+    img: { src: '/assets/hero-2.webp', alt: 'Máy ECOHUB bản năng lượng mặt trời trên ban công nhiều hoa' } },
+  { eyebrow: 'Dễ dùng mỗi ngày', title: 'Chạm để chăm sóc', nowrap: true, text: 'Tưới tự động, quản lý dinh dưỡng và năng lượng mặt trời trong một hệ thống nhỏ gọn.', cta: ['Trải nghiệm AR', '/trai-nghiem-ar/'],
+    img: { src: '/assets/hero-3.webp', alt: 'Máy ECOHUB đặt cạnh bồn cây xanh trong sảnh toà nhà' } },
 ];
 const trust = [['drop', 'Tưới tự động'], ['solar', 'Năng lượng mặt trời'], ['mobile', 'Giám sát qua app'], ['ar', 'Ướm thử bằng AR']] as const;
-const pains = [
-  ['hourglass', 'Thời gian bận rộn', 'Lịch trình bận rộn khiến việc tưới cây đều đặn trở thành một áp lực nhỏ nhưng dai dẳng.'],
-  ['tree', 'Không biết cây cần gì', 'Không phải ai cũng có thời gian đọc hiểu mọi dấu hiệu của một chậu cây.'],
-  ['home', 'Thường xuyên đi xa', 'Công tác hay du lịch không còn đồng nghĩa với việc bỏ lại góc xanh phía sau.'],
-  ['maximize', 'Không gian và nguồn điện hạn chế', 'Ban công, sân thượng nhỏ hẹp và khó bố trí nguồn điện.'],
+// Biểu tượng thời tiết (bật theo mã thời tiết trong script bên dưới)
+const wxIcons = ['solar', 'cloudSun', 'cloud', 'cloudFog', 'cloudDrizzle', 'cloudRain', 'cloudLightning', 'cloudSnow'] as const;
+
+// Nội dung 2 – ECOHUB là gì
+const features = [
+  ['cpu', 'Tưới nước dựa trên dữ liệu cảm biến IoT'],
+  ['chart', 'Theo dõi và quản lý qua Web App'],
+  ['ai', 'Hỗ trợ chăm sóc cây bằng AI'],
+  ['solar', 'Tùy chọn năng lượng phù hợp với từng phiên bản'],
 ] as const;
 const whys = [
   ['drop', 'Tưới, tiêu thông minh', 'Hệ thống sử dụng cảm biến và dữ liệu để hỗ trợ xác định nhu cầu nước thực tế của cây, từ đó hỗ trợ điều chỉnh hoạt động tưới thay vì phụ thuộc hoàn toàn vào lịch tưới thủ công.'],
@@ -35,6 +37,16 @@ const whys = [
   ['solar', 'Năng lượng mặt trời', 'Tích hợp tấm pin năng lượng mặt trời và pin dự phòng có thể tháo rời, giúp hệ thống vận hành linh hoạt và giảm sự phụ thuộc vào nguồn điện trực tiếp.'],
   ['ar', 'Ướm thử trước khi mua', 'Công nghệ AR cho phép người dùng hình dung ECOHUB trong chính không gian của mình, hỗ trợ lựa chọn vị trí và cách bố trí phù hợp.'],
 ] as const;
+// Nội dung 4 – Một hệ thống, nhiều cách sống xanh
+const steps = [
+  ['Thu thập dữ liệu', 'Cảm biến IoT ghi nhận các điều kiện thực tế liên quan đến nhu cầu chăm sóc cây.'],
+  ['Hỗ trợ chăm sóc', 'ECOHUB sử dụng dữ liệu cảm biến để vận hành chức năng tưới tự động; Web App hỗ trợ theo dõi và AI đưa ra gợi ý chăm sóc.'],
+  ['Theo dõi và điều chỉnh', 'Người dùng theo dõi tình trạng hệ thống qua Web App và chủ động điều chỉnh việc chăm sóc khi cần.'],
+] as const;
+
+// Đánh giá / blog chỉ hiện khi có nội dung thật; nền xen kẽ kem – trắng cho các mục cuối trang
+const tail = [reviews.length > 0 && 'reviews', posts.length > 0 && 'blog', 'contact'].filter(Boolean) as string[];
+const tint = (key: string) => tail.indexOf(key) % 2 === 0;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -45,57 +57,82 @@ const jsonLd = {
 };
 ---
 <BaseLayout active="home" jsonLd={jsonLd}>
-  <!-- HERO (carousel) -->
-  <section class="relative isolate overflow-hidden bg-brand-800 text-white" data-carousel aria-roledescription="carousel" aria-label="Giới thiệu VIO GREEN">
-    <div aria-hidden="true" class="absolute inset-0 -z-10">
-      <div class="absolute inset-0 animate-breath bg-[radial-gradient(ellipse_at_75%_40%,var(--color-brand-400)_0%,var(--color-brand)_38%,var(--color-brand-800)_75%)]"></div>
-      <div class="absolute top-0 -left-1/4 h-full w-2/3 animate-sweep bg-[linear-gradient(100deg,transparent,rgb(255_255_255/.12),transparent)]"></div>
-      <div class="absolute -bottom-24 left-[38%] size-72 rotate-[30deg] text-leaf/15"><Icon name="leaf" class="size-full" /></div>
-    </div>
-    <div class="container-x relative grid min-h-[min(82vh,700px)] items-center pt-12 pb-20 sm:pt-16 lg:pb-24">
+  <!-- HERO (carousel): ảnh + lớp phủ mờ, thời tiết & giờ Hà Nội -->
+  <section class="relative isolate overflow-hidden bg-brand-900 text-white" data-carousel aria-roledescription="carousel" aria-label="Giới thiệu VIO GREEN">
+    <div class="grid">
       {slides.map((s, i) => (
-        <div class:list={['col-start-1 row-start-1 grid items-center gap-8 transition-all duration-700 lg:grid-cols-[5fr_7fr] lg:gap-14', i === 0 ? 'opacity-100' : 'pointer-events-none translate-y-4 opacity-0']}
-          data-slide aria-hidden={i === 0 ? 'false' : 'true'} role="group" aria-roledescription="slide" aria-label={`${i + 1} / ${slides.length}`}>
-          <div>
-            <p class="eyebrow eyebrow-light">{s.eyebrow}</p>
-            {i === 0 ? <h1 class="text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl xl:text-6xl">{s.title}</h1>
-                     : <p class="text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl xl:text-6xl">{s.title}</p>}
-            <p class="mt-5 max-w-xl text-lg text-brand-100 sm:text-xl">{s.text}</p>
-            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a class="btn btn-light" href={s.cta[1]} tabindex={i ? -1 : undefined}>{s.cta[0]} <Icon name="arrowCircle" /></a>
-              <button class="btn btn-outline-light" type="button" data-open-chat tabindex={i ? -1 : undefined}><Icon name="chat" /> Hỏi MIO</button>
-            </div>
+        <div class="relative col-start-1 row-start-1 flex flex-col opacity-0 transition-opacity duration-1000 ease-(--ease-soft) not-data-[active]:pointer-events-none data-[active]:opacity-100 lg:min-h-[clamp(460px,calc(100svh-15rem),600px)] lg:justify-center"
+          data-slide data-active={i === 0 ? '' : undefined} aria-hidden={i === 0 ? 'false' : 'true'} role="group" aria-roledescription="slide" aria-label={`${i + 1} / ${slides.length}`}>
+          <!-- Ảnh: điện thoại nằm trên chữ; máy tính chiếm 64% bên phải, mờ dần sang nền xanh bên trái -->
+          <div class="relative aspect-[16/10] overflow-hidden lg:absolute lg:inset-y-0 lg:right-0 lg:aspect-auto lg:w-[64%]">
+            <img src={s.img.src} srcset={`${s.img.src.replace('.webp', '-800.webp')} 800w, ${s.img.src} 1680w`} sizes="(min-width: 1024px) 64vw, 100vw"
+              alt={s.img.alt} class="size-full animate-breath object-cover" loading={i ? 'lazy' : 'eager'} fetchpriority={i ? undefined : 'high'} />
+            <div aria-hidden="true" class="absolute inset-0 bg-[linear-gradient(to_top,var(--color-brand-900)_2%,rgb(1_54_0/.35)_35%,rgb(1_54_0/.1))] lg:bg-[linear-gradient(to_right,var(--color-brand-900)_0%,rgb(1_54_0/.55)_8%,rgb(1_54_0/.1)_20%,rgb(1_54_0/.15))]"></div>
+            <div aria-hidden="true" class="absolute inset-0 hidden bg-[linear-gradient(to_top,rgb(1_54_0/.55),transparent_45%)] lg:block"></div>
           </div>
-          <!-- Ảnh slide: ảnh thật (img.src) hoặc ảnh tạm ghi rõ nội dung cần chụp -->
-          <div class="breath aspect-[16/10] w-full shadow-lift ring-1 ring-white/15 lg:aspect-[5/4]">
-            {s.img.src
-              ? <img src={s.img.src} alt={s.img.alt} class="size-full object-cover" loading={i ? 'lazy' : 'eager'} />
-              : <div class:list={['ph size-full gap-3', s.img.dark && 'ph-dark hero-grid']} role="img" aria-label={`Ảnh tạm: ${s.img.alt}`}>
-                  <span class="absolute top-4 left-4 rounded-full bg-sun px-3 py-1 text-[11px] font-bold tracking-wider text-ink uppercase">Ảnh tạm</span>
-                  <span class="relative inline-flex size-14 items-center justify-center rounded-full bg-white/80 text-brand shadow-sm"><Icon name="camera" class="size-7" /></span>
-                  <strong class="relative text-lg font-bold">Ảnh cần chụp</strong>
-                  <span class="relative max-w-md text-sm leading-relaxed sm:text-base">{s.img.brief}</span>
-                </div>}
+          <div class="container-x relative -mt-10 pb-20 lg:mt-0 lg:py-16">
+            <div class="max-w-xl lg:max-w-[46%]">
+              <p class="eyebrow eyebrow-light">{s.eyebrow}</p>
+              {i === 0 ? <h1 class="text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl xl:text-[3.4rem]">{s.title}</h1>
+                       : <p class:list={['text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl xl:text-[3.4rem]', s.nowrap && 'sm:whitespace-nowrap']}>{s.title}</p>}
+              <p class="mt-5 max-w-lg text-lg text-brand-100 sm:text-xl">{s.text}</p>
+              <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                <a class="btn btn-light" href={s.cta[1]} tabindex={i ? -1 : undefined}>{s.cta[0]} <Icon name="arrowCircle" /></a>
+                <button class="btn btn-outline-light" type="button" data-open-chat tabindex={i ? -1 : undefined}><Icon name="chat" /> Hỏi MIO</button>
+              </div>
+            </div>
           </div>
         </div>
       ))}
-      <div class="absolute bottom-8 left-4 flex gap-2 sm:left-6 lg:left-8" role="tablist" aria-label="Chọn slide">
+    </div>
+
+    <!-- Thời tiết + giờ (máy tính: thẻ kính mờ góc phải; điện thoại: nhãn nhỏ trên ảnh) -->
+    <div data-weather data-lat={site.weather.lat} data-lon={site.weather.lon}>
+      <div class="absolute right-[max(2rem,calc((100%-80rem)/2+2rem))] bottom-10 z-10 hidden w-72 rounded-3xl border border-white/25 bg-white/10 p-5 shadow-lift backdrop-blur-md lg:block">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-5xl leading-none font-bold tracking-tight" data-wx-temp>--°</p>
+            <p class="mt-2 text-sm font-medium" data-wx-desc>Đang tải thời tiết…</p>
+          </div>
+          <span class="text-white/95" data-wx-icons>
+            {wxIcons.map((n) => <span data-wx-ic={n} hidden><Icon name={n} class="size-11 stroke-[1.5]" /></span>)}
+          </span>
+        </div>
+        <p class="mt-2 flex items-center gap-1.5 text-xs text-white/75"><Icon name="pin" class="size-3.5" /> {site.weather.label}, Việt Nam</p>
+        <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-white/20 pt-4 text-xs" data-wx-more hidden>
+          <div><dt class="text-white/70">Độ ẩm</dt><dd class="mt-0.5 text-sm font-semibold" data-wx="humidity">--</dd></div>
+          <div><dt class="text-white/70">Gió</dt><dd class="mt-0.5 text-sm font-semibold" data-wx="wind">--</dd></div>
+          <div><dt class="text-white/70">Cảm giác như</dt><dd class="mt-0.5 text-sm font-semibold" data-wx="feels">--</dd></div>
+          <div><dt class="text-white/70">Chỉ số UV</dt><dd class="mt-0.5 text-sm font-semibold" data-wx="uv">--</dd></div>
+        </dl>
+        <div class="mt-4 border-t border-white/20 pt-3">
+          <p class="text-xs text-white/75 first-letter:uppercase" data-clock-date></p>
+          <p class="mt-1 text-3xl font-semibold tracking-wider tabular-nums" data-clock-time>--:--:--</p>
+        </div>
+      </div>
+      <p class="absolute top-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-brand-900/55 px-3 py-1.5 text-xs font-semibold tabular-nums backdrop-blur lg:hidden">
+        <Icon name="pin" class="size-3.5" /> {site.weather.label} <span data-wx-temp-sm></span> · <span data-clock-short>--:--</span>
+      </p>
+    </div>
+
+    <div class="pointer-events-none absolute inset-x-0 bottom-6 z-10 lg:bottom-8">
+      <div class="container-x flex gap-2" role="tablist" aria-label="Chọn slide">
         {slides.map((_, i) => (
           <button type="button" data-dot={i} aria-label={`Slide ${i + 1}`} aria-selected={i === 0 ? 'true' : 'false'} role="tab"
-            class="h-1.5 w-8 rounded-full bg-white/35 transition-all duration-500 aria-selected:w-14 aria-selected:bg-white"></button>
+            class="pointer-events-auto h-1.5 w-8 rounded-full bg-white/35 transition-all duration-500 aria-selected:w-14 aria-selected:bg-white"></button>
         ))}
       </div>
     </div>
-    <ul class="relative border-t border-white/10 bg-brand-900/40 backdrop-blur-sm">
-      <div class="container-x grid grid-cols-2 gap-x-4 gap-y-3 py-5 text-sm sm:text-base lg:grid-cols-4">
-        {trust.map(([ic, t]) => (
-          <li class="flex items-center gap-3"><span class="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/40"><Icon name={ic} class="size-5" /></span>{t}</li>
-        ))}
-      </div>
-    </ul>
   </section>
+  <div class="border-t border-white/10 bg-brand-800 text-white">
+    <ul class="container-x grid grid-cols-2 gap-x-4 gap-y-3 py-5 text-sm sm:text-base lg:grid-cols-4">
+      {trust.map(([ic, t]) => (
+        <li class="flex items-center gap-3"><span class="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/40"><Icon name={ic} class="size-5" /></span>{t}</li>
+      ))}
+    </ul>
+  </div>
 
-  <!-- STORY -->
+  <!-- NỘI DUNG 1 – CÂU CHUYỆN -->
   <section class="section">
     <div class="container-x grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
       <div data-reveal>
@@ -103,45 +140,59 @@ const jsonLd = {
         <h2 class="h-display">Khi sống xanh trở nên dễ dàng hơn</h2>
         <div class="mt-5 space-y-4 text-muted sm:text-lg">
           <p>Cuộc sống đô thị ngày càng bận rộn, nhưng nhu cầu kết nối với thiên nhiên vẫn luôn hiện hữu.</p>
-          <p>VIO GREEN tin rằng một không gian xanh không nên trở thành một nhiệm vụ khiến con người thêm áp lực.</p>
-          <p>Từ đó, VIO GREEN được hình thành với định hướng kết nối <strong class="text-brand">công nghệ – con người – thiên nhiên</strong>, tạo ra những giải pháp giúp mọi người dễ dàng đưa cây xanh vào cuộc sống và duy trì chúng lâu dài.</p>
+          <p>VIO GREEN hướng đến việc biến chăm sóc cây từ những công việc đòi hỏi nhiều thời gian và kinh nghiệm thành trải nghiệm chủ động, thuận tiện hơn nhờ công nghệ thông minh.</p>
+          <p>Từ đó, VIO GREEN kết nối <strong class="text-brand">công nghệ – con người – thiên nhiên</strong>, phát triển những giải pháp giúp mọi người dễ dàng đưa cây xanh vào cuộc sống và nuôi dưỡng không gian xanh lâu dài.</p>
         </div>
         <a class="btn btn-primary mt-8" href="/gioi-thieu/">Khám phá ngay <Icon name="arrowCircle" /></a>
       </div>
-      <div class="breath shadow-soft" data-reveal style="--d:120ms"><Ph title="Không gian xanh đô thị" ratio="4/3" /></div>
+      <div class="breath aspect-[4/3] shadow-soft" data-reveal style="--d:120ms">
+        <img src="/assets/bia-1.webp" srcset="/assets/bia-1-800.webp 800w, /assets/bia-1.webp 1680w" sizes="(min-width: 1024px) 50vw, 100vw"
+          alt="Sân thượng trồng rau với máy VIO GREEN ECOHUB" class="size-full object-cover" loading="lazy" />
+      </div>
     </div>
   </section>
 
-  <!-- PAINS -->
+  <!-- NỘI DUNG 2 – ECOHUB LÀ GÌ -->
   <section class="section bg-cream">
     <div class="container-x">
-      <SectionHead eyebrow="Bạn có đang gặp?" title="Bạn yêu cây xanh. Nhưng không phải lúc nào cũng có thời gian." />
-      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {pains.map(([ic, t, d], i) => (
-          <div class="text-center" data-reveal style={`--d:${i * 80}ms`}>
-            <span class="sq-ic mx-auto"><Icon name={ic} /></span>
-            <h3 class="mt-4 text-lg font-bold">{t}</h3>
-            <p class="mt-2 text-sm text-muted">{d}</p>
+      <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div data-reveal>
+          <p class="eyebrow">Giải pháp ECOHUB</p>
+          <h2 class="h-display">ECOHUB – Giải pháp chăm sóc cây thông minh cho không gian đô thị</h2>
+          <p class="mt-5 text-lg font-semibold text-brand sm:text-xl">Một hệ thống gọn gàng. Nhiều tiện ích chăm sóc cây.</p>
+          <p class="mt-4 text-muted sm:text-lg">ECOHUB tích hợp các chức năng chăm sóc cây trong một thiết bị, từ tưới nước tự động theo điều kiện thực tế đến theo dõi và hỗ trợ quản lý việc chăm cây qua Web App.</p>
+        </div>
+        <div class="overflow-hidden rounded-card bg-white p-4 shadow-soft ring-1 ring-brand-100" data-reveal style="--d:120ms">
+          <img src="/assets/ecohub-sol-va-grid.webp" alt="VIO GREEN ECOHUB bản năng lượng mặt trời và bản điện lưới" width="1200" height="800" class="w-full" loading="lazy" />
+        </div>
+      </div>
+      <h3 class="mt-14 mb-6 text-center text-sm font-bold tracking-[0.2em] text-brand uppercase" data-reveal>Các tính năng chính</h3>
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {features.map(([ic, t], i) => (
+          <div class="card card-hover flex items-center gap-4 p-5" data-reveal style={`--d:${i * 80}ms`}>
+            <span class="sq-ic size-12 shrink-0"><Icon name={ic} class="size-6" /></span>
+            <p class="font-semibold leading-snug">{t}</p>
           </div>
         ))}
       </div>
-      <p class="mt-12 text-center text-lg font-bold text-brand sm:text-xl" data-reveal>VIO GREEN giúp bạn đơn giản hóa tất cả những điều đó.</p>
     </div>
   </section>
 
-  <!-- ECOSYSTEM -->
+  <!-- NỘI DUNG 3 – ECOHUB TRONG KHÔNG GIAN SỐNG -->
   <section class="section bg-brand text-white">
     <div class="container-x grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-      <div class="breath" data-reveal><Ph title="Ảnh tách lớp sản phẩm ECOHUB" ratio="16/11" dark /></div>
+      <div class="breath aspect-[16/11]" data-reveal>
+        <img src="/assets/hero-2-800.webp" srcset="/assets/hero-2-800.webp 800w, /assets/hero-2.webp 1680w" sizes="(min-width: 1024px) 50vw, 100vw"
+          alt="Góc ban công xanh với máy ECOHUB" class="size-full object-cover" loading="lazy" />
+      </div>
       <div data-reveal style="--d:120ms">
-        <p class="eyebrow eyebrow-light">Hệ sinh thái ECOHUB</p>
-        <h2 class="h-display">Một hệ sinh thái thông minh cho không gian xanh đô thị</h2>
-        <p class="mt-5 text-lg font-semibold text-leaf">Bạn yêu cây xanh nhưng không có đủ thời gian để chăm sóc mỗi ngày?</p>
-        <div class="mt-4 space-y-4 text-brand-100">
-          <p>VIO GREEN ECOHUB được phát triển để giải quyết những khó khăn phổ biến của người đô thị: thiếu thời gian, thiếu kiến thức chăm cây, không gian hạn chế và sự bất tiện về nguồn điện.</p>
-          <p>ECOHUB kết hợp tưới tự động, quản lý dinh dưỡng, cảm biến IoT, ứng dụng giám sát và năng lượng mặt trời trong một hệ thống nhỏ gọn, giúp người dùng chủ động duy trì không gian xanh mà không phải phụ thuộc hoàn toàn vào thao tác thủ công.</p>
+        <p class="eyebrow eyebrow-light">ECOHUB trong không gian sống</p>
+        <h2 class="h-display">Góc xanh đẹp, chăm cây nhẹ nhàng hơn</h2>
+        <div class="mt-5 space-y-4 text-brand-100 sm:text-lg">
+          <p>Dù là ban công nhỏ hay sân thượng gia đình, bạn vẫn có thể duy trì góc xanh của riêng mình mà không phải dành quá nhiều thời gian cho những công việc chăm sóc thường xuyên.</p>
+          <p>ECOHUB hỗ trợ đơn giản hóa việc chăm cây, giúp bạn chủ động hơn trong quá trình chăm sóc và dễ dàng đưa lối sống xanh vào nhịp sống hằng ngày.</p>
         </div>
-        <a class="link-arrow mt-6 text-white" href="/san-pham/#ecohub">Khám phá cách ECOHUB hoạt động <Icon name="arrowRight" /></a>
+        <a class="link-arrow mt-6 text-white" href="/san-pham/#ecohub">Xem các dòng ECOHUB <Icon name="arrowRight" /></a>
       </div>
     </div>
   </section>
@@ -163,21 +214,29 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- ONE SYSTEM -->
+  <!-- NỘI DUNG 4 – MỘT HỆ THỐNG, NHIỀU CÁCH SỐNG XANH -->
   <section class="section bg-cream">
-    <div class="container-x grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
-      <h2 class="text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl" data-reveal>Một hệ thống<br /><span class="text-brand">Nhiều cách sống xanh.</span></h2>
-      <div data-reveal style="--d:120ms">
-        <p class="text-lg text-muted">ECOHUB tích hợp IoT, bình nước &amp; dinh dưỡng, năng lượng mặt trời, pin dự phòng, Web App và AI trong một hệ thống nhỏ gọn, giúp tự động chăm sóc và theo dõi cây dễ dàng hơn mỗi ngày.</p>
-        <a class="link-arrow mt-5" href="/san-pham/#ecohub">Khám phá cách ECOHUB hoạt động <Icon name="arrowRight" /></a>
+    <div class="container-x grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+      <div data-reveal>
+        <h2 class="text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl">Một hệ thống<br /><span class="text-brand">Nhiều cách sống xanh.</span></h2>
+        <p class="mt-5 text-lg text-muted">Từ dữ liệu chăm sóc cây đến việc điều phối dinh dưỡng phù hợp.</p>
+        <a class="link-arrow mt-6" href="/san-pham/#ecohub">Khám phá cách ECOHUB hoạt động <Icon name="arrowRight" /></a>
       </div>
+      <ol class="space-y-4">
+        {steps.map(([t, d], i) => (
+          <li class="card flex gap-5 p-5 sm:p-6" data-reveal style={`--d:${i * 90}ms`}>
+            <span class="text-3xl leading-none font-extrabold text-brand-300 tabular-nums">0{i + 1}.</span>
+            <div><h3 class="text-lg font-bold">{t}</h3><p class="mt-1.5 text-muted">{d}</p></div>
+          </li>
+        ))}
+      </ol>
     </div>
   </section>
 
   <!-- FEATURED -->
   <section class="section">
     <div class="container-x">
-      <SectionHead eyebrow="Sản phẩm" title="Các dòng ECOHUB" sub="Chọn theo diện tích, nguồn điện và nguồn nước của không gian bạn." />
+      <SectionHead eyebrow="Sản phẩm" title="Các dòng ECOHUB" sub="Chọn theo số lượng cây, nguồn điện và nguồn nước của không gian bạn." />
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {inCategory('ecohub').slice(0, 3).map((p, i) => <ProductCard p={p} delay={i * 80} />)}
       </div>
@@ -185,10 +244,61 @@ const jsonLd = {
     </div>
   </section>
 
+  <!-- ĐÁNH GIÁ KHÁCH HÀNG (chỉ hiện khi src/data/reviews.ts có đánh giá thật) -->
+  {reviews.length > 0 && (
+    <section class:list={['section', tint('reviews') && 'bg-cream']} id="danh-gia">
+      <div class="container-x">
+        <SectionHead eyebrow="Khách hàng nói gì" title="Cảm nhận từ khách hàng VIO GREEN" />
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {reviews.map((r, i) => (
+            <figure class="card flex flex-col p-6" data-reveal style={`--d:${(i % 3) * 80}ms`}>
+              <div class="flex gap-0.5 text-sun" aria-label={`${r.rating}/5 sao`}>
+                {[1, 2, 3, 4, 5].map((n) => <Icon name="star" class:list={['size-4', n <= r.rating ? 'fill-current' : 'opacity-30']} />)}
+              </div>
+              <blockquote class="mt-4 flex-1 text-ink/90">“{r.text}”</blockquote>
+              <figcaption class="mt-5 flex items-center gap-3 border-t border-line pt-4">
+                {r.photo ? <img src={r.photo} alt="" class="size-11 rounded-full object-cover" loading="lazy" />
+                         : <span class="inline-flex size-11 items-center justify-center rounded-full bg-brand-50 font-bold text-brand">{r.name.trim().split(' ').pop()?.[0]}</span>}
+                <div class="min-w-0 text-sm">
+                  <p class="font-semibold">{r.name}</p>
+                  <p class="text-muted">{[r.place, r.product].filter(Boolean).join(' · ')}</p>
+                </div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- BLOG / TIN TỨC (chỉ hiện khi có bài trong src/content/blog/) -->
+  {posts.length > 0 && (
+    <section class:list={['section', tint('blog') && 'bg-cream']} id="tin-tuc">
+      <div class="container-x">
+        <SectionHead eyebrow="Blog & tin tức" title="Góc chia sẻ từ VIO GREEN" />
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.slice(0, 3).map((p, i) => (
+            <article class="card card-hover group relative flex flex-col overflow-hidden" data-reveal style={`--d:${i * 80}ms`}>
+              {p.cover && <img src={p.cover} alt="" class="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" loading="lazy" />}
+              <div class="flex flex-1 flex-col gap-2 p-5">
+                <p class="flex items-center gap-1.5 text-xs text-muted"><Icon name="calendar" class="size-3.5" />{fmtDate(p.date)}</p>
+                <h3 class="text-lg leading-snug font-bold"><a href={`/tin-tuc/${p.slug}/`} class="after:absolute after:inset-0 hover:text-brand">{p.title}</a></h3>
+                <p class="line-clamp-3 text-sm text-muted">{p.excerpt}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+        {posts.length > 3 && <div class="mt-10 text-center"><a class="btn btn-outline" href="/tin-tuc/">Xem tất cả bài viết <Icon name="arrowRight" /></a></div>}
+      </div>
+    </section>
+  )}
+
   <!-- CONTACT -->
-  <section class="section bg-cream" id="tu-van">
+  <section class:list={['section', tint('contact') && 'bg-cream']} id="tu-van">
     <div class="container-x grid items-center gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
-      <div class="breath hidden shadow-soft lg:block" data-reveal><Ph title="Tư vấn giải pháp xanh" ratio="1/1" /></div>
+      <div class="breath hidden aspect-square shadow-soft lg:block" data-reveal>
+        <img src="/assets/hero-3-800.webp" alt="Máy ECOHUB trong sảnh nhiều cây xanh" class="size-full object-cover" loading="lazy" />
+      </div>
       <div data-reveal style="--d:120ms">
         <p class="eyebrow">Tư vấn miễn phí</p>
         <h2 class="h-display text-brand">Bạn muốn tìm hiểu ECOHUB?</h2>
@@ -221,3 +331,61 @@ const jsonLd = {
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  // Giờ Việt Nam (chạy từng giây) + thời tiết hiện tại từ Open-Meteo (lưu 20 phút trong sessionStorage)
+  const root = document.querySelector<HTMLElement>('[data-weather]');
+  if (root) {
+    const q = <T extends Element = HTMLElement>(s: string) => root.querySelector<T>(s);
+    const tz = 'Asia/Ho_Chi_Minh';
+    const fDate = new Intl.DateTimeFormat('vi-VN', { timeZone: tz, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const fTime = new Intl.DateTimeFormat('vi-VN', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const tick = () => {
+      const now = new Date();
+      const t = fTime.format(now);
+      q('[data-clock-time]')!.textContent = t;
+      q('[data-clock-short]')!.textContent = t.slice(0, 5);
+      q('[data-clock-date]')!.textContent = fDate.format(now);
+    };
+    tick();
+    setInterval(tick, 1000);
+
+    // Mã thời tiết WMO → mô tả + biểu tượng
+    const wmo = (c: number): [string, string] =>
+      c === 0 ? ['Trời quang', 'solar'] : c <= 2 ? ['Ít mây', 'cloudSun'] : c === 3 ? ['Nhiều mây', 'cloud']
+      : c <= 48 ? ['Sương mù', 'cloudFog'] : c <= 57 ? ['Mưa phùn', 'cloudDrizzle']
+      : c === 61 ? ['Mưa nhỏ', 'cloudRain'] : c === 63 ? ['Mưa vừa', 'cloudRain'] : c <= 67 ? ['Mưa to', 'cloudRain']
+      : c <= 77 ? ['Tuyết', 'cloudSnow'] : c <= 82 ? ['Mưa rào', 'cloudRain'] : c <= 86 ? ['Tuyết', 'cloudSnow'] : ['Dông', 'cloudLightning'];
+
+    type Wx = { temperature_2m: number; relative_humidity_2m: number; apparent_temperature: number; weather_code: number; wind_speed_10m: number; uv_index: number };
+    const show = (w: Wx) => {
+      const [desc, icon] = wmo(w.weather_code);
+      const temp = `${Math.round(w.temperature_2m)}°`;
+      q('[data-wx-temp]')!.textContent = temp;
+      q('[data-wx-temp-sm]')!.textContent = temp;
+      q('[data-wx-desc]')!.textContent = desc;
+      root.querySelectorAll<HTMLElement>('[data-wx-ic]').forEach((el) => (el.hidden = el.dataset.wxIc !== icon));
+      const set = (k: string, v: string) => (q(`[data-wx="${k}"]`)!.textContent = v);
+      set('humidity', `${Math.round(w.relative_humidity_2m)}%`);
+      set('wind', `${w.wind_speed_10m.toFixed(1)} m/s`);
+      set('feels', `${Math.round(w.apparent_temperature)}°`);
+      set('uv', String(Math.round(w.uv_index)));
+      q('[data-wx-more]')!.hidden = false;
+    };
+    const KEY = 'vg-wx';
+    let cached: { t: number; w: Wx } | null = null;
+    try { cached = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch { /* ignore */ }
+    if (cached && Date.now() - cached.t < 20 * 60_000) show(cached.w);
+    else {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${root.dataset.lat}&longitude=${root.dataset.lon}`
+        + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,uv_index&timezone=Asia%2FBangkok&wind_speed_unit=ms';
+      fetch(url)
+        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+        .then((d: { current: Wx }) => {
+          show(d.current);
+          try { sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), w: d.current })); } catch { /* ignore */ }
+        })
+        .catch(() => { q('[data-wx-desc]')!.textContent = 'Chưa tải được thời tiết'; q('[data-wx-temp]')!.textContent = ''; });
+    }
+  }
+</script>

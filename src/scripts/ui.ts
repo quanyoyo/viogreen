@@ -78,10 +78,7 @@ $$('[data-carousel]').forEach((root) => {
     i = (n + slides.length) % slides.length;
     slides.forEach((s, k) => {
       const on = k === i;
-      s.classList.toggle('opacity-0', !on);
-      s.classList.toggle('translate-y-4', !on);
-      s.classList.toggle('pointer-events-none', !on);
-      s.classList.toggle('opacity-100', on);
+      s.toggleAttribute('data-active', on); // hiệu ứng chuyển slide viết bằng data-[active]: trong HTML
       s.setAttribute('aria-hidden', String(!on));
       $$<HTMLElement>('a,button', s).forEach((a) => (on ? a.removeAttribute('tabindex') : (a.tabIndex = -1)));
     });

@@ -49,7 +49,7 @@ import Icon from '../../components/Icon.astro';
 
     const LEAD_TYPE: Record<string, string> = { contact: 'Liên hệ', newsletter: 'Nhận tin', 'chat-lead': 'Chatbot MIO' };
     const LEAD_FIELDS: [string, string][] = [['phone', 'SĐT'], ['email', 'Email'], ['company', 'Công ty'], ['province', 'Khu vực'],
-      ['space', 'Không gian'], ['area', 'Diện tích'], ['topic', 'Chủ đề'], ['message', 'Nội dung'], ['source', 'Nguồn'], ['page', 'Trang']];
+      ['space', 'Không gian'], ['area', 'Số cây / diện tích'], ['topic', 'Chủ đề'], ['message', 'Nội dung'], ['source', 'Nguồn'], ['page', 'Trang']];
 
     const statusSelect = (kind: 'order' | 'lead', id: string, current: string, options: readonly string[]) =>
       `<select class="input min-h-10 w-auto py-1.5 text-sm" data-status="${kind}" data-id="${esc(id)}" aria-label="Đổi trạng thái">

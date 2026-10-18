@@ -88,7 +88,8 @@ const jsonLd = {
 
     <!-- Thời tiết + giờ (máy tính: thẻ kính mờ góc phải; điện thoại: nhãn nhỏ trên ảnh) -->
     <div data-weather data-lat={site.weather.lat} data-lon={site.weather.lon}>
-      <div class="absolute right-[max(2rem,calc((100%-80rem)/2+2rem))] bottom-10 z-10 hidden w-72 rounded-3xl border border-white/25 bg-white/10 p-5 shadow-lift backdrop-blur-md lg:block">
+      <!-- căn giữa theo chiều cao để không đè lên lời chào / nút MIO ở góc dưới phải -->
+      <div class="absolute top-1/2 right-[max(2rem,calc((100%-80rem)/2+2rem))] z-10 hidden w-72 -translate-y-1/2 rounded-3xl border border-white/25 bg-white/10 p-5 shadow-lift backdrop-blur-md lg:block">
         <div class="flex items-start justify-between gap-3">
           <div>
             <p class="text-5xl leading-none font-bold tracking-tight" data-wx-temp>--°</p>

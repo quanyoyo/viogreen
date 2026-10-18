@@ -107,13 +107,13 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Thanh toán:** `paymentMethod` = `cod` | `bank` (đơn trước 07/10/2026 không có → hiển thị "—"). Nhãn hiển thị ở `order-view.ts → PAYMENT_LABEL`.
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
-## 7. Trạng thái (cập nhật 14/10/2026)
+## 7. Trạng thái (cập nhật 18/10/2026)
 
 **Đã xong:** 32 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop. Đang chạy ở `https://viogreen.com` (Pages trong tài khoản khách; `www` 301 về đây; `viogreen.pages.dev` vẫn truy cập được). Đang ở **chế độ trước ra mắt** (noindex toàn web).
 
 - **Trang:**
   - Trang chủ, Sản phẩm (nhóm, bộ lọc, tìm kiếm `?q=` không dấu)
-  - 16 trang chi tiết (có nút **Mua trên Shopee** → `site.social.shopee`), Giỏ hàng, Đặt hàng, Đặt hàng thành công
+  - 16 trang chi tiết (nút Thêm vào giỏ + Mua ngay; nút "Mua trên Shopee" đã bỏ 18/10/2026, Shopee chỉ còn icon ở footer), Giỏ hàng, Đặt hàng, Đặt hàng thành công
   - Giới thiệu, AR, Liên hệ, 4 chính sách, 404
   - Đăng nhập, Tài khoản, Quản trị (Firebase – chủ web đã test: đặt đơn, liên hệ, lead, phân quyền OK)
 - **Hiệu ứng:** đủ theo mục 5. Carousel hero tự chạy, vuốt được, có chấm chuyển slide.
@@ -176,7 +176,6 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
   - Số gói trong Bio-Nutri Multi-Pack
   - Thông số kỹ thuật từng ECOHUB; phụ kiện **đi kèm** trong hộp từng model
   - Model nào có cảm biến / kết nối app
-  - Link Shopee **từng sản phẩm** (hiện nút "Mua trên Shopee" trỏ về trang shop)
 - **Thanh toán:**
   - Thời hạn bảo hành tiêu chuẩn
   - Email/Zalo nhận thông báo đơn (cho bước email báo đơn)

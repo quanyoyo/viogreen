@@ -34,7 +34,7 @@ export const site = {
     facebook: 'https://www.facebook.com/profile.php?id=61594287003144',
     tiktok: 'https://www.tiktok.com/@viogreen.vn',
     youtube: 'https://www.youtube.com/@VIOGREEN-vn',
-    shopee: 'https://shopee.vn/shop/1739793835', // cũng dùng cho nút "Mua trên Shopee" ở trang chi tiết SP
+    shopee: 'https://shopee.vn/shop/1739793835',
     messenger: '',
     zalo: '', // ví dụ 'https://zalo.me/0357170062'
     instagram: '',

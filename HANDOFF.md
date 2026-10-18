@@ -1,30 +1,22 @@
-# VIO GREEN web – trạng thái code (06/10/2026, phiên 2)
+# VIO GREEN web – bàn giao giữa các phiên chat (cập nhật 18/10/2026)
 
-**Đã chuyển sang Astro 7 + Tailwind CSS 4** (npm hoạt động). Mã cũ dạng .mjs đã gỡ – nội dung được chuyển hết sang cấu trúc mới.
-Bản đầy đủ (kèm logo PNG, package-lock) nằm trong file zip `viogreen-astro.zip` gửi trong chat; Project lưu các file văn bản (logo PNG không lưu được ở đây).
+**Nguồn sự thật là `CLAUDE.md`** (quy tắc, stack, trạng thái mục 7, việc tiếp theo mục 8, chờ khách mục 9). File này chỉ tóm tắt nhanh để mở phiên mới.
 
-## Đã xong (build 29 trang, `astro check` 0 lỗi, đã chạy thử trên Chromium mobile + desktop)
-- Trang: Trang chủ, Sản phẩm (nhóm + bộ lọc diện tích/điện/nước + tìm kiếm ?q= không dấu), 16 trang Chi tiết, Giỏ hàng, Đặt hàng, Đặt hàng thành công, Giới thiệu, Trải nghiệm AR, **Liên hệ (mới, theo Figma 265:1813)**, **4 trang chính sách từ 1 template** (menu chính sách + mục lục), **404**.
-- Hiệu ứng: reveal khi cuộn (fade-up + stagger), Ken Burns "breath", light sweep, pulse ring nút chat, hover lift thẻ, carousel hero (tự chạy, vuốt, chấm).
-- Giỏ hàng localStorage (biến thể Hose 6/8/10mm, số lượng), nhớ thông tin khách, mã đơn VG-yymmdd-XXXX.
-- Form đặt hàng / liên hệ / nhận tin / số ĐT từ chatbot → Firestore (`src/scripts/forms.ts`, `fb.ts`). `site.firebase.projectId` trống = chế độ thử.
-- AR: nút "Thử với AR" trên 6 ECOHUB → modal; có file 3D thì tải `<model-viewer>` 4.3.1 (glb + usdz), chưa có thì hiện "đang cập nhật" + Hỏi MIO.
-- Chatbot MIO v1: chips (Tư vấn chọn máy · Phụ kiện · Giao hàng · Đổi trả · Bảo hành · Gặp nhân viên); tư vấn 3 câu (diện tích → điện → nước) gợi ý model + thêm giỏ/AR; trả lời FAQ + chính sách theo từ khóa (`src/data/chatbot-kb.ts`); không hiểu → xin tên + SĐT gửi về Sheet; báo ngoài giờ (giờ VN).
-- SEO: title/description/canonical/OG, JSON-LD Organization + FAQPage + Product + Breadcrumb, robots.txt, `_headers` cache cho Cloudflare.
-- Logo thật lấy từ Figma (135px, độ phân giải thấp – cần file gốc).
+## Đang ở đâu
+- Web chạy thật ở **https://viogreen.com** (Cloudflare Pages trong tài khoản khách `viogreen102@gmail.com`; `www` 301 về đây; `viogreen.pages.dev` vẫn vào được). Repo `github.com/quanyoyo/viogreen`, push `main` là tự deploy.
+- **Chế độ trước ra mắt đang BẬT** (`site.ts → prelaunch: true` = noindex toàn web). Cách tắt: CLAUDE.md mục 8 "Ra mắt".
+- Firebase `viogreen-44a7f` (Auth Google + Email/mật khẩu, Firestore) chạy thật: đặt đơn, liên hệ, lead, tài khoản, `/quan-tri/`. Sửa `firestore.rules` thì chủ web phải dán lại vào Console **trước khi push**.
+- Đã xong gần đây: thanh toán COD (SPX Express) / chuyển khoản + QR; email, TikTok, YouTube, Shopee; hero 3 slide (ảnh tạm); tên miền + sitemap + prelaunch; chọn Tỉnh/thành → Phường/xã theo danh mục mới 34 tỉnh (`npm run dvhc`).
 
-## Còn chờ / bước tiếp
-- ✅ Deploy (06/10/2026): https://viogreen.pages.dev – repo github.com/quanyoyo/viogreen, push `main` là Cloudflare tự build.
-- ~~Google Sheet~~ → **Đổi sang Firebase** (06–07/10/2026): đã code đăng nhập (Google + Email), /tai-khoan/ (lịch sử đơn), /quan-tri/, `firestore.rules`. Còn: chủ web publish rules + thêm admin, test thật, email báo đơn (Blaze), App Check, sửa Chính sách bảo mật. Chi tiết: CLAUDE.md mục 8 bước 2.
-- Chờ khách: giá, ảnh SP, file 3D, logo gốc, thông tin liên hệ chính thức, link mạng xã hội.
-- ✅ Ảnh MIO (06/10/2026): đã thay vào nút chat, avatar chat, favicon (`site.mio`).
-- Chưa có: sitemap.xml (thêm @astrojs/sitemap khi có tên miền), chatbot AI v2 (Cloudflare Worker).
+## Đang dở / chờ
+- **AR:** `npm run models` chuyển STL → GLB đã chạy được. 12 STL trong `models-src/` = **1 máy bản Sol** → `public/models/ecohub-mau.glb` (**chưa commit, chưa gắn**). Chờ khách: máy này là model nào (X10 Sol / X10 Hydro Sol / X20 Sol?), màu từng bộ phận đúng chưa, ảnh + kích thước các model khác (hoặc file CAD từng model) để dựng biến thể.
+- **Đăng ký tài khoản bằng email:** code xong, chưa ai test thật (Claude không được tạo tài khoản) → chủ web tự thử theo các bước đã gửi trong chat.
+- **Địa chỉ cửa hàng** trong `site.ts` vẫn theo đơn vị hành chính cũ ("…Hạ Bằng, Thạch Thất, TP Hà Nội") → chờ khách xác nhận cách ghi mới (Xã Hạ Bằng, Thành phố Hà Nội).
+- Việc treo bàn giao (thẻ thanh toán Cloudflare, Firebase support email, UID khách vào `admins`, xoá 3 đơn test, App Check, email báo đơn cần gói Blaze, Chính sách bảo mật): CLAUDE.md mục 8.
+- Chờ khách gửi: giá, ảnh SP, ảnh hero, thông số, logo gốc, tên công ty + MST, link Messenger/Zalo/Instagram, nội dung 5 trang chính sách còn thiếu: CLAUDE.md mục 9.
 
-## Ghi chú kỹ thuật
-- Dữ liệu SP gửi xuống trình duyệt qua `<script id="vg-data">` (bản rút gọn), không nhúng mô tả dài vào JS.
-- Icon: lucide-static (import ?raw) + icon thương hiệu tự vẽ trong `src/components/icons.ts`.
-- Sandbox không tải được Google Fonts/Figma asset URL; ảnh Figma lấy bằng screenshot base64.
-
-## Figma frame IDs (file QuAedwzzxIiw4feFi7PJWX)
-Trang chủ 18:90 · Sản phẩm 254:584 · Chi tiết 278:1460 · Giỏ hàng 280:4032 · Đặt hàng 280:4258 · Giới thiệu 264:1521
-Vận chuyển 276:222 · Đổi trả 278:704 · Bảo mật 278:832 · Bảo hành 278:972 · AR 263:1259 · Liên hệ 265:1813 · Logo node 265:1852
+## Lưu ý khi làm việc
+- Mỗi thay đổi: `npm run check` → `npm run build` → commit (tác giả `quanyoyo`, email noreply) → push `main`.
+- Chạy thử xong phải tắt dev server; nếu cổng 4321 do chủ web tự chạy thì dùng luôn, không tắt.
+- Không bịa nội dung kinh doanh (giá, thông số, địa chỉ, đánh giá) – thiếu thì ghi vào "Chờ khách".
+- `Thông tin làm web.docx` nằm trong Claude Project, Claude Code **không đọc được** → cần thông tin gì thì dán vào chat hoặc chép file vào repo.

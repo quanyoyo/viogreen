@@ -248,27 +248,35 @@ async function quick(i: number) {
 }
 
 /* ---------- Lời chào nổi cạnh MIO ----------
-   Hiện mỗi lần vào web (phiên mới) hoặc tải lại trang. Khách bấm × (hoặc đã mở chat) → không hiện lại khi chuyển trang trong phiên. */
+   Hiện khi vào trang và mỗi lần khách đóng khung chat. Chỉ khi khách bấm × trên lời chào thì không hiện lại
+   (kể cả khi chuyển trang khác) – tới lần tải lại trang hoặc phiên mới. */
 const hint = $('[data-mio-hint]');
 const HINT_KEY = 'vg-mio-hint-off';
+let hintTimer: number | undefined;
+const hintOff = () => { try { return !!sessionStorage.getItem(HINT_KEY); } catch { return false; } };
+function showHint(delay: number) {
+  if (!hint || hintOff()) return;
+  clearTimeout(hintTimer);
+  hintTimer = window.setTimeout(() => {
+    if (chat && !chat.hidden) return;
+    hint.hidden = false;
+    void hint.offsetWidth; // ép trình duyệt tính lại bố cục để hiệu ứng hiện dần chạy (không phụ thuộc requestAnimationFrame)
+    hint.setAttribute('data-show', '');
+  }, delay);
+}
 function hideHint(remember: boolean) {
   if (remember) { try { sessionStorage.setItem(HINT_KEY, '1'); } catch { /* ignore */ } }
+  clearTimeout(hintTimer);
   if (!hint || hint.hidden) return;
   hint.removeAttribute('data-show');
-  setTimeout(() => (hint.hidden = true), 300);
+  setTimeout(() => { if (!hint.hasAttribute('data-show')) hint.hidden = true; }, 300);
 }
 function initHint() {
-  if (!hint) return;
   try {
     const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
     if (nav?.type === 'reload') sessionStorage.removeItem(HINT_KEY);
-    if (sessionStorage.getItem(HINT_KEY)) return;
   } catch { /* ignore */ }
-  setTimeout(() => {
-    if (chat && !chat.hidden) return;
-    hint.hidden = false;
-    requestAnimationFrame(() => requestAnimationFrame(() => hint.setAttribute('data-show', '')));
-  }, 1500);
+  showHint(1500);
 }
 
 /* ---------- Mở / đóng / khởi tạo ---------- */
@@ -282,7 +290,7 @@ function restore() {
 
 function openChat() {
   if (!chat) return;
-  hideHint(true);
+  hideHint(false); // ẩn tạm khi chat đang mở; đóng chat thì hiện lại
   openLayer(chat);
   $('[data-fab]')?.classList.add('max-sm:hidden');
   if (!history.length && !restore()) welcome();
@@ -292,6 +300,7 @@ function closeChat() {
   if (!chat) return;
   closeLayer(chat);
   $('[data-fab]')?.classList.remove('max-sm:hidden');
+  showHint(800);
 }
 
 if (chat && log && form) {

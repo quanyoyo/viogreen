@@ -136,7 +136,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Liên hệ & MXH:** email `viogreen102@gmail.com` (cả chính sách bảo mật qua `{{email}}`); Facebook, TikTok `@viogreen.vn`, YouTube `@VIOGREEN-vn`, Shopee có link; Messenger, Zalo, Instagram hiện icon mờ chưa có link.
 - **AR:** modal với `<model-viewer>`. **Chưa gắn file 3D** (`public/models/` trống).
 - **Chatbot MIO v1:**
-  - Bong bóng lời chào cạnh MIO: hiện mỗi lần vào web / tải lại trang; khách bấm × hoặc đã mở chat → không hiện lại khi chuyển trang trong phiên (sessionStorage `vg-mio-hint-off`)
+  - Bong bóng lời chào cạnh MIO: hiện khi vào trang và mỗi lần đóng khung chat (đang mở chat thì ẩn). Chỉ khi khách bấm × trên lời chào mới không hiện lại, kể cả khi chuyển trang, cho tới lần tải lại trang / phiên mới (sessionStorage `vg-mio-hint-off`). Hiệu ứng hiện dần dùng ép reflow, không dùng requestAnimationFrame.
   - Mở chat: màn hình chào (MIO + "Câu hỏi thường gặp" soạn sẵn ở `chatbot-kb.ts → quickQuestions`), dòng lưu ý cuối khung
   - Nút gợi ý: Tư vấn chọn máy, Phụ kiện, Giao hàng, Đổi trả, Bảo hành, Gặp nhân viên
   - Tư vấn chọn máy qua 3 câu hỏi (số cây → nguồn điện → nguồn nước; trên 30 cây → xin SĐT)

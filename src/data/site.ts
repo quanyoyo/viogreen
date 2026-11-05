@@ -26,7 +26,7 @@ export const site = {
   // ---- Chế độ trước ra mắt ----
   // true = mọi trang có <meta name="robots" content="noindex"> → Google chưa đưa web lên kết quả tìm kiếm.
   // Ngày ra mắt: đổi thành false, chạy check + build, push lên main (xem CLAUDE.md mục "Ra mắt").
-  prelaunch: true,
+  prelaunch: false, // ra mắt 05/11/2026
   companyName: 'VIO GREEN', // Tên pháp lý + MST thêm khi có
 
   // ---- Mạng xã hội: để '' = icon vẫn hiện nhưng chưa có link ----

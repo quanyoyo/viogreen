@@ -4,7 +4,7 @@
 
 ## Đang ở đâu
 - Web chạy thật ở **https://viogreen.com** (Cloudflare Pages trong tài khoản khách `viogreen102@gmail.com`; `www` 301 về đây; `viogreen.pages.dev` vẫn vào được). Repo `github.com/quanyoyo/viogreen`, push `main` là tự deploy.
-- **Chế độ trước ra mắt đang BẬT** (`site.ts → prelaunch: true` = noindex toàn web). Cách tắt: CLAUDE.md mục 8 "Ra mắt".
+- **Đã ra mắt 05/11/2026** (`site.ts → prelaunch: false`): Google được lập chỉ mục. Còn bước Google Search Console (CLAUDE.md mục 8 "Ra mắt", bước 4).
 - Firebase `viogreen-44a7f` (Auth Google + Email/mật khẩu, Firestore) chạy thật: đặt đơn, liên hệ, lead, tài khoản, `/quan-tri/`. Sửa `firestore.rules` thì chủ web phải dán lại vào Console **trước khi push**.
 - Đã xong gần đây: thanh toán COD (SPX Express) / chuyển khoản + QR; email, TikTok, YouTube, Shopee; tên miền + sitemap + prelaunch; chọn Tỉnh/thành → Phường/xã theo danh mục mới 34 tỉnh (`npm run dvhc`); bỏ nút "Mua trên Shopee".
 - **18/10/2026 – đợt sửa lớn theo "Thông tin làm web.docx" bản mới** (chi tiết CLAUDE.md mục 7): màu #037700 / #ebf2e3, chữ chạy ngang, hero ảnh thật + thời tiết/giờ, nội dung trang chủ mới, **đổi tên SP** (Sol / Grid / Plus / Pro, ECOBOX S / Plus / Pro, bỏ VIO-Care → chọn gói bảo hành 12/18/24 tháng ở trang máy), lọc theo **số lượng cây**, chatbot có lời chào nổi + câu hỏi soạn sẵn, đánh giá + blog dựng sẵn (ẩn). Ảnh gốc ở `images-src/` (không commit) → `npm run images`.

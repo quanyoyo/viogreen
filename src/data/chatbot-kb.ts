@@ -39,7 +39,9 @@ export const kb: KbEntry[] = [
   {
     id: 'price',
     keys: ['gia', 'bao nhieu tien', 'gia ban', 'bao gia', 'chi phi', 'gia bao nhieu', 'mac khong', 're khong'],
-    answer: 'Giá các dòng ECOHUB và phụ kiện đang được VIO GREEN cập nhật. Bạn cứ thêm sản phẩm vào giỏ và gửi đơn – nhân viên sẽ gọi báo giá chính xác kèm phí vận chuyển trước khi bạn quyết định. Hoặc để lại số điện thoại để được báo giá ngay.',
+    // Chatbot tự ghép bảng giá từ products.ts (chatbot.ts → priceHtml); câu dưới chỉ là phần kết.
+    answer: 'Sản phẩm ghi "Liên hệ" sẽ được nhân viên báo giá khi xác nhận đơn. Phí vận chuyển được thông báo trước khi bạn quyết định. Bạn cũng có thể để lại số điện thoại để được tư vấn ngay.',
+    links: [['Xem sản phẩm', '/san-pham/']],
   },
   {
     id: 'payment',

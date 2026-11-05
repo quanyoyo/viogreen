@@ -8,7 +8,7 @@ const ld = {
   itemListElement: all.map(([name, href], i) => ({ '@type': 'ListItem', position: i + 1, name, ...(href ? { item: new URL(href, Astro.site).href } : {}) })),
 };
 ---
-<nav aria-label="Breadcrumb" class="border-b border-line/70 bg-cream">
+<nav aria-label="Breadcrumb" class="border-b border-brand-200 bg-white">
   <ol class="container-x flex flex-wrap items-center gap-1.5 py-3 text-sm text-muted">
     {all.map(([label, href], i) => (
       <li class="flex items-center gap-1.5">

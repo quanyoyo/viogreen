@@ -5,6 +5,10 @@
 //   { "out": "ten-file", "dir": ".", "parts": { "Component2": "solar", ... }, "default": "body" }
 //   - dir: thư mục chứa STL (tương đối models-src/); mọi file .stl trong đó là bộ phận của 1 model
 //   - parts: tên file STL (không đuôi) → tên chất liệu trong "materials"; file không khai báo dùng "default"
+//   - regions (tuỳ chọn): tô màu khác cho 1 vùng của 1 bộ phận, VD lòng vòm xanh trên bình nước trắng:
+//       { "part": "Body1", "material": "green", "min": [x, y, z], "max": [x, y, z], "normals": ["+x", "-z"] }
+//     min/max: hộp toạ độ gốc của file STL (mm, Z hướng lên); tam giác có tâm nằm trong hộp → đổi chất liệu.
+//     normals (tuỳ chọn): chỉ đổi tam giác có mặt quay về các hướng này (+x -x +y -y +z -z).
 // Các bước: đọc STL → mm sang m, Z-up sang Y-up (chuẩn glTF) → căn giữa, đáy chạm sàn (y = 0)
 //   → gán chất liệu → hàn đỉnh trùng → giảm đa giác nếu quá ngân sách → nén meshopt → kiểm tra < 5MB.
 import fs from 'node:fs';
@@ -37,6 +41,18 @@ function readStl(file) {
   return new Float32Array(nums);
 }
 
+/** Chất liệu của vùng (regions) chứa tam giác này – theo tâm tam giác và hướng mặt; không thuộc vùng nào → undefined */
+function regionMaterial(tri, regions) {
+  if (!regions.length) return undefined;
+  const c = [0, 1, 2].map((k) => (tri[k] + tri[k + 3] + tri[k + 6]) / 3);
+  const a = [0, 1, 2].map((k) => tri[k + 3] - tri[k]), b = [0, 1, 2].map((k) => tri[k + 6] - tri[k]);
+  const n = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const big = [0, 1, 2].reduce((m, k) => (Math.abs(n[k]) > Math.abs(n[m]) ? k : m), 0);
+  const dir = (n[big] >= 0 ? '+' : '-') + 'xyz'[big];
+  const r = regions.find((r) => c.every((v, k) => v >= r.min[k] && v <= r.max[k]) && (!r.normals || r.normals.includes(dir)));
+  return r?.material;
+}
+
 /** Màu hex sRGB → hệ số tuyến tính cho glTF */
 const linear = (hex) => {
   const c = hex.replace('#', '').match(/../g).map((h) => parseInt(h, 16) / 255);
@@ -49,12 +65,25 @@ async function build(model) {
   if (!files.length) throw new Error(`Không có file STL trong ${dir}`);
   const s = (model.unitScale ?? 0.001); // mm → m
 
-  // 1) Đọc + đổi trục: CAD (x, y, z↑) → glTF (x, y↑, z) = (x, z, -y)
-  const parts = files.map((f) => {
+  // 1) Đọc + tách vùng tô màu riêng (regions, theo toạ độ gốc) + đổi trục: CAD (x, y, z↑) → glTF (x, y↑, z) = (x, z, -y)
+  const parts = files.flatMap((f) => {
+    const name = path.basename(f, path.extname(f));
     const raw = readStl(path.join(dir, f));
-    const pos = new Float32Array(raw.length);
-    for (let i = 0; i < raw.length; i += 3) { pos[i] = raw[i] * s; pos[i + 1] = raw[i + 2] * s; pos[i + 2] = -raw[i + 1] * s; }
-    return { name: path.basename(f, path.extname(f)), pos };
+    const base = model.parts?.[name] ?? model.default ?? 'body';
+    const regions = (model.regions ?? []).filter((r) => r.part === name);
+    const groups = new Map(); // chất liệu → toạ độ tam giác
+    for (let t = 0; t < raw.length; t += 9) {
+      const mat = regionMaterial(raw.subarray(t, t + 9), regions) ?? base;
+      if (!groups.has(mat)) groups.set(mat, []);
+      groups.get(mat).push(t);
+    }
+    return [...groups].map(([mat, starts]) => {
+      const pos = new Float32Array(starts.length * 9);
+      starts.forEach((t, j) => {
+        for (let v = 0; v < 9; v += 3) { pos[j * 9 + v] = raw[t + v] * s; pos[j * 9 + v + 1] = raw[t + v + 2] * s; pos[j * 9 + v + 2] = -raw[t + v + 1] * s; }
+      });
+      return { name: groups.size > 1 ? `${name}-${mat}` : name, mat, pos };
+    });
   });
 
   // 2) Căn giữa theo X/Z, đáy chạm sàn
@@ -75,7 +104,7 @@ async function build(model) {
   const root = doc.createNode(model.out);
   doc.createScene(model.out).addChild(root);
   let tris = 0;
-  for (const { name, pos } of parts) {
+  for (const { name, mat, pos } of parts) {
     // Pháp tuyến phẳng theo mặt (không tin pháp tuyến trong STL); hàn đỉnh sau đó giữ cạnh sắc của CAD
     const nor = new Float32Array(pos.length);
     for (let t = 0; t < pos.length; t += 9) {
@@ -89,7 +118,7 @@ async function build(model) {
     const prim = doc.createPrimitive()
       .setAttribute('POSITION', doc.createAccessor().setType('VEC3').setArray(pos).setBuffer(buffer))
       .setAttribute('NORMAL', doc.createAccessor().setType('VEC3').setArray(nor).setBuffer(buffer))
-      .setMaterial(material(model.parts?.[name] ?? model.default ?? 'body'));
+      .setMaterial(material(mat));
     root.addChild(doc.createNode(name).setMesh(doc.createMesh(name).addPrimitive(prim)));
   }
 
@@ -108,7 +137,7 @@ async function build(model) {
       fs.mkdirSync(OUT, { recursive: true });
       fs.writeFileSync(path.join(OUT, `${model.out}.glb`), glb);
       const size = max.map((v, k) => ((v - min[k]) * 100).toFixed(1));
-      console.log(`✔ ${model.out}.glb  ${(glb.byteLength / 1024).toFixed(0)} KB  ${files.length} bộ phận  ${tris} tam giác` +
+      console.log(`✔ ${model.out}.glb  ${(glb.byteLength / 1024).toFixed(0)} KB  ${files.length} bộ phận${parts.length > files.length ? ` (+${parts.length - files.length} vùng màu)` : ''}  ${tris} tam giác` +
         `${ratio < 1 ? ` → giảm còn ~${Math.round(tris * ratio)}` : ''}  kích thước ${size[0]}×${size[2]}×${size[1]} cm (rộng×sâu×cao)`);
       if (glb.byteLength > MAX_BYTES) console.warn(`  ⚠ vẫn lớn hơn 5MB`);
       return;

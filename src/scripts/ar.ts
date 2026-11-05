@@ -1,12 +1,15 @@
 // Xem 3D / AR bằng <model-viewer> (Google). Chỉ tải thư viện khi sản phẩm đã có file 3D.
-// Khai báo file trong src/data/products.ts: model: { glb: '/models/ecohub-sol.glb' } (usdz tuỳ chọn — không có thì model-viewer tự tạo cho iPhone).
+// Khai báo file trong src/data/products.ts: model: { glb: '/models/ecohub-plus.glb' } (usdz tuỳ chọn — không có thì model-viewer tự tạo cho iPhone).
 // File GLB tạo bằng `npm run models` từ STL trong models-src/ (xem scripts/stl-to-glb.mjs).
 import { clientProducts } from './data';
 import { $, $$, openLayer, closeLayer } from './ui';
 
 const MV_SRC = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js';
-// File GLB do `npm run models` xuất ra được nén meshopt → model-viewer cần bộ giải nén này
-const MESHOPT_SRC = 'https://cdn.jsdelivr.net/npm/meshoptimizer@1.3.0/meshopt_decoder.mjs';
+// File GLB do `npm run models` xuất ra được nén meshopt. model-viewer có sẵn bộ giải nén, nhưng chỉ bật khi khai báo
+// meshoptDecoderLocation: nó nạp file này bằng <script> thường rồi dùng bộ giải nén có sẵn. Vì vậy file phải là script
+// thường hợp lệ – dùng bản UMD tự host (chép từ node_modules/meshoptimizer/meshopt_decoder.cjs, v1.3.0).
+// Không dùng bản .mjs trên CDN (lỗi "Unexpected token 'export'") hay .cjs trên jsDelivr (bị chặn vì sai kiểu MIME).
+const MESHOPT_SRC = '/vendor/meshopt_decoder.js';
 const bySlug = Object.fromEntries(clientProducts.map((p) => [p.slug, p]));
 const modal = $('[data-ar-modal]');
 let mvLoaded: Promise<void> | null = null;
@@ -41,7 +44,7 @@ async function openAR(slug: string) {
       stage.innerHTML = `<model-viewer src="${esc(p.model.glb)}" ${p.model.usdz ? `ios-src="${esc(p.model.usdz)}"` : ''}
         alt="Mô hình 3D ${esc(p.shortName)}" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor"
         camera-controls auto-rotate shadow-intensity="1" touch-action="pan-y"
-        style="width:100%;aspect-ratio:4/3;background:var(--color-cream)">
+        style="display:block;width:100%;height:auto;aspect-ratio:4/3;background:var(--color-cream)">
         <button slot="ar-button" class="btn btn-primary absolute bottom-4 left-1/2 -translate-x-1/2">Xem trong không gian của bạn</button>
       </model-viewer>`;
     } catch {

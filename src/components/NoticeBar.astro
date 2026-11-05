@@ -6,7 +6,7 @@ import type { IconName } from './icons';
 // Lặp đủ dài để phủ màn hình rộng; cả dải được nhân đôi để chạy vòng liền mạch (keyframes marquee: 0 → -50%)
 const group = [...site.notice, ...site.notice, ...site.notice];
 ---
-<div class="group overflow-hidden border-b border-brand-100 bg-cream text-brand-800" role="region" aria-label="Thông báo">
+<div class="group overflow-hidden border-b border-brand-200 bg-cream text-brand-800" role="region" aria-label="Thông báo">
   <p class="sr-only">{site.notice.map((n) => n.text).join(' · ')}</p>
   <div class="flex w-max animate-marquee group-hover:[animation-play-state:paused]" aria-hidden="true">
     {[0, 1].map(() => (

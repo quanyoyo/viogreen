@@ -1,12 +1,94 @@
 {
   "maxTriangles": 150000,
   "materials": {
-    "body":   { "color": "#f1f1ec", "roughness": 0.85, "metalness": 0 },
-    "accent": { "color": "#355e3b", "roughness": 0.6,  "metalness": 0 },
-    "solar":  { "color": "#1c2b3c", "roughness": 0.3,  "metalness": 0.25 },
-    "foot":   { "color": "#2a302b", "roughness": 0.9,  "metalness": 0 }
+    "body": {
+      "color": "#f1f1ec",
+      "roughness": 0.85,
+      "metalness": 0
+    },
+    "accent": {
+      "color": "#355e3b",
+      "roughness": 0.6,
+      "metalness": 0
+    },
+    "solar": {
+      "color": "#1c2b3c",
+      "roughness": 0.3,
+      "metalness": 0.25
+    },
+    "foot": {
+      "color": "#2a302b",
+      "roughness": 0.9,
+      "metalness": 0
+    },
+    "green": {
+      "color": "#245c3a",
+      "roughness": 0.5,
+      "metalness": 0
+    },
+    "white": {
+      "color": "#f4f4f2",
+      "roughness": 0.45,
+      "metalness": 0
+    },
+    "black": {
+      "color": "#151515",
+      "roughness": 0.8,
+      "metalness": 0
+    }
   },
   "models": [
+    {
+      "out": "ecohub-plus",
+      "dir": "may-nho",
+      "default": "white",
+      "parts": {
+        "Body6 aa": "green",
+        "Body25": "black",
+        "Body26": "black",
+        "Body27": "black",
+        "Body28": "black"
+      },
+      "regions": [
+        {
+          "part": "Body1",
+          "material": "green",
+          "min": [
+            -56,
+            -124,
+            12
+          ],
+          "max": [
+            56,
+            -60,
+            134
+          ],
+          "normals": [
+            "+x",
+            "-x",
+            "+z",
+            "-z"
+          ]
+        },
+        {
+          "part": "Body1",
+          "material": "green",
+          "min": [
+            -56,
+            -112,
+            12
+          ],
+          "max": [
+            56,
+            -60,
+            134
+          ],
+          "normals": [
+            "-y"
+          ]
+        }
+      ]
+    },
     {
       "out": "ecohub-mau",
       "dir": ".",

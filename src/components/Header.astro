@@ -33,7 +33,8 @@ const nav = posts.length ? [...baseNav.slice(0, 3), { href: '/tin-tuc/', label: 
   </div>
 
   <!-- Thanh menu xanh (desktop) -->
-  <nav aria-label="Điều hướng chính" class="hidden bg-brand lg:block">
+  <!-- Viền trắng + bóng dưới thanh menu: tách rõ menu với các mục nền xanh khi cuộn (05/11/2026) -->
+  <nav aria-label="Điều hướng chính" class="hidden border-b-[3px] border-white bg-brand shadow-[0_10px_20px_-12px_rgb(1_54_0/0.6)] lg:block">
     <div class="container-x flex items-stretch justify-between">
       <ul class="flex items-stretch gap-1 py-1.5">
         {nav.map((n) => (

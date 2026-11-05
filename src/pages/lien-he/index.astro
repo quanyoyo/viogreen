@@ -18,22 +18,28 @@ const info = [
 <BaseLayout title="Liên hệ" active="contact" description="Liên hệ VIO GREEN để được tư vấn giải pháp chăm sóc cây thông minh ECOHUB cho ban công, sân thượng, văn phòng.">
   <Breadcrumbs items={[['Liên hệ']]} />
 
-  <!-- Băng ảnh -->
-  <section class="overflow-hidden pt-10 sm:pt-14" aria-hidden="true">
-    <div class="container-x grid grid-cols-[0.7fr_1.4fr_0.7fr] items-center gap-4">
-      <div class="aspect-[4/3] overflow-hidden rounded-3xl opacity-80"><img src="/assets/bia-1-800.webp" alt="" class="size-full object-cover" loading="lazy" /></div>
-      <div class="breath aspect-[16/10] shadow-lift"><img src="/assets/hero-2.webp" srcset="/assets/hero-2-800.webp 800w, /assets/hero-2.webp 1680w" sizes="(min-width: 1280px) 640px, 50vw" alt="" class="size-full object-cover" /></div>
-      <div class="aspect-[4/3] overflow-hidden rounded-3xl opacity-80"><img src="/assets/hero-3-800.webp" alt="" class="size-full object-cover object-left" loading="lazy" /></div>
+  <!-- HERO: ảnh bìa (chuyển từ trang Sản phẩm sang, 05/11/2026) – nửa phải mờ trắng, chữ đặt bên phải -->
+  <section class="relative isolate overflow-hidden bg-white">
+    <div class="relative aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto">
+      <img src="/assets/banner-san-pham.webp" srcset="/assets/banner-san-pham-800.webp 800w, /assets/banner-san-pham.webp 1680w" sizes="100vw"
+        alt="Máy VIO GREEN ECOHUB bên các luống rau trên sân thượng" class="size-full animate-breath object-cover object-left" fetchpriority="high" />
+      <div aria-hidden="true" class="absolute inset-0 bg-[linear-gradient(to_top,white,transparent_35%)] lg:bg-[linear-gradient(to_left,rgb(255_255_255/.96)_0%,rgb(255_255_255/.9)_40%,rgb(255_255_255/.55)_52%,transparent_68%)]"></div>
+    </div>
+    <div class="container-x relative grid lg:min-h-[480px] lg:grid-cols-[1.35fr_1fr] lg:items-center">
+      <div class="-mt-6 pb-12 lg:col-start-2 lg:mt-0 lg:py-16" data-reveal>
+        <p class="eyebrow">Liên hệ VIO GREEN</p>
+        <h1 class="h-display">Cùng nhau vun trồng lối sống xanh.</h1>
+        <p class="mt-4 text-lg text-muted">Bạn đã sẵn sàng mang thiên nhiên xanh mát vào không gian sống của mình? Hãy để lại thông tin, đội ngũ chuyên gia VIO GREEN sẽ đồng hành cùng bạn hiện thực hóa khu vườn mơ ước.</p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="#tu-van" class="btn btn-primary">Gửi yêu cầu tư vấn</a>
+          <a href={telHref} class="btn btn-light"><Icon name="phone" /> {site.phone}</a>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="section pt-12 sm:pt-16">
+  <section class="section">
     <div class="container-x">
-      <div class="mx-auto mb-12 max-w-3xl text-center" data-reveal>
-        <h1 class="h-display">Cùng nhau vun trồng lối sống xanh.</h1>
-        <p class="mt-4 text-lg text-muted">Bạn đã sẵn sàng mang thiên nhiên xanh mát vào không gian sống của mình? Hãy để lại thông tin, đội ngũ chuyên gia VIO GREEN sẽ đồng hành cùng bạn hiện thực hóa khu vườn mơ ước.</p>
-      </div>
-
       <div class="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
         <div class="space-y-5" data-reveal>
           <div class="card p-7 shadow-soft sm:p-8">
@@ -59,7 +65,7 @@ const info = [
           </div>
         </div>
 
-        <div class="card p-6 sm:p-8" data-reveal style="--d:120ms">
+        <div class="card scroll-mt-32 p-6 sm:p-8" id="tu-van" data-reveal style="--d:120ms">
           <h2 class="mb-6 text-xl font-bold">Gửi yêu cầu tư vấn</h2>
           <ContactForm source="Trang Liên hệ" />
         </div>

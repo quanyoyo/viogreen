@@ -174,6 +174,10 @@
   .prose-vg th { @apply bg-brand px-4 py-3 font-semibold text-white; }
   .prose-vg td { @apply border-t border-line px-4 py-3 align-top; }
   .prose-vg tr:nth-child(even) td { @apply bg-cream; }
+  .prose-vg .table-wrap table { @apply min-w-[480px]; }
+  .prose-vg .table-wrap table:not(:has(th:nth-child(3))) { @apply min-w-0; } /* bảng 2 cột: xuống dòng, không cuộn ngang */
+  .prose-vg img { @apply mx-auto h-auto max-w-full rounded-2xl; }
+  .prose-vg p:has(> img:only-child) { @apply my-7; }
 }
 
 @utility scrollbar-none {

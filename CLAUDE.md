@@ -43,6 +43,8 @@ npm run images   # ảnh gốc images-src/ → WebP trong public/ (scripts/optim
 ```
 
 - **Ảnh gốc khách gửi:** `images-src/` (không commit; bản gốc ở Google Drive "Ảnh làm web"). Đã đổi tên cho rõ nghĩa. Danh sách ảnh nào → file nào trong `public/` khai báo ở `scripts/optimize-images.mjs`; ảnh máy Sol có nền "ô cờ" giả in liền → script tự tô trắng (`clearChecker`).
+  - Đợt 05/11/2026: `images-src/2026-11/san-pham/` (Drive "ảnh sản phẩm" + thư mục con "SẢN PHẨM PHỤ KIỆN"), `images-src/2026-11/blog-doc/` (ảnh bài blog, lấy từ `web_information.docx`). Các thư mục Drive trong tài liệu để chế độ "ai có link cũng xem được" → tải được thẳng bằng script, không cần khách tải hộ.
+- **Tài liệu khách:** `docs/web_information.docx` (05/11/2026, bản mới nhất; `docs/` không commit) = bản `D:\Thông tin làm web.docx` (18/10) + phần mới ở đầu (giá, ECOBOX theo máy, Bio-Nutri Box, ảnh, bố cục) + 5 bài blog. Máy chưa có pandoc → đọc bằng `zipfile`/unzip + XML.
 
 ## 4. Cấu trúc thư mục
 
@@ -54,19 +56,21 @@ src/
                          dang-nhap, tai-khoan, quan-tri (3 trang này dùng Firebase, noindex)
   layouts/BaseLayout.astro   head/SEO, Header, NoticeBar, Footer, Chatbot, AR modal
   components/            Header, NoticeBar (chữ chạy ngang), Footer, ProductCard, PolicyStrip, CtaBand, SectionHead,
-                         Ph (ảnh tạm), Chatbot, ArModal, ContactForm, Breadcrumbs, Logo, Social, Icon
+                         Ph (ảnh tạm), Chatbot, ArModal, ContactForm, Breadcrumbs, Logo, Social, Icon,
+                         Coverflow (băng ảnh trượt: ảnh giữa to, 2 ảnh bên nằm một phần dưới – đầu trang Sản phẩm)
   scripts/               ui.ts (reveal, carousel, menu), cart.ts, forms.ts, ar.ts, chatbot.ts, data.ts,
                          fb.ts (Firebase: auth, đơn, lead, quản trị), order-view.ts (hiển thị đơn dùng chung),
-                         address.ts (chọn Tỉnh/thành → Phường/xã)
-  data/                  site.ts (cấu hình, notice, weather), products.ts (16 SP), faq.ts, chatbot-kb.ts (+ quickQuestions),
+                         address.ts (chọn Tỉnh/thành → Phường/xã),
+                         product-page.ts (trang chi tiết: đổi ảnh, khung phóng to ảnh, giá theo lựa chọn, ?may=s|plus|pro)
+  data/                  site.ts (cấu hình, notice, weather), products.ts (12 SP), faq.ts, chatbot-kb.ts (+ quickQuestions),
                          reviews.ts (đánh giá THẬT – trống = ẩn), blog.ts (đọc src/content/blog)
   content/policies/      van-chuyen, doi-tra, bao-hanh, bao-mat (.md; {{address}} {{email}}… thay từ site.ts)
-  content/blog/          bài viết .md (mẫu: _mau-bai-viet.md; file "_…" hoặc draft: true không hiện)
+  content/blog/          bài viết .md (mẫu: _mau-bai-viet.md; file "_…" hoặc draft: true không hiện) – 5 bài từ 05/11/2026
   styles/global.css      design tokens + hiệu ứng
 firestore.rules          quy tắc bảo mật Firestore (dán vào Console → Firestore → Rules → Publish)
 public/                  favicon-48.png, apple-touch-icon.png, robots.txt, _headers, _redirects (301 slug cũ),
                          assets/ (logo.png, mio-*.webp, hero-1..3, bia-1, banner-san-pham, ecohub-sol-va-grid – có bản -800),
-                         products/ (ecohub-sol.webp, ecohub-grid.webp), models/,
+                         products/ (ảnh SP 1600px + bản -800; "-info" = ảnh có chữ), blog/ (ảnh bài viết), models/,
                          data/dvhc.json (34 tỉnh/thành + 3.321 phường/xã – tạo bằng `npm run dvhc`)
 .claude/launch.json      cấu hình dev server cho Browser pane (tên "dev")
 ```
@@ -102,14 +106,16 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 ## 6. Quy ước dữ liệu
 
 - `price: null` → hiển thị "Liên hệ"; giỏ hàng ghi "Nhân viên sẽ báo giá".
-- `images: []` → hiển thị ảnh tạm. Ảnh thật đặt trong `public/products/`.
+- **Giá (05/11/2026, bảng giá khách gửi):** Grid 1.499.000, Sol 1.999.000, Grid Plus 1.799.000, Sol Plus 2.299.000, Grid Pro 2.499.000, Sol Pro 3.399.000, Bio-Tank máy S và máy Plus 39.000 (đ). Còn lại "Liên hệ" (khách dặn chưa có giá thì để Liên hệ; Bio-Nutri chưa cần giá).
+- `variants.prices` = giá riêng từng lựa chọn (cùng thứ tự `options`, `null` = Liên hệ); thẻ SP hiện "Từ …" khi các lựa chọn khác giá. Giỏ hàng + đơn lưu **đơn giá theo lựa chọn** (`cart.ts → unitPrice`). `variants.pick: true` = nút trên thẻ SP thành "Chọn máy" (mở trang chi tiết) thay vì thêm ngay.
+- `images` = khung ảnh trang chi tiết (ảnh đầu hiện to, bấm để phóng to: nút +/−, cuộn chuột, chụm 2 ngón, nhấp đúp, kéo). `thumb` = ảnh trên thẻ SP / giỏ hàng (mặc định `images[0]`, dùng bản `-800`). `info` = ảnh có chữ, hiện trong phần mô tả (ECOHUB). Phụ kiện: ảnh có chữ đứng **trước**, ảnh nền trắng sau (khách yêu cầu). `images: []` → ảnh tạm.
 - `model: null` → nút "Thử với AR" hiện "Đang cập nhật". File 3D đặt trong `public/models/`, dạng `{ glb, usdz }`.
-- **Sản phẩm (16)** chia 4 nhóm (đổi tên 18/10/2026 theo tài liệu mới; slug cũ có 301 trong `public/_redirects`):
+- **Sản phẩm (12)** chia 4 nhóm (slug cũ có 301 trong `public/_redirects`):
   - ECOHUB (6, đều có AR): Sol, Grid, Sol Plus, Grid Plus (nước trực tiếp), Sol Pro, Grid Pro (không gian lớn). Cũ: X10 → bỏ chữ X10, Hydro → Plus, X20 → Pro.
-  - ECOBOX (6): Bio-Tank S/Plus/Pro, Aqua-Tank S/Plus/Pro (S ↔ Sol/Grid, Plus ↔ Sol Plus/Grid Plus, Pro ↔ Sol Pro/Grid Pro)
+  - ECOBOX (2, gộp 05/11/2026, giữ tên ECOBOX): `bio-tank`, `aqua-tank`, chọn **Máy S / Máy Plus / Máy Pro** (S ↔ Sol/Grid, Plus ↔ Sol Plus/Grid Plus, Pro ↔ Sol Pro/Grid Pro). Link từ trang máy ECOHUB tự chọn sẵn đúng dòng (`?may=pro`). Slug cũ `bio-tank-s`… → 301 về trang mới kèm `?may=`.
   - Phụ kiện tưới (2): Bio-Dripper, Hose 6/8/10mm có biến thể
-  - Dinh dưỡng (2)
-  - ~~VIO-Care (2)~~ đã bỏ: bảo hành chọn ngay ở trang chi tiết máy ECOHUB (`variants` = `warrantyOptions`: 12 / 18 / 24 tháng, lưu vào đơn như biến thể "Bảo hành 18 tháng").
+  - Dinh dưỡng (2): Bio-Nutri 25 g, **Bio-Nutri Box** 250 g (thay Multi-Pack 05/11/2026; `bio-nutri-multi-pack` → 301 `bio-nutri-box`)
+  - ~~VIO-Care (2)~~ đã bỏ: bảo hành chọn ngay ở trang chi tiết máy ECOHUB (`variants` = `warrantyOptions`: 12 / 18 / 24 tháng, lưu vào đơn như biến thể "Bảo hành 18 tháng"). Giá máy kèm gói 12 tháng; phí gói 18/24 tháng chờ khách.
 - **Mô tả SP** lấy từ tài liệu, đã bỏ ghi chú nội bộ ("Lưu ý kỹ thuật… chưa được xác nhận", "Thông tin cần xác nhận", "Theo định vị trong tài liệu hiện tại"). `highlights` = Đặc điểm chính / Công dụng.
 - **Số lượng cây thay cho diện tích:** `plants` = `<15` ("Dưới 15 cây", máy cho không gian dưới 10 m²) / `<30` ("Dưới 30 cây", 10–20 m²). Form liên hệ: Dưới 15 / 20 / 30 / Trên 30 cây / Chưa rõ (vẫn lưu trường `area` của lead).
 - **Bộ lọc ECOHUB:** số lượng cây (`<15` / `<30`), nguồn điện (`solar` / `grid`), nguồn nước (`tank` / `direct`).
@@ -117,15 +123,17 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Thanh toán:** `paymentMethod` = `cod` | `bank` (đơn trước 07/10/2026 không có → hiển thị "—"). Nhãn hiển thị ở `order-view.ts → PAYMENT_LABEL`.
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
-## 7. Trạng thái (cập nhật 18/10/2026)
+## 7. Trạng thái (cập nhật 05/11/2026)
 
-**Đã xong:** 33 trang build OK, `astro check` 0 lỗi, đã thử trên mobile và desktop.
+**Đã xong:** 34 trang build OK, `astro check` 0 lỗi, đã thử trên mobile (360px) và desktop.
+
+**Đợt sửa 05/11/2026 theo `docs/web_information.docx` (chưa commit / chưa push lúc viết):** giá 8 mục (mục 6); gộp ECOBOX thành 2 SP chọn theo máy (16 → 12 SP); Multi-Pack → Bio-Nutri Box 250 g; ảnh thật cho 6 ECOHUB + 4 phụ kiện, khung ảnh + phóng to, ảnh có chữ trong phần mô tả; trang Sản phẩm: đầu trang là băng ảnh trượt (`Coverflow`, bố cục lấy từ trang Liên hệ), mục Bio-Nutri đổi nền xanh đậm `brand-900` (trước trùng màu thanh menu); trang Liên hệ: đầu trang là ảnh bìa cũ của trang Sản phẩm + chữ "Cùng nhau vun trồng lối sống xanh."; viền chia rõ: thanh menu có viền trắng + bóng, chữ chạy ngang và breadcrumb có viền `brand-200`, breadcrumb nền trắng; AR: "Phòng khách / Ban công" → "Trong nhà / Ngoài trời"; blog: 5 bài (SEO title, meta description, slug theo tài liệu; ảnh trong `public/blog/`) → menu "Tin tức" + mục tin trên trang chủ tự hiện; chatbot trả lời giá theo dữ liệu sản phẩm.
 
 **Đợt sửa 18/10/2026 theo "Thông tin làm web.docx" (bản mới, khách chọn phương án đề xuất):** màu #037700 / #ebf2e3; chữ chạy ngang (`site.notice`); menu: khung cho mục đang mở, nút "Chọn ECOHUB" → "Tư vấn ngay" (mở chat); hero 3 ảnh thật + lớp phủ + thẻ thời tiết/giờ Hà Nội (Open-Meteo, `site.weather`), slide 1 "Chăm sóc thông minh cho không gian xanh đô thị", eyebrow "VIO GREEN", "Chạm để chăm sóc" 1 dòng; nội dung trang chủ 1–4 thay theo tài liệu; trang Sản phẩm: banner ảnh + "ECOHUB – Thiết bị chăm sóc cây thông minh.", lọc theo số cây, bỏ mục VIO-Care; chọn gói bảo hành ở trang chi tiết; "Đặt hàng ECOHUB" → "Mua ngay"; Giới thiệu: hero ảnh nền kiểu tatagarden (Ảnh bìa 1, giữ chữ VIO GREEN), CTA tiếng Việt; AR: "Khám phá ECOHUB trong không gian của bạn."; Liên hệ: "Cùng nhau vun trồng lối sống xanh." + ảnh; footer "Chính sách bảo mật thông tin" 1 dòng; `site.tagline` đổi sang tiếng Việt; đánh giá + blog dựng sẵn, tự ẩn khi chưa có nội dung thật. Đang chạy ở `https://viogreen.com` (Pages trong tài khoản khách; `www` 301 về đây; `viogreen.pages.dev` vẫn truy cập được). Đang ở **chế độ trước ra mắt** (noindex toàn web).
 
 - **Trang:**
   - Trang chủ, Sản phẩm (nhóm, bộ lọc, tìm kiếm `?q=` không dấu)
-  - 16 trang chi tiết (nút Thêm vào giỏ + Mua ngay; nút "Mua trên Shopee" đã bỏ 18/10/2026, Shopee chỉ còn icon ở footer), Giỏ hàng, Đặt hàng, Đặt hàng thành công
+  - 12 trang chi tiết (khung ảnh phóng to được; nút Thêm vào giỏ + Mua ngay; nút "Mua trên Shopee" đã bỏ 18/10/2026, Shopee chỉ còn icon ở footer), Giỏ hàng, Đặt hàng, Đặt hàng thành công
   - Giới thiệu, AR, Liên hệ, 4 chính sách, 404
   - Đăng nhập, Tài khoản, Quản trị (Firebase – chủ web đã test: đặt đơn, liên hệ, lead, phân quyền OK)
 - **Hiệu ứng:** đủ theo mục 5. Carousel hero tự chạy, vuốt được, có chấm chuyển slide.
@@ -134,7 +142,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Đặt hàng:** chọn thanh toán **COD (giao qua SPX Express)** hoặc **Chuyển khoản** → lưu `paymentMethod` (`cod`/`bank`) vào đơn. Chọn chuyển khoản thì trang thành công (`?tt=bank`) hiện QR + Techcombank / STK / chủ TK / nội dung = mã đơn, nút sao chép. Thông tin ngân hàng ở `site.payment`. QR: `public/assets/qr-chuyen-khoan.webp` (cắt từ ảnh gốc `qr-chuyen-khoan.jpg` khách gửi; thiếu file thì trang tự ẩn QR). Phương thức thanh toán hiện ở `/tai-khoan/` và `/quan-tri/`.
 - **Form:** gửi vào Firestore (xem mục 8 bước 2).
 - **Liên hệ & MXH:** email `viogreen102@gmail.com` (cả chính sách bảo mật qua `{{email}}`); Facebook, TikTok `@viogreen.vn`, YouTube `@VIOGREEN-vn`, Shopee có link; Messenger, Zalo, Instagram hiện icon mờ chưa có link.
-- **AR:** modal với `<model-viewer>`. **Chưa gắn file 3D** (`public/models/` trống).
+- **AR:** modal với `<model-viewer>`. **Đã gắn 3D cho ECOHUB Sol Plus + Grid Plus** (`/models/ecohub-plus.glb`, 05/11/2026); 4 máy còn lại hiện "Mô hình 3D đang được cập nhật". Sửa 05/11: khung xem 3D trước chỉ cao 150px (thêm `height:auto`), bộ giải nén meshopt tự host `public/vendor/meshopt_decoder.js` (xem chú thích trong `ar.ts`).
 - **Chatbot MIO v1:**
   - Bong bóng lời chào cạnh MIO: hiện khi vào trang và mỗi lần đóng khung chat (đang mở chat thì ẩn). Chỉ khi khách bấm × trên lời chào mới không hiện lại, kể cả khi chuyển trang, cho tới lần tải lại trang / phiên mới (sessionStorage `vg-mio-hint-off`). Hiệu ứng hiện dần dùng ép reflow, không dùng requestAnimationFrame.
   - Mở chat: màn hình chào (MIO + "Câu hỏi thường gặp" soạn sẵn ở `chatbot-kb.ts → quickQuestions`), dòng lưu ý cuối khung
@@ -155,7 +163,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
    - ✅ **2a–2d xong và đã chạy thật (07/10/2026):** project `viogreen-44a7f`; `firestore.rules` đã publish; Auth Google + Email/Password đã bật; đã có admin; chủ web test đặt đơn / liên hệ / lead / phân quyền OK; Claude đặt thêm 1 đơn thật trên web sau khi push (`VG-261007-C7GX`, tên "TEST Claude").
    - **Mỗi lần sửa `firestore.rules`:** báo chủ web dán lại vào Console → Publish **trước khi push** code dùng trường mới. Viết rule tương thích cả bản web cũ lẫn mới (trường mới để tuỳ chọn).
 3. ~~**Ảnh MIO**~~ **Xong 06–07/10/2026:** đã tách nền. Trong `public/assets/`: `mio.webp` (toàn thân 640px), `mio-stand.webp` (toàn thân 280px – nút chat nổi), `mio-head-128.webp` (avatar trong khung chat), `mio-head-512.png` (bản gốc phần đầu). Favicon: `public/favicon-48.png`, `apple-touch-icon.png` (đầu MIO). Đường dẫn khai báo ở `site.mio`. `favicon.svg` cũ không còn dùng.
-4. **AR:** `npm run models` (`scripts/stl-to-glb.mjs`) chuyển STL trong `models-src/` → GLB trong `public/models/`: mm→m, Z-up→Y-up, căn giữa + đáy chạm sàn, chất liệu theo `models-src/models.json` (`parts`: tên file STL → chất liệu), giảm đa giác khi vượt `maxTriangles`, nén meshopt, kiểm tra < 5MB. `ar.ts` khai báo bộ giải nén meshopt cho model-viewer. Chỉ cần `glb` (model-viewer tự tạo USDZ cho iPhone). **Hiện có:** 12 STL = các bộ phận của **1 máy** bản Sol (54×40×75,6 cm, tấm pin trên cột) → `public/models/ecohub-mau.glb` (466 KB, chưa commit, chưa gắn). **Chờ khách xác nhận** máy này là model nào trước khi đổi tên + gắn vào `products.ts`.
+4. **AR:** `npm run models` (`scripts/stl-to-glb.mjs`) chuyển STL trong `models-src/` → GLB trong `public/models/`: mm→m, Z-up→Y-up, căn giữa + đáy chạm sàn, chất liệu theo `models-src/models.json` (`parts`: tên file STL → chất liệu), giảm đa giác khi vượt `maxTriangles`, nén meshopt, kiểm tra < 5MB. `ar.ts` khai báo bộ giải nén meshopt cho model-viewer. Chỉ cần `glb` (model-viewer tự tạo USDZ cho iPhone). **Hiện có:** 12 STL = các bộ phận của **1 máy** bản Sol (54×40×75,6 cm, tấm pin trên cột) → `public/models/ecohub-mau.glb` (466 KB, chưa commit, chưa gắn). **05/11/2026:** 9 STL "3D máy nhỏ" (Drive) trong `models-src/may-nho/` = **bản Plus** (chủ web xác nhận: dùng cho cả Sol Plus và Grid Plus; 25×25×35,6 cm khớp ảnh thông số) → `public/models/ecohub-plus.glb` (356 KB), đã gắn. Bộ phận: Body1 = bình nước phía trước (có vòm), Body1 aa = thân trên, Body8 aa = vỏ sau/bên (lỗ nút bấm), Body6 aa = nắp (xanh), Body25–28 = chân, Body36 = tấm trong. Màu theo ảnh SP: trắng, nắp + lòng vòm xanh `#245c3a` (lòng vòm tô bằng `regions` trong `models.json` – tô 1 vùng của 1 bộ phận theo hộp toạ độ + hướng mặt). **File 3D không có tấm pin** (và hộp Bio-Tank bên hông) → Sol Plus đang hiện giống Grid Plus. Bộ 12 STL cũ (`ecohub-mau.glb`, có tấm pin) vẫn chưa rõ model → chưa gắn, không commit.
 5. ~~**Hero trang chủ 3 slide**~~ **Xong 07/10/2026** (`src/pages/index.astro` → `slides`): (1) máy trong góc xanh – "Smart Care for Urban Green Spaces", (2) điện thoại app + máy, nền tối kiểu techno – "Giám sát mọi lúc qua app", (3) tay chạm vào máy – "Chạm để chăm sóc". Chữ lấy từ nội dung sẵn có, không thêm thông số. Bố cục tham khảo hikari-mansion.com, smarthomesjapan.com, samsung.com/vn/smartthings (chữ trái – ảnh lớn phải; mobile ảnh dưới chữ). **18/10/2026:** đã thay ảnh thật khách gửi (`hero-1..3.webp`); ảnh chiếm 64% bên phải, mờ dần sang trái vì máy đứng phía trái ảnh. Slide 2/3 vẫn giữ chữ "Giám sát qua app" / "Chạm để chăm sóc" dù ảnh mới là cảnh ban công / sảnh.
 6. **Thay nội dung thật khi khách gửi:** giá, ảnh SP, file 3D, logo gốc. Chỉ sửa trong `src/data/` và `public/`.
 7. **Tên miền `viogreen.com` (14/10/2026):**
@@ -186,24 +194,26 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 ## 9. Chờ khách (không tự điền)
 
 - **Sản phẩm:**
-  - Giá 16 SP; giá Hose theo từng cỡ và độ dài; phí gói bảo hành 18 / 24 tháng (nếu có)
-  - Số gói trong Bio-Nutri Multi-Pack
-  - Thông số kỹ thuật từng ECOHUB; phụ kiện **đi kèm** trong hộp từng model
-  - Model nào có cảm biến / kết nối app
-  - Mô tả **Bio-Tank Pro** (tài liệu chưa có: công dụng, dung tích, kích thước) – web đang ghi "đang cập nhật"
-  - Xác nhận Grid Plus dùng **Aqua-Tank Plus** (tài liệu ghi "Aqua-Tank Pro", web hiểu là Plus)
-  - Ảnh riêng cho Sol Plus, Grid Plus, Sol Pro, Grid Pro và các phụ kiện (hiện chỉ Sol, Grid có ảnh)
+  - ✅ Giá 6 ECOHUB + Bio-Tank S/Plus (05/11/2026). Còn "Liên hệ": Bio-Tank máy Pro, Aqua-Tank (cả 3), Bio-Dripper, Hose (theo cỡ, độ dài), Bio-Nutri (chủ web: chưa cần giá)
+  - Phí gói bảo hành 18 / 24 tháng (nếu có) – chủ web: "update later"
+  - **Thông số trên ảnh khách gửi (05/11/2026) lệch dữ liệu web – chờ quyết:** ảnh ghi Sol/Grid "< 10 chậu", Plus "< 15 chậu", Pro "< 30 chậu" (web: Sol/Grid/Plus = Dưới 15 cây, Pro = Dưới 30 cây); ảnh ghi Sol Pro/Grid Pro dùng **nước trực tiếp** (web: bình chứa nước); ảnh có công suất (100 / 130 / 250 W) và kích thước (30×30×40 / 25×25×35 / 40×40×50 cm) – web chưa đưa vào bảng thông số. Ảnh có chữ đang hiện trong phần mô tả nên khách xem trang sẽ thấy hai số khác nhau.
+  - ✅ ~~Số gói trong Multi-Pack~~ → đổi thành Bio-Nutri Box 250 g
+  - Phụ kiện **đi kèm** trong hộp từng model
+  - ✅ Cảm biến / Web App / AI Chat: chủ web xác nhận đúng cho các dòng ECOHUB (theo nội dung blog, 05/11/2026)
+  - Mô tả **Bio-Tank Pro** (dung tích, kích thước) – trang Bio-Tank hiện dùng mô tả chung cho 3 dòng máy
+  - ✅ Ảnh 6 ECOHUB + Bio-Tank, Aqua-Tank, Bio-Dripper, Hose (05/11/2026). Còn thiếu: ảnh **Bio-Nutri** 25 g và Box
+  - Tên trên ảnh phụ kiện khác tên trên web: "VIO Dripper Set (VIO DRIP-01)" ↔ Bio-Dripper, "VIO Micro-Hose" ↔ VIO GREEN Hose – web giữ tên cũ, hỏi khách nếu muốn đổi
 - **Bảo hành / vận chuyển:**
   - ✅ Bảo hành tiêu chuẩn 12 tháng (khách ghi trong thanh chữ chạy 18/10/2026)
-  - Dòng chữ chạy "Giao hàng miễn phí từ 2.000.000đ" rộng hơn chính sách vận chuyển (chỉ miễn phí ở Hà Nội) – chờ khách quyết có sửa chữ không
+  - Dòng chữ chạy "Giao hàng miễn phí từ 2.000.000đ" rộng hơn chính sách vận chuyển (chỉ miễn phí ở Hà Nội) – nay đã có giá thật (Sol Plus, Grid Pro, Sol Pro trên 2 triệu) nên càng cần chốt; chủ web: "update later"
   - Email/Zalo nhận thông báo đơn (cho bước email báo đơn)
 - **Thông tin doanh nghiệp:**
   - Địa chỉ theo đơn vị hành chính mới
   - Tên công ty, MST
 - **Liên kết:** link Messenger, Zalo, Instagram (đang hiện icon mờ chưa có link).
 - **Nội dung 5 trang chưa có** (đang ẩn khỏi footer): Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
-- **Hình ảnh và file:** ảnh sản phẩm còn thiếu (xem trên), file 3D (GLB) kèm bảng file ↔ model, logo gốc SVG/PNG. Ảnh `nha-phu-cay-xanh-750px.jpg` (Drive) chưa dùng – nhỏ và có vẻ là ảnh trên mạng.
-- **Đánh giá khách hàng thật** → điền vào `src/data/reviews.ts` (mục tự hiện). **Bài blog** → file .md trong `src/content/blog/` (menu "Tin tức" tự hiện).
+- **Hình ảnh và file:** ảnh Bio-Nutri, file 3D: tấm pin cho Sol Plus, 3D các máy Sol/Grid/Pro, bộ cũ trong `models-src/` (54×40×75,6 cm, có tấm pin) là model nào, logo gốc SVG/PNG. Ảnh `nha-phu-cay-xanh-750px.jpg` (Drive) chưa dùng – nhỏ và có vẻ là ảnh trên mạng.
+- **Đánh giá khách hàng thật** → điền vào `src/data/reviews.ts` (mục tự hiện). **Bài blog mới** → file .md trong `src/content/blog/` (đã có 5 bài, ngày đăng 05/11/2026; `seoTitle`, `excerpt` = meta description, `cover`, `order`).
 - **Ô trống trong bảng phí vận chuyển** (Figma để trống): hiện đang hiển thị "—".
 
 ## 10. Ghi chú

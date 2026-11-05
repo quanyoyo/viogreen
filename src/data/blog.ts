@@ -1,18 +1,23 @@
 // Blog / tin tức: mỗi bài là 1 file .md trong src/content/blog/ (xem mẫu src/content/blog/_mau-bai-viet.md).
 // File bắt đầu bằng "_" hoặc có `draft: true` bị bỏ qua.
 // Chưa có bài nào = mục Tin tức tự ẩn khỏi menu và trang chủ; trang /tin-tuc/ để noindex.
-export interface PostMeta { title: string; date: string; excerpt: string; cover?: string; draft?: boolean }
+// seoTitle: tiêu đề cho Google (thẻ <title>), khác tiêu đề hiện trên trang (title) – tuỳ chọn.
+// excerpt: tóm tắt trên thẻ bài viết, đồng thời là meta description.
+// order: thứ tự khi nhiều bài cùng ngày (số nhỏ hiện trước) – tuỳ chọn.
+export interface PostMeta { title: string; seoTitle?: string; date: string; excerpt: string; cover?: string; coverAlt?: string; order?: number; draft?: boolean }
 type PostModule = { frontmatter: PostMeta; compiledContent: () => string | Promise<string> };
 
 const files = import.meta.glob<PostModule>('../content/blog/*.md', { eager: true });
 
 // YAML đọc `date: 2026-10-18` thành Date → đổi về chuỗi năm-tháng-ngày để sắp xếp
 const ymd = (d: unknown) => (d instanceof Date ? d.toISOString().slice(0, 10) : String(d ?? ''));
+// Ảnh bìa trong public/blog/ có bản nhỏ -800 (npm run images) cho thẻ bài viết
+const small = (src?: string) => (src?.startsWith('/blog/') ? src.replace(/\.webp$/, '-800.webp') : src);
 
 export const posts = Object.entries(files)
-  .map(([path, mod]) => ({ slug: path.split('/').pop()!.replace(/\.md$/, ''), ...mod.frontmatter, date: ymd(mod.frontmatter.date), mod }))
+  .map(([path, mod]) => ({ slug: path.split('/').pop()!.replace(/\.md$/, ''), ...mod.frontmatter, date: ymd(mod.frontmatter.date), thumb: small(mod.frontmatter.cover), mod }))
   .filter((p) => !p.slug.startsWith('_') && !p.draft)
-  .sort((a, b) => b.date.localeCompare(a.date));
+  .sort((a, b) => b.date.localeCompare(a.date) || (a.order ?? 99) - (b.order ?? 99));
 
 export type Post = (typeof posts)[number];
 

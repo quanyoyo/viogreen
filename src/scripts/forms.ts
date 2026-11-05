@@ -2,7 +2,7 @@
 // SDK Firebase chỉ được tải khi cần (`import('./fb')`) để các trang khác vẫn nhẹ.
 // Chưa cấu hình site.firebase.projectId = chế độ thử: không gửi dữ liệu đi.
 import { site } from '../data/site';
-import { readCart, clearCart, totals, productBySlug } from './cart';
+import { readCart, clearCart, totals, productBySlug, unitPrice } from './cart';
 import { $, $$, toast } from './ui';
 import { setAddress } from './address';
 
@@ -125,7 +125,7 @@ $$<HTMLFormElement>('form[data-form]').forEach((form) => {
         province: data.province.trim(), ward: data.ward.trim(), address: data.address.trim(),
         shipping: data.shipping || '', note: (data.note || '').trim(),
         paymentMethod: (data.paymentMethod === 'bank' ? 'bank' : 'cod') as 'cod' | 'bank',
-        items: lines.map((l) => ({ slug: l.slug, name: productBySlug[l.slug].shortName, variant: l.variant || '', qty: l.qty, price: productBySlug[l.slug].price ?? null })),
+        items: lines.map((l) => ({ slug: l.slug, name: productBySlug[l.slug].shortName, variant: l.variant || '', qty: l.qty, price: unitPrice(l) })),
         totalQty: t.qty, total: t.sum, page: location.pathname,
       };
       if (!firebaseOn) {

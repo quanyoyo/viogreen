@@ -1,6 +1,6 @@
 ---
 import type { Product } from '../data/products';
-import { categoryOf, formatPrice, productTags } from '../data/products';
+import { categoryOf, formatPrice, productTags, smallImage, thumbOf } from '../data/products';
 import { site } from '../data/site';
 import Icon from './Icon.astro';
 import Ph from './Ph.astro';
@@ -9,6 +9,8 @@ const { p, reveal = true, delay = 0 } = Astro.props;
 const tags = productTags(p);
 const href = `/san-pham/${p.slug}/`;
 const searchText = [p.name, p.shortName, p.summary, categoryOf(p).label].join(' ');
+const thumb = thumbOf(p);
+const priced = !!p.price || !!p.variants?.prices?.some((x) => x);
 ---
 <article class="card card-hover group relative flex flex-col overflow-hidden"
   data-reveal={reveal ? '' : undefined} style={delay ? `--d:${delay}ms` : undefined}
@@ -16,7 +18,7 @@ const searchText = [p.name, p.shortName, p.summary, categoryOf(p).label].join(' 
   data-search={searchText}>
   <a href={href} tabindex="-1" aria-hidden="true" class="block overflow-hidden">
     <div class="transition-transform duration-700 group-hover:scale-[1.04]">
-      {p.images[0] ? <img src={p.images[0]} alt="" loading="lazy" class="aspect-[4/3] w-full bg-white object-contain p-4" /> : <Ph title={p.shortName} ratio="4/3" />}
+      {thumb ? <img src={smallImage(thumb)} alt="" loading="lazy" width="800" height="800" class="aspect-[4/3] w-full bg-white object-contain p-4" /> : <Ph title={p.shortName} ratio="4/3" />}
     </div>
   </a>
   {p.hasAR && (
@@ -30,11 +32,18 @@ const searchText = [p.name, p.shortName, p.summary, categoryOf(p).label].join(' 
     <p class="line-clamp-2 text-sm text-muted">{p.summary}</p>
     {tags.length > 0 && <ul class="flex flex-wrap gap-1.5">{tags.map((t) => <li class="tag">{t}</li>)}</ul>}
     <div class="mt-auto flex items-center justify-between gap-3 pt-3">
-      <span class:list={['font-bold', p.price ? 'text-lg text-ink' : 'text-base text-brand']}>{formatPrice(p, site.priceFallback)}</span>
-      <button type="button" data-add-cart={p.slug} aria-label={`Thêm ${p.shortName} vào giỏ`}
-        class="relative z-10 inline-flex size-11 items-center justify-center rounded-full bg-brand text-white transition-all duration-300 hover:scale-105 hover:bg-brand-700">
-        <Icon name="plus" class="size-5" />
-      </button>
+      <span class:list={['font-bold', priced ? 'text-lg text-ink' : 'text-base text-brand']}>{formatPrice(p, site.priceFallback)}</span>
+      {p.variants?.pick ? (
+        <a href={href} aria-label={`Chọn máy cho ${p.shortName}`}
+          class="relative z-10 inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-brand px-4 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-brand-700">
+          Chọn máy <Icon name="arrowRight" class="size-4" />
+        </a>
+      ) : (
+        <button type="button" data-add-cart={p.slug} aria-label={`Thêm ${p.shortName} vào giỏ`}
+          class="relative z-10 inline-flex size-11 items-center justify-center rounded-full bg-brand text-white transition-all duration-300 hover:scale-105 hover:bg-brand-700">
+          <Icon name="plus" class="size-5" />
+        </button>
+      )}
     </div>
   </div>
 </article>

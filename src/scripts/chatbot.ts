@@ -78,16 +78,32 @@ function setChips(list: string[]) {
   chipsBox.hidden = list.length === 0;
   chipsBox.scrollLeft = 0;
 }
+const vnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + ' ₫';
+/** Bảng giá lấy từ dữ liệu sản phẩm (chỉ những sản phẩm / lựa chọn đã có giá) */
+const priceHtml = () => {
+  const rows = clientProducts.flatMap((p) =>
+    p.prices && p.variants
+      ? p.variants.flatMap((v, i) => (p.prices![i] ? [`• ${esc(p.shortName)} (${esc(v)}): <b>${vnd(p.prices![i]!)}</b>`] : []))
+      : p.price ? [`• ${esc(p.shortName)}: <b>${vnd(p.price)}</b>`] : []);
+  return rows.length ? `Giá niêm yết hiện tại:<br>${rows.join('<br>')}<br>` : '';
+};
 const kbHtml = (k: (typeof kb)[number]) =>
+  (k.id === 'price' ? priceHtml() : '') +
   nl(k.answer) + (k.links?.length ? `<div class="mt-2 flex flex-wrap gap-1.5">${k.links.map(([l, h]) => link(l, h)).join('')}</div>` : '');
 
 /* ---------- Gợi ý sản phẩm ---------- */
+const priceOf = (p: ClientProduct) => {
+  const known = (p.prices ?? [p.price]).filter((x): x is number => x != null);
+  if (!known.length) return site.priceFallback;
+  const min = Math.min(...known);
+  return (p.prices && (known.length < p.prices.length || known.some((x) => x !== min)) ? 'Từ ' : '') + vnd(min);
+};
 const productCard = (p: ClientProduct) => `
   <div class="mt-2 rounded-xl bg-cream p-3 ring-1 ring-line">
-    <p class="font-semibold">${esc(p.shortName)}</p>
+    <p class="font-semibold">${esc(p.shortName)} <span class="font-bold text-brand">· ${priceOf(p)}</span></p>
     <p class="mt-0.5 text-xs text-muted">${esc(p.summary)}</p>
     <div class="mt-2 flex flex-wrap gap-1.5">${link('Xem chi tiết', `/san-pham/${p.slug}/`)}
-      <button type="button" data-chat-add="${p.slug}" class="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700">+ Thêm vào giỏ</button>
+      ${p.prices ? '' : `<button type="button" data-chat-add="${p.slug}" class="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700">+ Thêm vào giỏ</button>`}
       ${p.hasAR ? `<button type="button" data-ar="${p.slug}" class="rounded-full px-3 py-1 text-xs font-semibold text-brand ring-1 ring-brand-200 hover:bg-brand-50">Thử AR</button>` : ''}</div>
   </div>`;
 
@@ -197,7 +213,7 @@ async function answer(raw: string) {
     return bot(`Đây là thông tin về ${prods.length > 1 ? 'các sản phẩm' : 'sản phẩm'} bạn hỏi:${prods.map(productCard).join('')}`);
   }
   if (score(t, accessoryKeys) || t === 'phu kien di kem') {
-    return bot(`Phụ kiện đi kèm ECOHUB gồm:<br>• <b>ECOBOX</b>: Bio-Tank (dinh dưỡng) & Aqua-Tank (nước) – bản S / Plus / Pro theo dòng máy<br>• <b>Tưới</b>: Bio-Dripper (bộ 10 đầu nhỏ giọt), Hose 6/8/10 mm<br>• <b>Dinh dưỡng</b>: Bio-Nutri 25 g & Multi-Pack<div class="mt-2 flex flex-wrap gap-1.5">${link('ECOBOX', '/san-pham/#ecobox')}${link('Phụ kiện tưới', '/san-pham/#irrigation')}${link('Bio-Nutri', '/san-pham/#nutrition')}</div>`,
+    return bot(`Phụ kiện đi kèm ECOHUB gồm:<br>• <b>ECOBOX</b>: Bio-Tank (dinh dưỡng) & Aqua-Tank (nước) – chọn theo dòng máy S / Plus / Pro<br>• <b>Tưới</b>: Bio-Dripper (bộ 10 đầu nhỏ giọt), Hose 6/8/10 mm<br>• <b>Dinh dưỡng</b>: Bio-Nutri 25 g & Bio-Nutri Box 250 g<div class="mt-2 flex flex-wrap gap-1.5">${link('ECOBOX', '/san-pham/#ecobox')}${link('Phụ kiện tưới', '/san-pham/#irrigation')}${link('Bio-Nutri', '/san-pham/#nutrition')}</div>`,
       ['Tư vấn chọn máy', 'Giá bao nhiêu?', 'Giao hàng', 'Gặp nhân viên']);
   }
 

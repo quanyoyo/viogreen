@@ -1,0 +1,86 @@
+---
+// Băng ảnh trượt kiểu "coverflow": ảnh giữa to, 2 ảnh hai bên nằm một phần bên dưới ảnh giữa.
+// Tự chuyển ảnh, bấm ảnh bên cạnh / chấm / vuốt để đổi. Dùng ở đầu trang Sản phẩm (05/11/2026).
+interface Slide { src: string; small: string; alt: string; position?: string }
+interface Props { slides: Slide[]; label: string }
+const { slides, label } = Astro.props;
+---
+<div data-coverflow aria-roledescription="carousel" aria-label={label}>
+  <div class="relative aspect-[2/1] w-full sm:aspect-[2.75/1]">
+    {slides.map((s, i) => (
+      <button type="button" class="cf-slide absolute top-0 left-1/2 h-full w-[80%] overflow-hidden rounded-3xl bg-cream sm:w-[58%]"
+        data-cf-slide={i} data-pos={i === 0 ? '0' : i === 1 ? '1' : i === slides.length - 1 ? '-1' : '2'}
+        aria-label={`Xem ảnh ${i + 1}: ${s.alt}`} aria-roledescription="slide">
+        <img src={s.small} srcset={`${s.small} 800w, ${s.src} 1600w`} sizes="(min-width: 640px) 58vw, 80vw" alt={s.alt}
+          width="1600" height="1000" class="size-full object-cover" style={s.position ? `object-position:${s.position}` : undefined}
+          loading={i < 2 || i === slides.length - 1 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} />
+      </button>
+    ))}
+  </div>
+  <div class="mt-5 flex justify-center gap-2" role="tablist" aria-label="Chọn ảnh">
+    {slides.map((_, i) => (
+      <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} aria-label={`Ảnh ${i + 1}`} data-cf-dot={i}
+        class="h-2.5 w-2.5 rounded-full bg-brand-200 transition-all duration-300 hover:bg-brand-300 aria-selected:w-7 aria-selected:bg-brand"></button>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* Vị trí theo data-pos: 0 = giữa, ±1 = hai bên (một phần nằm dưới ảnh giữa), ±2 = ẩn phía sau */
+  .cf-slide {
+    transform: translateX(-50%) scale(0.6);
+    opacity: 0;
+    z-index: 0;
+    pointer-events: none;
+    transition: transform 0.75s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.75s, filter 0.75s, box-shadow 0.75s;
+  }
+  .cf-slide[data-pos='0'] { transform: translateX(-50%) scale(1); opacity: 1; z-index: 3; pointer-events: auto; cursor: default; box-shadow: var(--shadow-lift); }
+  .cf-slide[data-pos='-1'] { transform: translateX(-110%) scale(0.8); opacity: 1; z-index: 2; pointer-events: auto; cursor: pointer; filter: brightness(0.82) saturate(0.9); }
+  .cf-slide[data-pos='1'] { transform: translateX(10%) scale(0.8); opacity: 1; z-index: 2; pointer-events: auto; cursor: pointer; filter: brightness(0.82) saturate(0.9); }
+  .cf-slide[data-pos='-2'] { transform: translateX(-150%) scale(0.6); }
+  .cf-slide[data-pos='2'] { transform: translateX(50%) scale(0.6); }
+  .cf-slide[data-pos='-1']:hover, .cf-slide[data-pos='1']:hover { filter: none; }
+  @media (prefers-reduced-motion: reduce) { .cf-slide { transition: none; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-coverflow]').forEach((root) => {
+    const slides = [...root.querySelectorAll<HTMLButtonElement>('[data-cf-slide]')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-cf-dot]')];
+    const n = slides.length;
+    if (n < 2) return;
+    let i = 0;
+    let timer: number | undefined;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const show = (k: number) => {
+      i = (k + n) % n;
+      slides.forEach((s, j) => {
+        let d = j - i;
+        if (d > n / 2) d -= n;
+        if (d < -n / 2) d += n;
+        s.dataset.pos = String(Math.max(-2, Math.min(2, d)));
+        s.setAttribute('aria-hidden', String(Math.abs(d) > 1));
+        s.tabIndex = Math.abs(d) === 1 ? 0 : -1;
+      });
+      dots.forEach((d, j) => d.setAttribute('aria-selected', String(j === i)));
+    };
+    const play = () => { if (!reduce) { clearInterval(timer); timer = window.setInterval(() => show(i + 1), 5000); } };
+
+    slides.forEach((s, j) => s.addEventListener('click', () => { if (j !== i) { show(j); play(); } }));
+    dots.forEach((d, j) => d.addEventListener('click', () => { show(j); play(); }));
+    root.addEventListener('mouseenter', () => clearInterval(timer));
+    root.addEventListener('mouseleave', play);
+    root.addEventListener('focusin', () => clearInterval(timer));
+    let x0: number | null = null;
+    root.addEventListener('touchstart', (e) => (x0 = e.touches[0].clientX), { passive: true });
+    root.addEventListener('touchend', (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) { show(i + (dx < 0 ? 1 : -1)); play(); }
+      x0 = null;
+    });
+    show(0);
+    play();
+  });
+</script>

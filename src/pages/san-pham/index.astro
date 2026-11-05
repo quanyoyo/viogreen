@@ -6,7 +6,16 @@ import ProductCard from '../../components/ProductCard.astro';
 import PolicyStrip from '../../components/PolicyStrip.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Coverflow from '../../components/Coverflow.astro';
 import { products, inCategory, categories, plantLabels, powerLabels, waterLabels, type CategoryKey } from '../../data/products';
+
+const heroSlides = [
+  { src: '/assets/hero-1.webp', small: '/assets/hero-1-800.webp', alt: 'Máy ECOHUB trên sân thượng lúc hoàng hôn' },
+  { src: '/blog/ecohub-san-thuong.webp', small: '/blog/ecohub-san-thuong-800.webp', alt: 'ECOHUB bên các bồn cây trên sân thượng' },
+  { src: '/assets/hero-2.webp', small: '/assets/hero-2-800.webp', alt: 'Ban công nhiều hoa và cây xanh' },
+  { src: '/blog/ecohub-ban-cong.webp', small: '/blog/ecohub-ban-cong-800.webp', alt: 'ECOHUB trên ban công căn hộ' },
+  { src: '/assets/hero-3.webp', small: '/assets/hero-3-800.webp', alt: 'ECOHUB trong sảnh nhiều cây xanh', position: 'left' },
+];
 
 const filters = [
   ['plants', 'Số lượng cây', plantLabels],
@@ -15,12 +24,12 @@ const filters = [
 ] as const;
 
 const sections: { key: CategoryKey; title: string; sub: string; cols: string; tint: boolean }[] = [
-  { key: 'ecobox', title: 'Bình chứa ECOBOX', sub: 'Bình chứa dinh dưỡng (Bio-Tank) và nước (Aqua-Tank) – thay thế hoặc bổ sung theo cấu hình S / Plus / Pro.', cols: 'sm:grid-cols-2 lg:grid-cols-3', tint: true },
+  { key: 'ecobox', title: 'Bình chứa ECOBOX', sub: 'Hộp chứa dinh dưỡng (Bio-Tank) và hộp nước (Aqua-Tank) thay thế cho 3 dòng máy – chọn theo máy S, Plus hoặc Pro.', cols: 'sm:grid-cols-2 lg:max-w-4xl lg:mx-auto', tint: true },
   { key: 'irrigation', title: 'Phụ kiện tưới', sub: 'Đầu tưới nhỏ giọt và ống dẫn để đưa nước, dinh dưỡng đến từng gốc cây.', cols: 'sm:grid-cols-2 lg:max-w-4xl lg:mx-auto', tint: false },
 ];
 const nutriInfo = [
   ['settings', 'Công dụng', 'Bổ sung dinh dưỡng cho cây trong hệ thống ECOHUB theo cấu hình phù hợp.'],
-  ['product', 'Quy cách', 'Gói lẻ 25g hoặc hộp Multi-Pack nhiều gói để dự trữ cho nhiều chu kỳ.'],
+  ['product', 'Quy cách', 'Gói lẻ 25 g hoặc hộp Bio-Nutri Box 250 g để dự trữ cho nhiều chu kỳ.'],
   ['science', 'Hướng dẫn', 'Liều lượng, cách pha/trộn và tần suất theo hướng dẫn chính thức của VIO GREEN.'],
   ['warning', 'Lưu ý', 'Không tự ý tăng liều lượng khi chưa có hướng dẫn kỹ thuật.'],
 ] as const;
@@ -29,19 +38,15 @@ const nutriInfo = [
   description="Hệ thống chăm sóc cây thông minh ECOHUB Sol, Grid, Plus, Pro, bình chứa ECOBOX, phụ kiện tưới và phân bón Bio-Nutri.">
   <Breadcrumbs items={[['Sản phẩm']]} />
 
-  <!-- HERO: ảnh banner (nửa phải mờ trắng) – chữ đặt bên phải -->
-  <section class="relative isolate overflow-hidden bg-white">
-    <div class="relative aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto">
-      <img src="/assets/banner-san-pham.webp" srcset="/assets/banner-san-pham-800.webp 800w, /assets/banner-san-pham.webp 1680w" sizes="100vw"
-        alt="Máy VIO GREEN ECOHUB bên các luống rau trên sân thượng" class="size-full animate-breath object-cover object-left" fetchpriority="high" />
-      <div aria-hidden="true" class="absolute inset-0 bg-[linear-gradient(to_top,white,transparent_35%)] lg:bg-[linear-gradient(to_left,rgb(255_255_255/.96)_0%,rgb(255_255_255/.9)_40%,rgb(255_255_255/.55)_52%,transparent_68%)]"></div>
-    </div>
-    <div class="container-x relative grid lg:min-h-[480px] lg:grid-cols-[1.35fr_1fr] lg:items-center">
-      <div class="-mt-6 pb-12 lg:col-start-2 lg:mt-0 lg:py-16" data-reveal>
+  <!-- HERO: băng ảnh trượt (bố cục chuyển từ trang Liên hệ sang, 05/11/2026) + tiêu đề -->
+  <section class="overflow-hidden bg-white pt-8 sm:pt-12">
+    <div class="container-x">
+      <Coverflow label="Hình ảnh ECOHUB trong không gian sống" slides={heroSlides} />
+      <div class="mx-auto mt-10 max-w-3xl text-center" data-reveal>
         <p class="eyebrow">Sản phẩm VIO GREEN</p>
         <h1 class="h-display">ECOHUB – Thiết bị chăm sóc cây thông minh.</h1>
         <p class="mt-4 text-lg text-muted">Hệ thống chăm sóc cây trồng đô thị thông minh tích hợp toàn diện các công nghệ tiên tiến.</p>
-        <nav aria-label="Nhóm sản phẩm" class="mt-6 flex flex-wrap gap-2">
+        <nav aria-label="Nhóm sản phẩm" class="mt-6 flex flex-wrap justify-center gap-2">
           {categories.map((c) => <a class="chip" href={`#${c.key}`}>{c.short}</a>)}
         </nav>
       </div>
@@ -105,12 +110,12 @@ const nutriInfo = [
     ))}
 
     <!-- Dinh dưỡng -->
-    <section class="section scroll-mt-28 bg-brand text-white" id="nutrition">
+    <section class="section scroll-mt-28 bg-brand-900 text-white" id="nutrition">
       <div class="container-x grid gap-10 lg:grid-cols-2 lg:items-center">
         <div data-reveal>
           <p class="eyebrow eyebrow-light">Dinh dưỡng Bio-Nutri</p>
-          <h2 class="h-section">Gói phân bón VIO GREEN</h2>
-          <p class="mt-4 text-brand-100">Phân bón sinh học dạng gói được thiết kế để bổ sung dinh dưỡng cho cây trong hệ thống chăm sóc VIO GREEN – dễ bảo quản, dễ sử dụng theo từng chu kỳ.</p>
+          <h2 class="h-section">Phân bón VIO GREEN Bio-Nutri</h2>
+          <p class="mt-4 text-brand-100">Phân bón sinh học dạng gói 25 g và hộp 250 g, được thiết kế để bổ sung dinh dưỡng cho cây trong hệ thống chăm sóc VIO GREEN – dễ bảo quản, dễ sử dụng theo từng chu kỳ.</p>
           <div class="mt-8 grid gap-4 sm:grid-cols-2">
             {nutriInfo.map(([ic, t, d]) => (
               <div class="flex gap-3 rounded-2xl bg-white/[0.07] p-4 ring-1 ring-white/10">

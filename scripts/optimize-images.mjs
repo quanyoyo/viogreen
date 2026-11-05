@@ -15,11 +15,45 @@ const jobs = [
   { src: 'bia-1-san-thuong-luong-rau.png', out: 'assets/bia-1.webp', width: 1680, small: true },
   // Banner trang Sản phẩm (nửa phải mờ trắng để đặt chữ)
   { src: 'banner-san-pham-mo-phai.png', out: 'assets/banner-san-pham.webp', width: 1680, small: true },
-  // Ảnh sản phẩm
-  { src: 'ecohub-sol-nen-o-co.png', out: 'products/ecohub-sol.webp', width: 1000, clearChecker: true },
-  { src: 'ecohub-grid-nen-trang.png', out: 'products/ecohub-grid.webp', width: 1000 },
   { src: 'ecohub-sol-va-grid-nen-trang.png', out: 'assets/ecohub-sol-va-grid.webp', width: 1200 },
+  // Ảnh sản phẩm (05/11/2026, Drive "ảnh sản phẩm"): bản 1600px để phóng to + bản -800 cho thẻ sản phẩm.
+  // Ảnh nền trắng → khung ảnh (phóng to được); ảnh có chữ (-info) → phần mô tả (ECOHUB) hoặc đứng đầu khung ảnh (phụ kiện).
+  ...product('thường.png', 'ecohub-sol'),
+  ...product('thường (2).png', 'ecohub-grid'),
+  ...product('plus.png', 'ecohub-sol-plus'),
+  ...product('plus (2).png', 'ecohub-grid-plus'),
+  ...product('pro.png', 'ecohub-sol-pro'),
+  ...product('pro (2).png', 'ecohub-grid-pro'),
+  ...product('ECOHUB Sol.png', 'ecohub-sol-info'),
+  ...product('ECOHUB Grid.png', 'ecohub-grid-info'),
+  ...product('ECOHUB Sol Plu.png', 'ecohub-sol-plus-info'),
+  ...product('ECOHUB Grid Plus.png', 'ecohub-grid-plus-info'),
+  ...product('ECOHUB Sol Pro.png', 'ecohub-sol-pro-info'),
+  ...product('ECOHUB Grid Pro.png', 'ecohub-grid-pro-info'),
+  ...product('SẢN PHẨM PHỤ KIỆN/hộp nước/8.png', 'aqua-tank-info'),
+  ...product('SẢN PHẨM PHỤ KIỆN/hộp nước/hộp nước.png', 'aqua-tank'),
+  ...product('SẢN PHẨM PHỤ KIỆN/hộp phân/6.png', 'bio-tank-info'),
+  ...product('SẢN PHẨM PHỤ KIỆN/hộp phân/Hộp phân.png', 'bio-tank'),
+  ...product('SẢN PHẨM PHỤ KIỆN/ống dây/4.png', 'hose-info'),
+  ...product('SẢN PHẨM PHỤ KIỆN/ống dây/ống nước.png', 'hose-1'),
+  ...product('SẢN PHẨM PHỤ KIỆN/ống dây/ống nước (2).png', 'hose-2'),
+  ...product('SẢN PHẨM PHỤ KIỆN/vòi nước/1.png', 'dripper-info'),
+  ...product('SẢN PHẨM PHỤ KIỆN/vòi nước/bộ vòi nước.png', 'dripper-set'),
+  ...product('SẢN PHẨM PHỤ KIỆN/vòi nước/bộ vòi nước (2).png', 'dripper-set-2'),
+  ...product('SẢN PHẨM PHỤ KIỆN/vòi nước/vòi tưới.png', 'dripper'),
+  // Ảnh bài blog (05/11/2026, lấy từ web_information.docx – trùng Drive "Ảnh cho bài SEO"). Ảnh bìa có thêm bản -800 cho thẻ bài viết.
+  ...['ban-cong-cover.jpg', 'tuoi-cay-cover.png', 'he-thong-tuoi-cover.png', 'web-app-theo-doi.png', 'ecohub-ban-cong.png', 'ecohub-san-thuong.png']
+    .map((f) => ({ src: `2026-11/blog-doc/${f}`, out: `blog/${f.replace(/\.\w+$/, '.webp')}`, width: 1600, small: true })),
+  ...['ban-cong-chon-cay.jpg', 'ban-cong-tuoi-cay.png', 'ban-cong-anh-sang.jpg', 'ban-cong-dinh-duong.jpg', 'ban-cong-sau-benh.jpg', 'ban-cong-cong-nghe.jpg',
+    'tuoi-cay-qua-nhieu.png', 'tuoi-cay-do-am.png', 'tuoi-cay-thoi-diem.png', 'tuoi-cay-ung-re.png', 'tuoi-cay-nguoi-moi.png',
+    'cam-bien-do-am.png', 'ecohub-web-app.png', 'ecohub-khong-gian.png', 'ecohub-sanh.png']
+    .map((f) => ({ src: `2026-11/blog-doc/${f}`, out: `blog/${f.replace(/\.\w+$/, '.webp')}`, width: 1200 })),
 ];
+
+/** Ảnh sản phẩm trong images-src/2026-11/san-pham/ → public/products/<name>.webp (+ -800) */
+function product(src, name) {
+  return [{ src: `2026-11/san-pham/${src}`, out: `products/${name}.webp`, width: 1600, small: true }];
+}
 
 /** Tô trắng nền ô cờ: loang từ mép ảnh qua các điểm xám trung tính, sáng (≥ 236). */
 async function clearChecker(input) {

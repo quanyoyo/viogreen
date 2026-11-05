@@ -68,6 +68,9 @@ import cpu from 'lucide-static/icons/cpu.svg?raw';
 import chart from 'lucide-static/icons/chart-line.svg?raw';
 import ai from 'lucide-static/icons/brain-circuit.svg?raw';
 import sliders from 'lucide-static/icons/sliders-horizontal.svg?raw';
+import zoomIn from 'lucide-static/icons/zoom-in.svg?raw';
+import zoomOut from 'lucide-static/icons/zoom-out.svg?raw';
+import chevronLeft from 'lucide-static/icons/chevron-left.svg?raw';
 
 const lucide = {
   leaf, search, help, cart, menu, close, sparkles, chevronRight, chevronDown, phone, clock, pin, email,
@@ -75,7 +78,7 @@ const lucide = {
   mobile, sprout, home, hourglass, maximize, settings, product, science, warning, minus, plus, info, box,
   user, check, quote, layers, move, chat, send, refresh, tree, globe, trash, mouse, logout, lock, copy, wallet,
   cloudSun, cloud, cloudFog, cloudDrizzle, cloudRain, cloudLightning, cloudSnow, star, newspaper, calendar,
-  cpu, chart, ai, sliders,
+  cpu, chart, ai, sliders, zoomIn, zoomOut, chevronLeft,
 };
 
 const brand = (path: string) =>

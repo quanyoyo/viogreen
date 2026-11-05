@@ -7,7 +7,7 @@ import ProductCard from '../../components/ProductCard.astro';
 import PolicyStrip from '../../components/PolicyStrip.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import { products, bySlug, categoryOf, formatPrice, productTags, plantLabels, powerLabels, waterLabels, type Product } from '../../data/products';
+import { products, bySlug, categoryOf, productTags, plantLabels, powerLabels, waterLabels, variantPrice, vnd, smallImage, type Product } from '../../data/products';
 import { site, telHref } from '../../data/site';
 
 export function getStaticPaths() {
@@ -16,6 +16,18 @@ export function getStaticPaths() {
 const { p } = Astro.props as { p: Product };
 const cat = categoryOf(p);
 const tags = productTags(p);
+
+// Ảnh: khung ảnh (p.images) + ảnh có chữ trong phần mô tả (p.info) – tất cả mở được trong khung phóng to
+const zoomList = [...p.images, ...(p.info ?? [])];
+const srcset = (src: string) => (smallImage(src) !== src ? `${smallImage(src)} 800w, ${src} 1600w` : undefined);
+
+// Giá theo lựa chọn đang chọn (mặc định lựa chọn đầu tiên)
+const firstPrice = variantPrice(p, p.variants?.options[0]);
+const knownPrices = (p.variants?.prices ?? [p.price]).filter((x): x is number => x != null);
+
+// ECOHUB → link ECOBOX chọn sẵn đúng dòng máy (?may=s|plus|pro)
+const tier = p.slug.endsWith('-pro') ? 'pro' : p.slug.endsWith('-plus') ? 'plus' : 's';
+const accHref = (a: Product) => `/san-pham/${a.slug}/` + (p.category === 'ecohub' && a.variants?.pick ? `?may=${tier}` : '');
 
 const specs: [string, string][] = [];
 if (p.category === 'ecohub' && p.plants && p.power && p.water) {
@@ -26,10 +38,12 @@ if (p.fits) specs.push(['Tương thích', p.fits]);
 specs.push(...p.specs);
 
 const acc = p.accessories.map((s) => bySlug[s]).filter(Boolean);
-const related = acc.length >= 3
-  ? { title: 'Phụ kiện tương thích', items: acc.slice(0, 4) }
-  : { title: 'Sản phẩm liên quan', items: [...acc, ...products.filter((x) => x.category === p.category && x.slug !== p.slug)].slice(0, 3) };
-const relCols = related.items.length >= 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-2 lg:grid-cols-3';
+const related = p.category === 'ecobox'
+  ? { title: 'Dùng cho các dòng máy ECOHUB', items: acc }
+  : acc.length >= 3
+    ? { title: 'Phụ kiện tương thích', items: acc.slice(0, 4) }
+    : { title: 'Sản phẩm liên quan', items: [...acc, ...products.filter((x) => x.category === p.category && x.slug !== p.slug)].slice(0, 3) };
+const relCols = related.items.length === 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-2 lg:grid-cols-3';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -38,8 +52,11 @@ const jsonLd = {
   description: p.description[0],
   brand: { '@type': 'Brand', name: 'VIO GREEN' },
   category: cat.label,
-  ...(p.images[0] ? { image: new URL(p.images[0], Astro.site).href } : {}),
-  ...(p.price ? { offers: { '@type': 'Offer', priceCurrency: 'VND', price: p.price, availability: 'https://schema.org/InStock' } } : {}),
+  ...(p.images.length ? { image: p.images.map((src) => new URL(src, Astro.site).href) } : {}),
+  ...(knownPrices.length === 0 ? {}
+    : p.variants?.prices
+      ? { offers: { '@type': 'AggregateOffer', priceCurrency: 'VND', lowPrice: Math.min(...knownPrices), highPrice: Math.max(...knownPrices), offerCount: knownPrices.length, availability: 'https://schema.org/InStock' } }
+      : { offers: { '@type': 'Offer', priceCurrency: 'VND', price: p.price, availability: 'https://schema.org/InStock' } }),
 };
 ---
 <BaseLayout title={p.shortName} description={p.summary} active="products" jsonLd={jsonLd}>
@@ -47,17 +64,36 @@ const jsonLd = {
 
   <section class="py-10 sm:py-14">
     <div class="container-x grid gap-10 lg:grid-cols-2 lg:gap-14" data-pdp={p.slug}>
-      <!-- Ảnh -->
-      <div data-reveal>
-        <div class="relative overflow-hidden rounded-card border border-brand-200">
-          {p.images[0] ? <img src={p.images[0]} alt={p.name} class="aspect-square w-full bg-white object-contain p-6" /> : <Ph title={p.shortName} ratio="1/1" label="Ảnh sản phẩm đang cập nhật" />}
+      <!-- Ảnh: bấm để phóng to (khung xem ảnh ở cuối trang) -->
+      <div data-reveal data-gallery>
+        <div class="relative overflow-hidden rounded-card border border-brand-200 bg-white">
+          {p.images[0] ? (
+            <button type="button" class="group block w-full cursor-zoom-in" data-zoom-open="0" data-gallery-main aria-label="Phóng to ảnh sản phẩm">
+              <img src={smallImage(p.images[0])} srcset={srcset(p.images[0])} sizes="(min-width: 1024px) 560px, 100vw" alt={p.name} width="1600" height="1600"
+                class="aspect-square w-full object-contain p-4 transition-transform duration-500 group-hover:scale-[1.03] sm:p-6" fetchpriority="high" data-gallery-img />
+            </button>
+          ) : <Ph title={p.shortName} ratio="1/1" label="Ảnh sản phẩm đang cập nhật" />}
+          {p.images[0] && (
+            <span class="pointer-events-none absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-brand shadow-soft">
+              <Icon name="zoomIn" class="size-4" /> Bấm để phóng to
+            </span>
+          )}
           {p.hasAR && (
             <button type="button" data-ar={p.slug} class="btn btn-light absolute bottom-4 left-4 min-h-11 px-4 py-2"><Icon name="ar" /> Thử với AR</button>
           )}
         </div>
-        <div class="mt-3 grid grid-cols-4 gap-3" aria-hidden="true">
-          {[1, 2, 3, 4].map(() => <div class="overflow-hidden rounded-2xl border border-line opacity-70"><Ph ratio="1/1" label="" /></div>)}
-        </div>
+        {p.images.length > 1 && (
+          <ul class="mt-3 grid grid-cols-4 gap-3" aria-label="Ảnh sản phẩm">
+            {p.images.map((src, i) => (
+              <li>
+                <button type="button" data-thumb={i} data-src={smallImage(src)} data-srcset={srcset(src)} aria-current={i === 0 ? 'true' : 'false'} aria-label={`Xem ảnh ${i + 1}`}
+                  class="block w-full overflow-hidden rounded-2xl border-2 border-line bg-white transition-colors hover:border-brand-300 aria-[current=true]:border-brand">
+                  <img src={smallImage(src)} alt="" loading="lazy" width="800" height="800" class="aspect-square w-full object-contain p-1.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <!-- Thông tin mua -->
@@ -67,9 +103,9 @@ const jsonLd = {
         <p class="mt-3 text-muted sm:text-lg">{p.summary}</p>
         {tags.length > 0 && <ul class="mt-4 flex flex-wrap gap-2">{tags.map((t) => <li class="tag px-3 py-1.5 text-sm">{t}</li>)}</ul>}
 
-        <div class="mt-6 rounded-2xl bg-cream p-5">
-          <p class:list={['text-2xl font-extrabold', p.price ? 'text-ink' : 'text-brand']}>{formatPrice(p, site.priceFallback)}</p>
-          {!p.price && <p class="mt-1 text-sm text-muted">Nhân viên sẽ báo giá khi xác nhận đơn</p>}
+        <div class="mt-6 rounded-2xl bg-cream p-5" data-price-box data-prices={p.variants?.prices ? JSON.stringify(p.variants.prices) : undefined} data-fallback={site.priceFallback}>
+          <p class:list={['text-2xl font-extrabold', firstPrice ? 'text-ink' : 'text-brand']} data-price-text>{firstPrice ? vnd(firstPrice) : site.priceFallback}</p>
+          <p class="mt-1 text-sm text-muted" data-price-note hidden={!!firstPrice}>Nhân viên sẽ báo giá khi xác nhận đơn</p>
         </div>
 
         <dl class="mt-6 space-y-5">
@@ -121,6 +157,13 @@ const jsonLd = {
             </ul>
           </div>
         )}
+        {p.info?.map((src, j) => (
+          <button type="button" data-zoom-open={p.images.length + j} aria-label="Phóng to ảnh thông tin sản phẩm"
+            class="mt-7 block w-full max-w-xl cursor-zoom-in overflow-hidden rounded-card border border-line bg-white shadow-soft">
+            <img src={smallImage(src)} srcset={srcset(src)} sizes="(min-width: 640px) 576px, 100vw" alt={`${p.shortName} – thông tin sản phẩm`}
+              loading="lazy" width="1600" height="1600" class="w-full" />
+          </button>
+        ))}
         {p.note && (
           <div class="mt-6 flex gap-3 rounded-2xl border border-sun/50 bg-sun/10 p-4 text-sm">
             <Icon name="warning" class="mt-0.5 size-5 shrink-0 text-[#a37813]" />
@@ -139,7 +182,7 @@ const jsonLd = {
           <div>
             <h3 class="font-bold">{p.category === 'ecobox' ? 'Dùng cho máy' : 'Phụ kiện tương thích'}</h3>
             <ul class="mt-3 space-y-2">
-              {acc.map((a) => <li><a href={`/san-pham/${a.slug}/`} class="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-medium text-brand hover:bg-brand-50"><Icon name="box" class="size-4" /> {a.shortName}</a></li>)}
+              {acc.map((a) => <li><a href={accHref(a)} class="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-medium text-brand hover:bg-brand-50"><Icon name="box" class="size-4" /> {a.shortName}</a></li>)}
             </ul>
           </div>
         )}
@@ -156,4 +199,33 @@ const jsonLd = {
 
   <PolicyStrip />
   <CtaBand />
+
+  <!-- Khung xem ảnh phóng to: nút +/−, cuộn chuột, chạm 2 ngón, nhấp đúp; kéo để xem chỗ khác -->
+  {zoomList.length > 0 && (
+    <div class="fixed inset-0 z-[70] bg-ink/95 opacity-0 transition-opacity duration-300 data-[open]:opacity-100" hidden data-lightbox
+      role="dialog" aria-modal="true" aria-label={`Ảnh ${p.shortName}`} data-images={JSON.stringify(zoomList)}>
+      <div class="absolute inset-0 cursor-grab touch-none overflow-hidden select-none" data-lb-stage>
+        <img alt={p.name} draggable="false" class="absolute top-1/2 left-1/2 max-h-[84vh] max-w-[94vw] origin-center rounded-xl bg-white will-change-transform" data-lb-img />
+      </div>
+      <div class="absolute inset-x-0 top-0 flex items-center justify-between gap-3 bg-gradient-to-b from-ink/80 to-transparent p-3 text-white sm:p-4">
+        <span class="text-sm font-semibold" data-lb-count aria-live="polite"></span>
+        <div class="flex items-center gap-2">
+          <button type="button" class="inline-flex size-11 items-center justify-center rounded-full bg-white/15 hover:bg-white/25" data-lb-zoom="-1" aria-label="Thu nhỏ"><Icon name="zoomOut" class="size-5" /></button>
+          <span class="w-12 text-center text-sm tabular-nums" data-lb-level>100%</span>
+          <button type="button" class="inline-flex size-11 items-center justify-center rounded-full bg-white/15 hover:bg-white/25" data-lb-zoom="1" aria-label="Phóng to"><Icon name="zoomIn" class="size-5" /></button>
+          <button type="button" class="ml-2 inline-flex size-11 items-center justify-center rounded-full bg-white text-ink hover:bg-brand-50" data-lb-close aria-label="Đóng"><Icon name="close" class="size-5" /></button>
+        </div>
+      </div>
+      {zoomList.length > 1 && (
+        <>
+          <button type="button" class="absolute top-1/2 left-2 inline-flex size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:left-4" data-lb-step="-1" aria-label="Ảnh trước"><Icon name="chevronLeft" class="size-6" /></button>
+          <button type="button" class="absolute top-1/2 right-2 inline-flex size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:right-4" data-lb-step="1" aria-label="Ảnh sau"><Icon name="chevronRight" class="size-6" /></button>
+        </>
+      )}
+    </div>
+  )}
 </BaseLayout>
+
+<script>
+  import '../../scripts/product-page';
+</script>

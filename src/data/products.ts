@@ -1,9 +1,14 @@
 // ============================================================
-//  DỮ LIỆU SẢN PHẨM — nguồn: "Thông tin làm web.docx" (bản 18/10/2026: tên Sol / Plus / Pro, ECOBOX S / Plus / Pro)
+//  DỮ LIỆU SẢN PHẨM — nguồn: "Thông tin làm web.docx" (bản 18/10/2026: tên Sol / Plus / Pro)
+//  và "web_information.docx" (05/11/2026: giá, gộp ECOBOX theo máy S / Plus / Pro, Bio-Nutri Box, ảnh sản phẩm).
 //  Mô tả lấy từ tài liệu, đã bỏ các ghi chú nội bộ ("Lưu ý kỹ thuật… chưa được xác nhận", "Thông tin cần xác nhận").
 //  price: null  => hiển thị "Liên hệ" (site.priceFallback)
-//  images: []   => hiển thị khung ảnh tạm. Đặt ảnh vào public/products/ rồi ghi '/products/ten-anh.webp'
-//  model: null  => nút AR hiện "Đang cập nhật". Khi có file 3D: { glb: '/models/ecohub-sol.glb' }
+//  variants.prices: giá riêng từng lựa chọn (cùng thứ tự options; null = Liên hệ). Không có thì dùng price.
+//  images: []   => hiển thị khung ảnh tạm. Ảnh trong public/products/ (tạo bằng `npm run images`, mỗi ảnh có bản -800)
+//               ảnh đầu tiên hiện to; bấm vào để phóng to.
+//  thumb        => ảnh trên thẻ sản phẩm / giỏ hàng (mặc định images[0])
+//  info         => ảnh có chữ, hiện trong phần mô tả (ECOHUB)
+//  model: null  => nút AR hiện "Đang cập nhật". Khi có file 3D: { glb: '/models/ecohub-plus.glb' } (tạo bằng npm run models)
 //  Đổi slug → nhớ thêm dòng chuyển hướng 301 trong public/_redirects.
 // ============================================================
 
@@ -28,10 +33,13 @@ export interface Product {
   highlights?: { title: string; items: string[] };
   accessories: string[];
   specs: [string, string][];
-  variants?: { label: string; options: string[]; hint?: string };
+  /** pick: khách phải chọn ở trang chi tiết (nút + trên thẻ sản phẩm mở trang chi tiết thay vì thêm ngay) */
+  variants?: { label: string; options: string[]; hint?: string; prices?: (number | null)[]; pick?: boolean };
   note?: string;
   price: number | null;
   images: string[];
+  thumb?: string;
+  info?: string[];
   model: { glb: string; usdz?: string } | null;
 }
 
@@ -49,12 +57,16 @@ export const waterLabels: Record<Water, string> = { tank: 'Bình chứa nước'
 
 // Gói bảo hành chọn ở trang chi tiết máy ECOHUB (lưu vào đơn như một biến thể). 12 tháng = tiêu chuẩn.
 export const warrantyOptions = ['Bảo hành 12 tháng', 'Bảo hành 18 tháng', 'Bảo hành 24 tháng'];
-const warranty = { label: 'Gói bảo hành', options: warrantyOptions, hint: 'Bảo hành tiêu chuẩn 12 tháng. Nhân viên sẽ xác nhận gói bảo hành cùng đơn hàng.' };
+const warranty = { label: 'Gói bảo hành', options: warrantyOptions, hint: 'Giá trên kèm bảo hành tiêu chuẩn 12 tháng. Phí gói 18 / 24 tháng (nếu có) nhân viên sẽ báo khi xác nhận đơn hàng.' };
 
-const accS = ['bio-tank-s', 'aqua-tank-s', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
-const accPlus = ['bio-tank-plus', 'aqua-tank-plus', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
-const accPro = ['bio-tank-pro', 'aqua-tank-pro', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
+// ECOBOX: mỗi loại 1 sản phẩm, khách chọn theo dòng máy (05/11/2026). Thứ tự khớp variants.prices.
+export const machineOptions = ['Máy S', 'Máy Plus', 'Máy Pro'];
+const machineHint = 'Máy S: ECOHUB Sol, Grid · Máy Plus: ECOHUB Sol Plus, Grid Plus · Máy Pro: ECOHUB Sol Pro, Grid Pro';
+
+const acc = ['bio-tank', 'aqua-tank', 'bio-dripper', 'vio-green-hose', 'bio-nutri-25g'];
 const ecoboxNote = 'Chỉ sử dụng nước hoặc dịch xử lý phù hợp với hướng dẫn kỹ thuật của VIO GREEN và đảm bảo vệ sinh hộp chứa trong quá trình sử dụng.';
+/** Ảnh sản phẩm trong public/products/ */
+const img = (name: string) => `/products/${name}.webp`;
 
 type Raw = Partial<Product> & Pick<Product, 'slug' | 'name' | 'shortName' | 'category' | 'summary' | 'description'>;
 
@@ -80,9 +92,11 @@ const raw: Raw[] = [
       'Hỗ trợ giảm các thao tác tưới cây thủ công.',
       'Phù hợp với cấu hình lắp đặt có quy mô nhỏ theo định vị sản phẩm.',
     ] },
-    accessories: accS,
+    accessories: acc,
     variants: warranty,
-    images: ['/products/ecohub-sol.webp'],
+    price: 1_999_000,
+    images: [img('ecohub-sol')],
+    info: [img('ecohub-sol-info')],
   },
   {
     slug: 'ecohub-grid',
@@ -104,9 +118,11 @@ const raw: Raw[] = [
       'Hướng đến việc giảm thời gian chăm sóc cây thủ công.',
       'Phù hợp với không gian trồng cây nhỏ có điều kiện cấp điện phù hợp.',
     ] },
-    accessories: accS,
+    accessories: acc,
     variants: warranty,
-    images: ['/products/ecohub-grid.webp'],
+    price: 1_499_000,
+    images: [img('ecohub-grid')],
+    info: [img('ecohub-grid-info')],
   },
   {
     slug: 'ecohub-sol-plus',
@@ -129,8 +145,13 @@ const raw: Raw[] = [
       'Hướng đến việc giảm thao tác tưới cây thủ công.',
       'Phù hợp với các không gian nhỏ có điều kiện kết nối nguồn nước.',
     ] },
-    accessories: accPlus,
+    accessories: acc,
     variants: warranty,
+    price: 2_299_000,
+    images: [img('ecohub-sol-plus')],
+    // 3D bản Plus (Drive '3D máy nhỏ', 25×25×35,6 cm) – chủ web xác nhận dùng cho cả Sol Plus và Grid Plus (05/11/2026); file 3D chưa có tấm pin
+    model: { glb: '/models/ecohub-plus.glb' },
+    info: [img('ecohub-sol-plus-info')],
   },
   {
     slug: 'ecohub-grid-plus',
@@ -152,9 +173,12 @@ const raw: Raw[] = [
       'Hỗ trợ phân phối nước qua hệ thống tưới.',
       'Hướng đến việc giảm thao tác tưới thủ công tại các không gian đô thị nhỏ.',
     ] },
-    // Tài liệu ghi "Aqua-Tank Pro" cho Grid Plus – hiểu là Aqua-Tank Plus (Aqua-Tank Plus ghi tương thích Sol Plus, Grid Plus)
-    accessories: accPlus,
+    accessories: acc,
     variants: warranty,
+    price: 1_799_000,
+    images: [img('ecohub-grid-plus')],
+    model: { glb: '/models/ecohub-plus.glb' },
+    info: [img('ecohub-grid-plus-info')],
     note: 'Việc lắp đặt phải tuân thủ hướng dẫn kỹ thuật của sản phẩm.',
   },
   {
@@ -177,8 +201,11 @@ const raw: Raw[] = [
       'Hỗ trợ tổ chức việc tưới và bổ sung dinh dưỡng theo cấu hình.',
       'Phù hợp với các khu vực có nhiều cây cần được chăm sóc thường xuyên.',
     ] },
-    accessories: accPro,
+    accessories: acc,
     variants: warranty,
+    price: 3_399_000,
+    images: [img('ecohub-sol-pro')],
+    info: [img('ecohub-sol-pro-info')],
   },
   {
     slug: 'ecohub-grid-pro',
@@ -200,118 +227,61 @@ const raw: Raw[] = [
       'Hỗ trợ phân phối nước qua hệ thống dẫn và đầu tưới.',
       'Giúp giảm các thao tác tưới cây thủ công lặp lại.',
     ] },
-    accessories: accPro,
+    accessories: acc,
     variants: warranty,
+    price: 2_499_000,
+    images: [img('ecohub-grid-pro')],
+    info: [img('ecohub-grid-pro-info')],
   },
 
   // ---------------- ECOBOX ----------------
+  // 05/11/2026: gộp S / Plus / Pro thành 1 sản phẩm mỗi loại, khách chọn "Máy S / Máy Plus / Máy Pro" (giữ tên ECOBOX).
+  // Giá theo bảng giá khách gửi: Bio-Tank S, Plus 39.000đ; Bio-Tank Pro và Aqua-Tank chưa có giá → Liên hệ.
   {
-    slug: 'bio-tank-s',
-    name: 'VIO GREEN ECOBOX Bio-Tank S',
-    shortName: 'Bio-Tank S',
+    slug: 'aqua-tank',
+    name: 'VIO GREEN ECOBOX Aqua-Tank',
+    shortName: 'ECOBOX Aqua-Tank',
     category: 'ecobox',
-    fits: 'ECOHUB Sol, Grid',
-    summary: 'Bình chứa dung dịch dinh dưỡng cho cấu hình ECOHUB Sol và Grid.',
+    fits: 'ECOHUB S / Plus / Pro',
+    summary: 'Hộp nước thay thế cho 3 dòng ECOHUB – chọn theo máy S, Plus hoặc Pro.',
     description: [
-      'VIO GREEN ECOBOX Bio-Tank S là bình hoặc hộp chứa dung dịch dinh dưỡng dành cho cấu hình hệ thống ECOHUB tương thích. Sản phẩm được định hướng phục vụ việc lưu trữ và hỗ trợ cấp dung dịch dinh dưỡng cho cây trong quá trình vận hành.',
-      'Bio-Tank S hướng đến các cấu hình có quy mô nhỏ, giúp việc chuẩn bị và bổ sung dung dịch dinh dưỡng trở nên thuận tiện hơn khi hệ thống được thiết kế hỗ trợ chức năng này.',
-    ],
-    highlights: { title: 'Công dụng', items: [
-      'Lưu trữ dung dịch dinh dưỡng theo cấu hình tương thích.',
-      'Hỗ trợ cấp dung dịch cho hệ thống khi thiết kế thực tế có tích hợp chức năng.',
-      'Có thể sử dụng để thay thế hoặc bổ sung bình chứa theo nhu cầu.',
-    ] },
-    accessories: ['ecohub-sol', 'ecohub-grid'],
-    note: ecoboxNote,
-  },
-  {
-    slug: 'bio-tank-plus',
-    name: 'VIO GREEN ECOBOX Bio-Tank Plus',
-    shortName: 'Bio-Tank Plus',
-    category: 'ecobox',
-    fits: 'ECOHUB Sol Plus, Grid Plus',
-    summary: 'Bình chứa dung dịch dinh dưỡng cho cấu hình ECOHUB Sol Plus và Grid Plus.',
-    description: [
-      'VIO GREEN ECOBOX Bio-Tank Plus là bình hoặc hộp chứa dung dịch dinh dưỡng dành cho cấu hình ECOHUB tương thích.',
-      'Sản phẩm hướng đến việc hỗ trợ lưu trữ và bổ sung dung dịch dinh dưỡng cho hệ thống chăm sóc cây. Bình chứa có thể được sử dụng để thay thế hoặc bổ sung cho cấu hình tương thích theo nhu cầu vận hành.',
-    ],
-    highlights: { title: 'Công dụng', items: [
-      'Lưu trữ dung dịch dinh dưỡng theo thiết kế được hỗ trợ.',
-      'Hỗ trợ việc bổ sung dinh dưỡng trong quá trình chăm sóc cây.',
-      'Phục vụ cấu hình ECOHUB được xác nhận tương thích.',
-    ] },
-    accessories: ['ecohub-sol-plus', 'ecohub-grid-plus'],
-    note: ecoboxNote,
-  },
-  {
-    slug: 'bio-tank-pro',
-    name: 'VIO GREEN ECOBOX Bio-Tank Pro',
-    shortName: 'Bio-Tank Pro',
-    category: 'ecobox',
-    fits: 'ECOHUB Sol Pro, Grid Pro',
-    summary: 'Bình chứa ECOBOX cho cấu hình ECOHUB Sol Pro và Grid Pro – thông tin chi tiết đang cập nhật.',
-    description: [
-      'VIO GREEN ECOBOX Bio-Tank Pro là bình chứa thuộc dòng ECOBOX, dùng cho cấu hình ECOHUB Sol Pro và ECOHUB Grid Pro.',
-      'Thông tin chi tiết về công dụng, dung tích và kích thước đang được VIO GREEN cập nhật. Bạn vui lòng liên hệ để được tư vấn cấu hình phù hợp.',
-    ],
-    accessories: ['ecohub-sol-pro', 'ecohub-grid-pro'],
-    note: ecoboxNote,
-  },
-  {
-    slug: 'aqua-tank-s',
-    name: 'VIO GREEN ECOBOX Aqua-Tank S',
-    shortName: 'Aqua-Tank S',
-    category: 'ecobox',
-    fits: 'ECOHUB Sol, Grid',
-    summary: 'Bình chứa nước cho cấu hình ECOHUB Sol và Grid dùng nguồn chứa riêng.',
-    description: [
-      'VIO GREEN ECOBOX Aqua-Tank S là bình chứa nước hoặc dung dịch phù hợp với cấu hình ECOHUB sử dụng nguồn chứa riêng. Sản phẩm hướng đến việc giúp người dùng chuẩn bị nguồn nước phục vụ quá trình tưới cây theo cấu hình hệ thống.',
-      'Aqua-Tank S có thể được sử dụng như phụ kiện bổ sung hoặc thay thế khi hệ thống được thiết kế tương thích. Việc sử dụng bình chứa giúp người dùng chủ động chuẩn bị nguồn nước tại khu vực trồng cây mà không nhất thiết phải kết nối nguồn cấp nước trực tiếp.',
+      'VIO GREEN ECOBOX Aqua-Tank là bình chứa nước hoặc dung dịch dành cho các cấu hình ECOHUB tương thích. Sản phẩm hướng đến việc giúp người dùng chuẩn bị và lưu trữ nguồn nước phục vụ quá trình tưới cây theo cấu hình hệ thống.',
+      'Aqua-Tank có thể được sử dụng như phụ kiện bổ sung hoặc thay thế khi cần thiết. Việc sử dụng bình chứa giúp người dùng chủ động chuẩn bị nguồn nước tại khu vực trồng cây mà không nhất thiết phải kết nối nguồn cấp nước trực tiếp.',
+      'Sản phẩm có 3 phiên bản theo dòng máy: Máy S (ECOHUB Sol, Grid), Máy Plus (ECOHUB Sol Plus, Grid Plus) và Máy Pro (ECOHUB Sol Pro, Grid Pro).',
     ],
     highlights: { title: 'Công dụng', items: [
       'Lưu trữ nước theo cấu hình hệ thống tương thích.',
       'Hỗ trợ cung cấp nước cho quá trình tưới cây.',
       'Có thể thay thế hoặc bổ sung khi cần thiết.',
     ] },
-    accessories: ['ecohub-sol', 'ecohub-grid'],
+    variants: { label: 'Dùng cho máy', options: machineOptions, hint: machineHint, prices: [null, null, null], pick: true },
+    accessories: ['ecohub-sol', 'ecohub-grid', 'ecohub-sol-plus', 'ecohub-grid-plus', 'ecohub-sol-pro', 'ecohub-grid-pro'],
+    images: [img('aqua-tank-info'), img('aqua-tank')],
+    thumb: img('aqua-tank'),
     note: ecoboxNote,
   },
   {
-    slug: 'aqua-tank-plus',
-    name: 'VIO GREEN ECOBOX Aqua-Tank Plus',
-    shortName: 'Aqua-Tank Plus',
+    slug: 'bio-tank',
+    name: 'VIO GREEN ECOBOX Bio-Tank',
+    shortName: 'ECOBOX Bio-Tank',
     category: 'ecobox',
-    fits: 'ECOHUB Sol Plus, Grid Plus',
-    summary: 'Bình chứa nước cho cấu hình ECOHUB Sol Plus và Grid Plus.',
+    fits: 'ECOHUB S / Plus / Pro',
+    summary: 'Hộp chứa dung dịch dinh dưỡng thay thế cho 3 dòng ECOHUB – chọn theo máy S, Plus hoặc Pro.',
     description: [
-      'VIO GREEN ECOBOX Aqua-Tank Plus là bình chứa nước hoặc dung dịch dành cho cấu hình ECOHUB tương thích. Sản phẩm hướng đến nhu cầu chuẩn bị và lưu trữ nguồn nước phục vụ hệ thống tưới tại các khu vực trồng cây đô thị.',
-      'Aqua-Tank Plus có thể được sử dụng để thay thế hoặc bổ sung bình chứa khi cần thiết, giúp người dùng chủ động hơn trong quá trình vận hành hệ thống chăm sóc cây.',
+      'VIO GREEN ECOBOX Bio-Tank là bình hoặc hộp chứa dung dịch dinh dưỡng dành cho các cấu hình hệ thống ECOHUB tương thích. Sản phẩm được định hướng phục vụ việc lưu trữ và hỗ trợ cấp dung dịch dinh dưỡng cho cây trong quá trình vận hành.',
+      'Bình chứa giúp việc chuẩn bị và bổ sung dung dịch dinh dưỡng trở nên thuận tiện hơn, có thể được sử dụng để thay thế hoặc bổ sung cho cấu hình tương thích theo nhu cầu vận hành.',
+      'Sản phẩm có 3 phiên bản theo dòng máy: Máy S (ECOHUB Sol, Grid), Máy Plus (ECOHUB Sol Plus, Grid Plus) và Máy Pro (ECOHUB Sol Pro, Grid Pro).',
     ],
     highlights: { title: 'Công dụng', items: [
-      'Lưu trữ nước cho cấu hình tương thích.',
-      'Hỗ trợ cung cấp nước cho hệ thống tưới.',
-      'Phục vụ các cấu hình ECOHUB được xác nhận phù hợp.',
+      'Lưu trữ dung dịch dinh dưỡng theo cấu hình tương thích.',
+      'Hỗ trợ việc bổ sung dinh dưỡng trong quá trình chăm sóc cây.',
+      'Có thể sử dụng để thay thế hoặc bổ sung bình chứa theo nhu cầu.',
     ] },
-    accessories: ['ecohub-sol-plus', 'ecohub-grid-plus'],
-    note: ecoboxNote,
-  },
-  {
-    slug: 'aqua-tank-pro',
-    name: 'VIO GREEN ECOBOX Aqua-Tank Pro',
-    shortName: 'Aqua-Tank Pro',
-    category: 'ecobox',
-    fits: 'ECOHUB Sol Pro, Grid Pro',
-    summary: 'Bình chứa nước cho cấu hình ECOHUB Sol Pro và Grid Pro.',
-    description: [
-      'VIO GREEN ECOBOX Aqua-Tank Pro là bình chứa nước hoặc dung dịch dành cho cấu hình ECOHUB Pro tương thích. Sản phẩm hướng đến nhu cầu chuẩn bị và lưu trữ nguồn nước phục vụ hệ thống tưới tại các khu vực trồng cây đô thị.',
-      'Aqua-Tank Pro có thể được sử dụng để thay thế hoặc bổ sung bình chứa khi cần thiết, giúp người dùng chủ động hơn trong quá trình vận hành hệ thống chăm sóc cây.',
-    ],
-    highlights: { title: 'Công dụng', items: [
-      'Lưu trữ nước cho cấu hình tương thích.',
-      'Hỗ trợ cung cấp nước cho hệ thống tưới.',
-      'Phục vụ các cấu hình ECOHUB được xác nhận phù hợp.',
-    ] },
-    accessories: ['ecohub-sol-pro', 'ecohub-grid-pro'],
+    variants: { label: 'Dùng cho máy', options: machineOptions, hint: machineHint, prices: [39_000, 39_000, null], pick: true },
+    price: 39_000,
+    accessories: ['ecohub-sol', 'ecohub-grid', 'ecohub-sol-plus', 'ecohub-grid-plus', 'ecohub-sol-pro', 'ecohub-grid-pro'],
+    images: [img('bio-tank-info'), img('bio-tank')],
+    thumb: img('bio-tank'),
     note: ecoboxNote,
   },
 
@@ -335,6 +305,9 @@ const raw: Raw[] = [
       'Hướng đến việc tổ chức tưới cây thuận tiện hơn.',
     ] },
     accessories: ['vio-green-hose'],
+    // Phụ kiện: ảnh có chữ đứng trước, ảnh nền trắng sau (khách yêu cầu 05/11/2026)
+    images: [img('dripper-info'), img('dripper-set'), img('dripper-set-2'), img('dripper')],
+    thumb: img('dripper-set'),
   },
   {
     slug: 'vio-green-hose',
@@ -356,6 +329,8 @@ const raw: Raw[] = [
       'Có các cỡ đường kính 6 mm, 8 mm và 10 mm.',
     ] },
     accessories: ['bio-dripper'],
+    images: [img('hose-info'), img('hose-1'), img('hose-2')],
+    thumb: img('hose-1'),
     note: 'Các cỡ ống không mặc định thay thế trực tiếp cho nhau – vui lòng chọn đúng đường kính theo cấu hình hệ thống hoặc liên hệ để được tư vấn.',
   },
 
@@ -382,24 +357,26 @@ const raw: Raw[] = [
     note: 'Sử dụng theo nhãn sản phẩm và hướng dẫn chính thức của VIO GREEN. Không tự ý tăng liều lượng hoặc sử dụng theo cách chưa được hướng dẫn.',
   },
   {
-    slug: 'bio-nutri-multi-pack',
-    name: 'VIO GREEN Bio-Nutri – Multi-Pack',
-    shortName: 'Bio-Nutri Multi-Pack',
+    // 05/11/2026: thay "Bio-Nutri Multi-Pack" (slug cũ có 301). Mô tả theo tài liệu, bỏ dòng "Lưu ý kỹ thuật" nội bộ.
+    slug: 'bio-nutri-box',
+    name: 'VIO GREEN Bio-Nutri Box – Hộp 250 g',
+    shortName: 'Bio-Nutri Box',
     category: 'nutrition',
     fits: 'Mọi dòng ECOHUB',
-    specs: [['Quy cách', 'Hộp nhiều gói (số gói trong hộp đang cập nhật)']],
-    summary: 'Hộp nhiều gói Bio-Nutri riêng lẻ – dự trữ dinh dưỡng cho nhiều lần chăm sóc cây.',
+    specs: [['Quy cách', '01 hộp Bio-Nutri, khối lượng tịnh 250 gram']],
+    summary: 'Dinh dưỡng cho cây đóng hộp 250 g – tiện bảo quản, dự trữ và dùng cho nhiều lần chăm sóc.',
     description: [
-      'VIO GREEN Bio-Nutri Multi-Pack là quy cách đóng gói gồm nhiều gói Bio-Nutri riêng lẻ, hướng đến người dùng có nhu cầu dự trữ sản phẩm dinh dưỡng để sử dụng trong nhiều lần chăm sóc cây.',
-      'Việc đóng gói thành nhiều gói nhỏ giúp người dùng thuận tiện trong việc bảo quản và lấy sản phẩm theo từng lần sử dụng. Multi-Pack phù hợp với người dùng ECOHUB muốn chủ động chuẩn bị nguồn dinh dưỡng cho quá trình chăm sóc cây.',
+      'VIO GREEN Bio-Nutri Box là sản phẩm dinh dưỡng dành cho cây trồng, được đóng gói trong hộp có khối lượng 250 gram, hướng đến người dùng ECOHUB có nhu cầu bổ sung dinh dưỡng cho cây trong quá trình chăm sóc.',
+      'Quy cách hộp 250 gram giúp người dùng thuận tiện trong việc bảo quản, dự trữ và lấy sản phẩm theo lượng cần thiết cho từng lần sử dụng. Bio-Nutri có thể kết hợp với hệ thống ECOHUB để hỗ trợ quá trình bổ sung dinh dưỡng cho cây thông qua cơ chế châm phân tự động, tùy theo hướng dẫn sử dụng và cấu hình tương thích.',
     ],
     highlights: { title: 'Đặc điểm chính', items: [
-      'Đóng gói nhiều gói Bio-Nutri riêng lẻ.',
-      'Hỗ trợ dự trữ sản phẩm cho các lần sử dụng tiếp theo.',
-      'Thuận tiện cho việc bảo quản và sử dụng theo từng gói.',
-      'Có thể kết hợp với ECOHUB theo hướng dẫn và cấu hình phù hợp.',
+      'Quy cách đóng gói: Hộp 250 gram.',
+      'Cung cấp sản phẩm dinh dưỡng hỗ trợ chăm sóc và phát triển cây trồng.',
+      'Thuận tiện cho việc bảo quản và sử dụng trong nhiều lần.',
+      'Có thể kết hợp với hệ thống bổ sung dinh dưỡng tự động của ECOHUB.',
+      'Phù hợp với người dùng ECOHUB có nhu cầu bổ sung dinh dưỡng định kỳ cho cây.',
     ] },
-    note: 'Bảo quản sản phẩm theo hướng dẫn trên bao bì và sử dụng đúng liều lượng được khuyến nghị.',
+    note: 'Sử dụng theo nhãn sản phẩm và hướng dẫn chính thức của VIO GREEN. Không tự ý tăng liều lượng hoặc sử dụng theo cách chưa được hướng dẫn.',
   },
 ];
 
@@ -417,8 +394,29 @@ export const bySlug: Record<string, Product> = Object.fromEntries(products.map((
 export const inCategory = (key: CategoryKey) => products.filter((p) => p.category === key);
 export const categoryOf = (p: Product) => categories.find((c) => c.key === p.category)!;
 
-export const formatPrice = (p: Product, fallback = 'Liên hệ') =>
-  p.price ? new Intl.NumberFormat('vi-VN').format(p.price) + ' ₫' : fallback;
+export const vnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + ' ₫';
+
+/** Giá của một lựa chọn (biến thể). Không có giá riêng từng lựa chọn → giá chung. */
+export const variantPrice = (p: Pick<Product, 'price' | 'variants'>, option?: string): number | null => {
+  const v = p.variants;
+  if (!v?.prices) return p.price;
+  const i = option ? v.options.indexOf(option) : 0;
+  return v.prices[i < 0 ? 0 : i] ?? null;
+};
+
+/** Giá trên thẻ sản phẩm: các lựa chọn khác giá (hoặc có lựa chọn chưa có giá) → "Từ …" */
+export const formatPrice = (p: Product, fallback = 'Liên hệ') => {
+  const list = p.variants?.prices;
+  if (!list) return p.price ? vnd(p.price) : fallback;
+  const known = list.filter((x): x is number => x != null);
+  if (!known.length) return fallback;
+  const min = Math.min(...known);
+  return known.length === list.length && known.every((x) => x === min) ? vnd(min) : `Từ ${vnd(min)}`;
+};
+
+/** Ảnh nhỏ (bản -800 do `npm run images` tạo) cho thẻ sản phẩm, giỏ hàng */
+export const smallImage = (src: string) => (src.startsWith('/products/') ? src.replace(/\.webp$/, '-800.webp') : src);
+export const thumbOf = (p: Product) => p.thumb ?? p.images[0];
 
 export const productTags = (p: Product): string[] => {
   if (p.category === 'ecohub' && p.plants && p.power && p.water)
@@ -437,10 +435,11 @@ export const clientProducts = products.map((p) => ({
   power: p.power ?? null,
   water: p.water ?? null,
   price: p.price,
-  image: p.images[0] ?? null,
+  image: thumbOf(p) ? smallImage(thumbOf(p)!) : null,
   hasAR: p.hasAR,
   model: p.model,
   summary: p.summary,
   variants: p.variants?.options ?? null,
+  prices: p.variants?.prices ?? null,
 }));
 export type ClientProduct = (typeof clientProducts)[number];

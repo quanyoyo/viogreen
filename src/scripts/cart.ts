@@ -37,11 +37,19 @@ const setQty = (idx: number, qty: number) => {
 
 /* ---------- Tiền ---------- */
 const vnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + ' ₫';
-export const priceText = (p: ClientProduct) => (p.price ? vnd(p.price) : site.priceFallback);
+/** Đơn giá 1 dòng giỏ: sản phẩm có giá riêng từng lựa chọn (ECOBOX theo máy) thì lấy theo lựa chọn */
+export const unitPrice = (l: CartLine): number | null => {
+  const p = bySlug[l.slug];
+  if (!p.prices || !p.variants) return p.price;
+  const i = Math.max(0, p.variants.indexOf(l.variant || ''));
+  return p.prices[i] ?? null;
+};
+const priceText = (l: CartLine) => { const u = unitPrice(l); return u ? vnd(u) : site.priceFallback; };
+const subText = (l: CartLine) => { const u = unitPrice(l); return u ? vnd(u * l.qty) : site.priceFallback; };
 export function totals(lines = readCart()) {
   const qty = lines.reduce((s, l) => s + l.qty, 0);
-  const allPriced = lines.every((l) => bySlug[l.slug].price);
-  const sum = lines.reduce((s, l) => s + (bySlug[l.slug].price || 0) * l.qty, 0);
+  const allPriced = lines.every((l) => unitPrice(l));
+  const sum = lines.reduce((s, l) => s + (unitPrice(l) || 0) * l.qty, 0);
   return { qty, text: lines.length && allPriced ? vnd(sum) : 'Chờ báo giá', sum: allPriced ? sum : null };
 }
 export const lineLabel = (l: CartLine) => bySlug[l.slug].shortName + (l.variant ? ` (${l.variant})` : '');
@@ -71,18 +79,17 @@ function render() {
   if (rows) {
     rows.innerHTML = lines.map((l, i) => {
       const p = bySlug[l.slug];
-      const sub = p.price ? vnd(p.price * l.qty) : site.priceFallback;
       return `<li class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-3 py-5 md:grid-cols-[1fr_120px_140px_120px_44px]">
         <div class="flex min-w-0 items-center gap-4">${thumb(p)}
           <div class="min-w-0"><a href="/san-pham/${p.slug}/" class="font-semibold hover:text-brand">${esc(p.shortName)}</a>
           ${l.variant ? `<p class="text-sm text-muted">${esc(l.variant)}</p>` : ''}
-          <p class="text-sm text-muted md:hidden">${priceText(p)}</p></div></div>
-        <span class="hidden text-sm md:block">${priceText(p)}</span>
+          <p class="text-sm text-muted md:hidden">${priceText(l)}</p></div></div>
+        <span class="hidden text-sm md:block">${priceText(l)}</span>
         <div class="col-start-1 inline-flex w-fit items-center rounded-full border border-line md:col-start-auto">
           <button type="button" class="inline-flex size-10 items-center justify-center rounded-full hover:bg-brand-50" data-dec="${i}" aria-label="Giảm">${I.minus}</button>
           <span class="w-8 text-center font-semibold" aria-live="polite">${l.qty}</span>
           <button type="button" class="inline-flex size-10 items-center justify-center rounded-full hover:bg-brand-50" data-inc="${i}" aria-label="Tăng">${I.plus}</button></div>
-        <span class="text-right font-semibold text-brand md:text-left">${sub}</span>
+        <span class="text-right font-semibold text-brand md:text-left">${subText(l)}</span>
         <button type="button" class="col-start-2 row-start-1 inline-flex size-10 items-center justify-center justify-self-end rounded-full text-muted hover:bg-red-50 hover:text-red-600 md:col-start-auto md:row-start-auto" data-del="${i}" aria-label="Xóa ${esc(p.shortName)}">${I.trash}</button>
       </li>`;
     }).join('');
@@ -95,7 +102,7 @@ function render() {
       const p = bySlug[l.slug];
       return `<li class="flex items-center gap-3 py-3">${thumb(p).replace(/size-20/g, 'size-14')}
         <div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold">${esc(lineLabel(l))}</p><p class="text-xs text-muted">SL: ${l.qty}</p></div>
-        <span class="text-sm font-medium">${p.price ? vnd(p.price * l.qty) : site.priceFallback}</span></li>`;
+        <span class="text-sm font-medium">${subText(l)}</span></li>`;
     }).join('');
   }
 }

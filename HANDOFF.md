@@ -13,7 +13,7 @@
 
 ## Đang dở / chờ
 - **Thông số trên ảnh khách gửi lệch dữ liệu web** (số chậu, Sol Pro/Grid Pro dùng nước trực tiếp, công suất, kích thước) – chờ chủ web quyết (CLAUDE.md mục 9).
-- **AR:** `npm run models` chuyển STL → GLB đã chạy được. 12 STL trong `models-src/` = **1 máy bản Sol** → `public/models/ecohub-mau.glb` (**chưa commit, chưa gắn**); 9 STL "máy nhỏ" trong `models-src/may-nho/` = **bản Plus** → `ecohub-plus.glb`, **đã gắn cho Sol Plus + Grid Plus** (05/11; file không có tấm pin). Chờ khách: 3D tấm pin + các máy còn lại; bộ 12 STL cũ là model nào.
+- **AR:** `npm run models` chuyển STL → GLB. Đã gắn 3D (bản tạm 05/11, dựng thêm tấm pin, hộp Bio-Tank, nút bấm, sọc, logo theo ảnh SP vì CAD thiếu): Sol Plus + Grid Plus (`models-src/may-nho/`), Sol Pro + Grid Pro (12 STL gốc trong `models-src/`, thân 40×40×50 cm). Còn thiếu 3D bản thường Sol / Grid. Chờ khách: file 3D dùng để render ảnh SP (để giống hoàn toàn).
 - **Đăng ký tài khoản bằng email:** code xong, chưa ai test thật (Claude không được tạo tài khoản) → chủ web tự thử theo các bước đã gửi trong chat.
 - **Địa chỉ cửa hàng** trong `site.ts` vẫn theo đơn vị hành chính cũ ("…Hạ Bằng, Thạch Thất, TP Hà Nội") → chờ khách xác nhận cách ghi mới (Xã Hạ Bằng, Thành phố Hà Nội).
 - Việc treo bàn giao (thẻ thanh toán Cloudflare, Firebase support email, UID khách vào `admins`, xoá 3 đơn test, App Check, email báo đơn cần gói Blaze, Chính sách bảo mật): CLAUDE.md mục 8.

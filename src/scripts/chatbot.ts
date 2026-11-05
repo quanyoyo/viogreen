@@ -213,7 +213,7 @@ async function answer(raw: string) {
     return bot(`Đây là thông tin về ${prods.length > 1 ? 'các sản phẩm' : 'sản phẩm'} bạn hỏi:${prods.map(productCard).join('')}`);
   }
   if (score(t, accessoryKeys) || t === 'phu kien di kem') {
-    return bot(`Phụ kiện đi kèm ECOHUB gồm:<br>• <b>ECOBOX</b>: Bio-Tank (dinh dưỡng) & Aqua-Tank (nước) – chọn theo dòng máy S / Plus / Pro<br>• <b>Tưới</b>: Bio-Dripper (bộ 10 đầu nhỏ giọt), Hose 6/8/10 mm<br>• <b>Dinh dưỡng</b>: Bio-Nutri 25 g & Bio-Nutri Box 250 g<div class="mt-2 flex flex-wrap gap-1.5">${link('ECOBOX', '/san-pham/#ecobox')}${link('Phụ kiện tưới', '/san-pham/#irrigation')}${link('Bio-Nutri', '/san-pham/#nutrition')}</div>`,
+    return bot(`Phụ kiện đi kèm ECOHUB gồm:<br>• <b>ECOBOX</b>: Bio-Tank (dinh dưỡng) & Aqua-Tank (nước) – chọn theo dòng máy S / Plus / Pro<br>• <b>Tưới</b>: Bio-Dripper (bộ 10 đầu nhỏ giọt), Hose 6/8/10 mm<br>• <b>Dinh dưỡng</b>: Bio-Nutri 25g pack & Bio-Nutri Box 250g<div class="mt-2 flex flex-wrap gap-1.5">${link('ECOBOX', '/san-pham/#ecobox')}${link('Phụ kiện tưới', '/san-pham/#irrigation')}${link('Bio-Nutri', '/san-pham/#nutrition')}</div>`,
       ['Tư vấn chọn máy', 'Giá bao nhiêu?', 'Giao hàng', 'Gặp nhân viên']);
   }
 

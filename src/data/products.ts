@@ -8,7 +8,7 @@
 //               ảnh đầu tiên hiện to; bấm vào để phóng to.
 //  thumb        => ảnh trên thẻ sản phẩm / giỏ hàng (mặc định images[0])
 //  info         => ảnh có chữ, hiện trong phần mô tả (ECOHUB)
-//  model: null  => nút AR hiện "Đang cập nhật". Khi có file 3D: { glb: '/models/ecohub-plus.glb' } (tạo bằng npm run models)
+//  model: null  => nút AR hiện "Đang cập nhật". Khi có file 3D: { glb: '/models/ecohub-sol-plus.glb' } (tạo bằng npm run models)
 //  Đổi slug → nhớ thêm dòng chuyển hướng 301 trong public/_redirects.
 // ============================================================
 
@@ -149,8 +149,8 @@ const raw: Raw[] = [
     variants: warranty,
     price: 2_299_000,
     images: [img('ecohub-sol-plus')],
-    // 3D bản Plus (Drive '3D máy nhỏ', 25×25×35,6 cm) – chủ web xác nhận dùng cho cả Sol Plus và Grid Plus (05/11/2026); file 3D chưa có tấm pin
-    model: { glb: '/models/ecohub-plus.glb' },
+    // 3D bản Plus (Drive '3D máy nhỏ', 25×25×35,6 cm). Tấm pin, hộp Bio-Tank, nút bấm dựng tay theo ảnh (file CAD thiếu) – bản tạm 05/11/2026
+    model: { glb: '/models/ecohub-sol-plus.glb' },
     info: [img('ecohub-sol-plus-info')],
   },
   {
@@ -177,7 +177,7 @@ const raw: Raw[] = [
     variants: warranty,
     price: 1_799_000,
     images: [img('ecohub-grid-plus')],
-    model: { glb: '/models/ecohub-plus.glb' },
+    model: { glb: '/models/ecohub-grid-plus.glb' },
     info: [img('ecohub-grid-plus-info')],
     note: 'Việc lắp đặt phải tuân thủ hướng dẫn kỹ thuật của sản phẩm.',
   },
@@ -205,6 +205,8 @@ const raw: Raw[] = [
     variants: warranty,
     price: 3_399_000,
     images: [img('ecohub-sol-pro')],
+    // 3D bản Pro (12 STL gốc, thân 40×40×50 cm). Cột + tấm pin, sọc xanh, nút bấm, logo dựng thêm theo ảnh – bản tạm 05/11/2026
+    model: { glb: '/models/ecohub-sol-pro.glb' },
     info: [img('ecohub-sol-pro-info')],
   },
   {
@@ -231,6 +233,7 @@ const raw: Raw[] = [
     variants: warranty,
     price: 2_499_000,
     images: [img('ecohub-grid-pro')],
+    model: { glb: '/models/ecohub-grid-pro.glb' },
     info: [img('ecohub-grid-pro-info')],
   },
 
@@ -337,19 +340,19 @@ const raw: Raw[] = [
   // ---------------- DINH DƯỠNG ----------------
   {
     slug: 'bio-nutri-25g',
-    name: 'VIO GREEN Bio-Nutri – Phân bón sinh học gói 25 g',
-    shortName: 'Bio-Nutri 25 g',
+    name: 'VIO GREEN Bio-Nutri 25g pack – Phân bón sinh học gói 25g',
+    shortName: 'Bio-Nutri 25g pack',
     category: 'nutrition',
     fits: 'Mọi dòng ECOHUB',
-    specs: [['Quy cách', '01 gói 25 g']],
-    summary: 'Dinh dưỡng cho cây đóng gói 25 g – tiện bảo quản và chuẩn bị cho từng lần sử dụng.',
+    specs: [['Quy cách', '01 gói 25g']],
+    summary: 'Dinh dưỡng cho cây đóng gói 25g – tiện bảo quản và chuẩn bị cho từng lần sử dụng.',
     description: [
-      'VIO GREEN Bio-Nutri 25 g là sản phẩm dinh dưỡng cho cây được đóng gói theo đơn vị 25 g, hướng đến nhu cầu bổ sung dinh dưỡng trong quá trình chăm sóc cây trồng.',
+      'VIO GREEN Bio-Nutri 25g pack là sản phẩm dinh dưỡng cho cây được đóng gói theo đơn vị 25g, hướng đến nhu cầu bổ sung dinh dưỡng trong quá trình chăm sóc cây trồng.',
       'Quy cách gói nhỏ giúp người dùng thuận tiện trong việc bảo quản và chuẩn bị sản phẩm cho từng lần sử dụng. Bio-Nutri có thể được sử dụng cùng hệ thống ECOHUB theo cấu hình phù hợp.',
       'Sản phẩm được định hướng trở thành một phần trong giải pháp chăm sóc cây của VIO GREEN, hỗ trợ người dùng tổ chức việc bổ sung dinh dưỡng thuận tiện hơn.',
     ],
     highlights: { title: 'Đặc điểm chính', items: [
-      'Quy cách gói 25 g.',
+      'Quy cách gói 25g.',
       'Hướng đến việc bổ sung dinh dưỡng cho cây trồng.',
       'Có thể kết hợp với hệ thống ECOHUB khi cấu hình và hướng dẫn sử dụng cho phép.',
       'Thuận tiện cho việc bảo quản và sử dụng theo từng gói.',
@@ -359,12 +362,12 @@ const raw: Raw[] = [
   {
     // 05/11/2026: thay "Bio-Nutri Multi-Pack" (slug cũ có 301). Mô tả theo tài liệu, bỏ dòng "Lưu ý kỹ thuật" nội bộ.
     slug: 'bio-nutri-box',
-    name: 'VIO GREEN Bio-Nutri Box – Hộp 250 g',
+    name: 'VIO GREEN Bio-Nutri Box – Hộp 250g',
     shortName: 'Bio-Nutri Box',
     category: 'nutrition',
     fits: 'Mọi dòng ECOHUB',
     specs: [['Quy cách', '01 hộp Bio-Nutri, khối lượng tịnh 250 gram']],
-    summary: 'Dinh dưỡng cho cây đóng hộp 250 g – tiện bảo quản, dự trữ và dùng cho nhiều lần chăm sóc.',
+    summary: 'Dinh dưỡng cho cây đóng hộp 250g – tiện bảo quản, dự trữ và dùng cho nhiều lần chăm sóc.',
     description: [
       'VIO GREEN Bio-Nutri Box là sản phẩm dinh dưỡng dành cho cây trồng, được đóng gói trong hộp có khối lượng 250 gram, hướng đến người dùng ECOHUB có nhu cầu bổ sung dinh dưỡng cho cây trong quá trình chăm sóc.',
       'Quy cách hộp 250 gram giúp người dùng thuận tiện trong việc bảo quản, dự trữ và lấy sản phẩm theo lượng cần thiết cho từng lần sử dụng. Bio-Nutri có thể kết hợp với hệ thống ECOHUB để hỗ trợ quá trình bổ sung dinh dưỡng cho cây thông qua cơ chế châm phân tự động, tùy theo hướng dẫn sử dụng và cấu hình tương thích.',

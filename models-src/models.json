@@ -23,7 +23,7 @@
     },
     "green": {
       "color": "#245c3a",
-      "roughness": 0.5,
+      "roughness": 0.75,
       "metalness": 0
     },
     "white": {
@@ -35,13 +35,29 @@
       "color": "#151515",
       "roughness": 0.8,
       "metalness": 0
+    },
+    "grey": {
+      "color": "#cfd2d4",
+      "roughness": 0.5,
+      "metalness": 0
+    },
+    "metal": {
+      "color": "#d9dcde",
+      "roughness": 0.35,
+      "metalness": 0.4
+    },
+    "solarCell": {
+      "color": "#1e2b45",
+      "roughness": 0.25,
+      "metalness": 0.35
     }
   },
   "models": [
     {
-      "out": "ecohub-plus",
+      "out": "ecohub-grid-plus",
       "dir": "may-nho",
       "default": "white",
+      "_note": "3D Drive \"3D máy nhỏ\" = bản Plus (25×25×35,6 cm). Khối extras dựng tay theo ảnh SP (file CAD thiếu): hộp Bio-Tank, nút bấm, cổng USB, đèn, nút nguồn.",
       "parts": {
         "Body6 aa": "green",
         "Body25": "black",
@@ -86,24 +102,646 @@
           "normals": [
             "-y"
           ]
+        },
+        {
+          "part": "Body1 aa",
+          "material": "green",
+          "min": [
+            -130,
+            -130,
+            320
+          ],
+          "max": [
+            130,
+            105,
+            349.5
+          ],
+          "normals": [
+            "+z"
+          ],
+          "_note": "mặt dưới nắp"
+        },
+        {
+          "part": "Body1 aa",
+          "material": "green",
+          "min": [
+            -130,
+            -130,
+            342
+          ],
+          "max": [
+            130,
+            105,
+            349.5
+          ],
+          "_note": "chân vít dưới nắp → lỗ vít trên nắp không lộ màu trắng"
+        }
+      ],
+      "extras": [
+        {
+          "name": "bio-tank",
+          "shape": "box",
+          "size": [
+            96,
+            89,
+            144
+          ],
+          "center": [
+            -75.5,
+            71.5,
+            272
+          ],
+          "material": "white"
+        },
+        {
+          "name": "bio-tank-nap",
+          "shape": "box",
+          "size": [
+            70,
+            60,
+            5
+          ],
+          "center": [
+            -75.5,
+            71.5,
+            346.5
+          ],
+          "material": "grey"
+        },
+        {
+          "name": "nut-1",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 4.5,
+          "from": [
+            -126,
+            56.8,
+            182
+          ],
+          "length": 5,
+          "material": "grey"
+        },
+        {
+          "name": "nut-2",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 4.5,
+          "from": [
+            -126,
+            82.2,
+            182
+          ],
+          "length": 5,
+          "material": "grey"
+        },
+        {
+          "name": "cong-usb",
+          "shape": "box",
+          "size": [
+            4,
+            27,
+            13.2
+          ],
+          "center": [
+            -123.2,
+            66.6,
+            155
+          ],
+          "material": "black"
+        },
+        {
+          "name": "den-bao",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 2.8,
+          "from": [
+            -125.5,
+            39.5,
+            155.4
+          ],
+          "length": 4,
+          "material": "black"
+        },
+        {
+          "name": "nut-nguon",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 8.6,
+          "from": [
+            -126,
+            61.4,
+            124.4
+          ],
+          "length": 5,
+          "material": "green"
+        },
+        {
+          "name": "logo",
+          "shape": "decal",
+          "image": "decals/logo-vio-green.png",
+          "center": [
+            0,
+            304
+          ],
+          "height": 71,
+          "offset": 0.6,
+          "grid": [
+            48,
+            28
+          ],
+          "_note": "logo cắt từ ảnh SP (models-src/decals/logo-vio-green.png), dán ôm mặt trước"
         }
       ]
     },
     {
-      "out": "ecohub-mau",
+      "out": "ecohub-sol-plus",
+      "extends": "ecohub-grid-plus",
+      "_note": "Sol Plus = Grid Plus + cột + tấm pin (dựng tay theo ảnh SP, file CAD không có tấm pin).",
+      "extras": [
+        {
+          "name": "cot-pin",
+          "shape": "cylinder",
+          "axis": "z",
+          "radius": 9,
+          "from": [
+            -100,
+            112,
+            349
+          ],
+          "length": 118,
+          "material": "metal"
+        },
+        {
+          "name": "khop-pin",
+          "shape": "box",
+          "size": [
+            26,
+            22,
+            22
+          ],
+          "center": [
+            -100,
+            108,
+            472
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "khung-pin",
+          "shape": "box",
+          "size": [
+            270,
+            170,
+            10
+          ],
+          "center": [
+            -15,
+            40,
+            448
+          ],
+          "rotX": 28,
+          "material": "white"
+        },
+        {
+          "name": "o-pin",
+          "shape": "box",
+          "size": [
+            256,
+            156,
+            2
+          ],
+          "center": [
+            -15,
+            40,
+            454
+          ],
+          "grid": [
+            6,
+            4,
+            2.5
+          ],
+          "rotX": 28,
+          "pivot": [
+            -15,
+            40,
+            448
+          ],
+          "material": "solarCell"
+        }
+      ]
+    },
+    {
+      "out": "ecohub-grid-pro",
       "dir": ".",
-      "default": "body",
+      "default": "white",
+      "_note": "12 STL gốc trong models-src/ = bản Pro (thân 40×40×50 cm khớp ảnh thông số Pro). Bỏ cột + tấm pin cũ (đặt giữa, nằm ngang) để làm giống ảnh SP.",
+      "exclude": [
+        "Component2",
+        "Component3"
+      ],
       "parts": {
-        "Component2": "solar",
-        "Component3": "accent",
-        "Component20": "accent",
-        "Component15": "accent",
-        "Component17": "accent",
-        "Body25": "foot",
-        "Body26": "foot",
-        "Body27": "foot",
-        "Body28": "foot"
-      }
+        "Component16": "grey",
+        "Body25": "black",
+        "Body26": "black",
+        "Body27": "black",
+        "Body28": "black"
+      },
+      "regions": [
+        {
+          "part": "Component20",
+          "material": "green",
+          "min": [
+            -210,
+            -210,
+            470
+          ],
+          "max": [
+            210,
+            210,
+            505
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "minDot": 0.85,
+          "_note": "mặt hướng lên của nắp (cả đáy hốc vít) → xanh; mép bo đứng giữ trắng"
+        },
+        {
+          "part": "Component20",
+          "material": "green",
+          "min": [
+            -194,
+            -194,
+            470
+          ],
+          "max": [
+            194,
+            -30,
+            505
+          ],
+          "_note": "vách hốc vít trong nắp → xanh (chừa viền ngoài + hốc hộp bên hông)"
+        },
+        {
+          "part": "Component20",
+          "material": "green",
+          "min": [
+            -96,
+            -30,
+            470
+          ],
+          "max": [
+            194,
+            120,
+            505
+          ]
+        },
+        {
+          "part": "Component20",
+          "material": "green",
+          "min": [
+            -194,
+            120,
+            470
+          ],
+          "max": [
+            194,
+            194,
+            505
+          ]
+        },
+        {
+          "part": "Component17",
+          "material": "green",
+          "min": [
+            -60,
+            -199,
+            20
+          ],
+          "max": [
+            60,
+            -5,
+            185
+          ],
+          "normals": [
+            "+x",
+            "-x",
+            "+z",
+            "-z"
+          ],
+          "_note": "lòng vòm: vách, trần, sàn"
+        },
+        {
+          "part": "Component17",
+          "material": "green",
+          "min": [
+            -60,
+            -190,
+            20
+          ],
+          "max": [
+            60,
+            -5,
+            185
+          ],
+          "normals": [
+            "-y"
+          ],
+          "_note": "lòng vòm: vách sau (không lấy mép bo sát mặt trước)"
+        },
+        {
+          "part": "Component21",
+          "material": "green",
+          "min": [
+            -60,
+            -200,
+            15
+          ],
+          "max": [
+            60,
+            0,
+            190
+          ],
+          "_note": "phần thân dưới nhìn thấy qua vòm"
+        },
+        {
+          "part": "Component19",
+          "material": "green",
+          "min": [
+            -196,
+            -196,
+            468
+          ],
+          "max": [
+            196,
+            -28,
+            505
+          ],
+          "_note": "chân vít dưới nắp trên → lỗ vít trên nắp không lộ trắng (chừa vách quanh hộp bên hông)"
+        },
+        {
+          "part": "Component19",
+          "material": "green",
+          "min": [
+            -98,
+            -28,
+            468
+          ],
+          "max": [
+            196,
+            118,
+            505
+          ],
+          "_note": "chân vít dưới nắp trên → lỗ vít trên nắp không lộ trắng (chừa vách quanh hộp bên hông)"
+        },
+        {
+          "part": "Component19",
+          "material": "green",
+          "min": [
+            -196,
+            118,
+            468
+          ],
+          "max": [
+            196,
+            196,
+            505
+          ],
+          "_note": "chân vít dưới nắp trên → lỗ vít trên nắp không lộ trắng (chừa vách quanh hộp bên hông)"
+        }
+      ],
+      "extras": [
+        {
+          "name": "nap-lo-cot",
+          "shape": "cylinder",
+          "axis": "z",
+          "radius": 72,
+          "from": [
+            0,
+            0,
+            499.4
+          ],
+          "length": 1,
+          "material": "green",
+          "_note": "bịt lỗ cột tấm pin cũ trên nắp"
+        },
+        {
+          "name": "nut-1",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 5.8,
+          "from": [
+            -203,
+            25.9,
+            236.6
+          ],
+          "length": 4.5,
+          "material": "grey"
+        },
+        {
+          "name": "nut-2",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 5.8,
+          "from": [
+            -203,
+            58.9,
+            236.6
+          ],
+          "length": 4.5,
+          "material": "grey"
+        },
+        {
+          "name": "cong-usb",
+          "shape": "box",
+          "size": [
+            4,
+            35,
+            17
+          ],
+          "center": [
+            -201,
+            38.6,
+            201.5
+          ],
+          "material": "black"
+        },
+        {
+          "name": "den-bao",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 3.6,
+          "from": [
+            -202.5,
+            3.4,
+            201.5
+          ],
+          "length": 4,
+          "material": "black"
+        },
+        {
+          "name": "nut-nguon",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 11,
+          "from": [
+            -203,
+            31.9,
+            161.7
+          ],
+          "length": 4.5,
+          "material": "green"
+        },
+        {
+          "name": "va-lo-truoc",
+          "shape": "decal",
+          "material": "white",
+          "center": [
+            0,
+            370
+          ],
+          "width": 170,
+          "height": 84,
+          "offset": 0.3,
+          "grid": [
+            68,
+            34
+          ],
+          "_note": "miếng vá trắng ôm mặt trước, bịt 5 lỗ bắt vít quanh logo (x ±75, z 335…405)"
+        },
+        {
+          "name": "logo",
+          "shape": "decal",
+          "image": "decals/logo-vio-green.png",
+          "center": [
+            0,
+            375
+          ],
+          "height": 120,
+          "offset": 0.6,
+          "grid": [
+            48,
+            28
+          ],
+          "_note": "logo cắt từ ảnh SP (models-src/decals/logo-vio-green.png), dán ôm mặt trước"
+        },
+        {
+          "name": "bit-lo-hop",
+          "shape": "cylinder",
+          "axis": "z",
+          "radius": 6.3,
+          "from": [
+            -151,
+            75.5,
+            439.5
+          ],
+          "length": 3.8,
+          "material": "grey",
+          "_note": "bịt lỗ Ø12 trên nắp hộp bên hông"
+        }
+      ],
+      "stripes": [
+        {
+          "parts": [
+            "Component19",
+            "Component21"
+          ],
+          "z": [
+            258,
+            284
+          ],
+          "material": "green",
+          "skip": {
+            "min": [
+              -210,
+              -35
+            ],
+            "max": [
+              -185,
+              125
+            ]
+          },
+          "_note": "sọc xanh sơn lên vách thân (chừa đoạn hộp bên hông che)"
+        }
+      ]
+    },
+    {
+      "out": "ecohub-sol-pro",
+      "extends": "ecohub-grid-pro",
+      "_note": "Sol Pro = Grid Pro + cột + tấm pin ở góc sau trái như ảnh SP.",
+      "extras": [
+        {
+          "name": "cot-pin",
+          "shape": "cylinder",
+          "axis": "z",
+          "radius": 12,
+          "from": [
+            -150,
+            160,
+            499
+          ],
+          "length": 172,
+          "material": "metal"
+        },
+        {
+          "name": "khop-pin",
+          "shape": "box",
+          "size": [
+            34,
+            28,
+            28
+          ],
+          "center": [
+            -150,
+            155,
+            676
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "khung-pin",
+          "shape": "box",
+          "size": [
+            380,
+            240,
+            12
+          ],
+          "center": [
+            -10,
+            70,
+            640
+          ],
+          "rotX": 28,
+          "material": "white"
+        },
+        {
+          "name": "o-pin",
+          "shape": "box",
+          "size": [
+            364,
+            224,
+            2
+          ],
+          "center": [
+            -10,
+            70,
+            647
+          ],
+          "grid": [
+            8,
+            5,
+            3
+          ],
+          "rotX": 28,
+          "pivot": [
+            -10,
+            70,
+            640
+          ],
+          "material": "solarCell"
+        }
+      ]
     }
   ]
 }

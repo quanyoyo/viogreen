@@ -25,7 +25,7 @@
 | 18/10/2026 | Đợt sửa lớn theo "Thông tin làm web.docx": màu mới `#037700` / `#ebf2e3`, chữ chạy ngang, hero ảnh thật + thời tiết, đổi tên sản phẩm, lọc theo số cây, chọn gói bảo hành |
 | 05/11/2026 | Sửa theo `web_information.docx`: giá thật 8 mục, gộp ECOBOX theo máy (16 → 12 SP), Bio-Nutri Box, ảnh SP thật + phóng to, 5 bài blog; **ra mắt** (mở cho Google); AR bản tạm cho 4 máy Plus / Pro |
 | 06/11/2026 | Tạm tắt AR Sol Pro / Grid Pro (khách chỉ cần AR bản Plus) |
-| 07/11/2026 | **AR Grid Plus thay bằng bản 3D AI đã chỉnh** (chủ web duyệt) |
+| 07/11/2026 | **AR Grid Plus và Sol Plus thay bằng bản 3D AI đã chỉnh** (chủ web duyệt) |
 
 ## 3. Đã xong
 
@@ -48,7 +48,7 @@
 | Máy | Trạng thái AR |
 |---|---|
 | **Grid Plus** | **Bản 3D AI đã chỉnh (07/11/2026)** – dựng lại bằng `npm run models:ai` |
-| Sol Plus | Bản tạm dựng từ CAD (05/11/2026). Bản AI đã làm một phần, **chưa duyệt lên web** |
+| **Sol Plus** | **Bản 3D AI đã chỉnh (07/11/2026)** – màu vỏ đồng bộ, mép nắp gọn, 2 bình hai bên giống nhau, khe mảnh và nhạt |
 | Sol Pro, Grid Pro | Có file 3D (bản tạm từ CAD) nhưng **tạm tắt AR** theo yêu cầu khách |
 | Sol, Grid (bản thường) | Chưa có 3D → hiện "Đang cập nhật" |
 
@@ -59,7 +59,7 @@
    - Mép ngoài nắp hơi gồ ghề quanh hộp Bio-Tank.
    - Vài khía rất nhỏ ở mép dưới mặt lưng; một đường cong rất mờ ở giữa lưng.
    - Mặt đáy có một mảng đen, chỉ thấy khi nhìn từ dưới lên.
-2. **3D Sol Plus:** quyết định có làm tiếp bản AI (như Grid Plus) rồi thay lên web không.
+2. **3D Sol Plus – điểm nhỏ còn lại:** khe dọc ở mép khối dưới hơi lấm tấm khi nhìn sát. Theo yêu cầu chủ web, mặt lưng (các đường dọc) và khe quanh hộp Bio-Tank được giữ nguyên hình.
 3. **Google Search Console** (cần tài khoản Google của khách / chủ web): thêm `viogreen.com`, gửi sitemap `https://viogreen.com/sitemap-index.xml`, yêu cầu lập chỉ mục trang chủ.
 4. **Sau v1 (chỉ làm khi được yêu cầu):** chatbot AI, thanh toán online VNPay / MoMo, Web App 360×640 (chờ quyền Figma).
 
@@ -100,8 +100,8 @@ npm run dev        # chạy thử ở http://localhost:4321
 npm run check      # kiểm tra lỗi
 npm run build      # xuất trang ra dist/
 npm run images     # ảnh gốc images-src/ → WebP trong public/
-npm run models     # 3D từ CAD (STL) → public/models/ (bỏ qua Grid Plus)
-npm run models:ai  # 3D AI Grid Plus → public/models/ecohub-grid-plus.glb
+npm run models     # 3D từ CAD (STL) → public/models/ (bỏ qua Grid Plus, Sol Plus)
+npm run models:ai  # 3D AI Grid Plus + Sol Plus → public/models/
 ```
 
 - Nội dung và cấu hình chỉ sửa trong `src/data/` (`site.ts` = liên hệ, ngân hàng, chữ chạy; `products.ts` = sản phẩm, giá) và `public/` (ảnh, 3D).

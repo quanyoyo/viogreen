@@ -277,7 +277,7 @@ function resolve(model) {
   const base = resolve(config.models.find((m) => m.out === model.extends) ?? (() => { throw new Error(`extends: không có model "${model.extends}"`); })());
   return {
     ...base, ...model,
-    skipWrite: model.skipWrite, // không kế thừa (Sol Plus kế thừa Grid Plus nhưng vẫn ghi bản CAD)
+    skipWrite: model.skipWrite, // không kế thừa: mỗi model tự khai báo
     parts: { ...base.parts, ...model.parts },
     regions: [...(base.regions ?? []), ...(model.regions ?? [])],
     extras: [...(base.extras ?? []), ...(model.extras ?? [])],

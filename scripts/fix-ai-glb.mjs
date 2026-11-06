@@ -47,8 +47,9 @@ for (let i = 0; i < P.length; i += 3) {
 // Mép hộp mờ dần (--flatten-feather m, mặc định 1,2 cm) để chỗ giáp mặt xung quanh không bị nhăn
 // --flatten-z: như trên nhưng là phẳng theo trục Z (mặt trước / sau), VD vết lõm trên viền nắp phía sau
 for (const [flag, ax] of [['--flatten-x', 0], ['--flatten-z', 2]]) for (let i = args.indexOf(flag); i >= 0; i = args.indexOf(flag, i + 1)) {
-  // số thứ 7 (tuỳ chọn) = độ mờ mép riêng cho hộp này
-  const [x0, y0, z0, x1, y1, z1, f7] = args[i + 1].split(',').map(Number), F = f7 ?? +opt('flatten-feather', 0.012), core = [], ring = [];
+  // số thứ 7 (tuỳ chọn) = độ mờ mép riêng cho hộp này; số thứ 8 (tuỳ chọn) = mặt phẳng đích cố định thay cho trung vị
+  // (dùng khi hộp chỉ ôm phần nhô ra, VD gờ nổi trên mặt lưng: ép về đúng mặt lưng xung quanh)
+  const [x0, y0, z0, x1, y1, z1, f7, t8] = args[i + 1].split(',').map(Number), F = f7 ?? +opt('flatten-feather', 0.012), core = [], ring = [];
   const lo = [x0, y0, z0], hi = [x1, y1, z1], o1 = ax === 0 ? 2 : 0;
   const dOut = (v, a, b) => Math.max(a - v, 0, v - b);
   for (let j = 0; j < P.length; j += 3) {
@@ -56,7 +57,7 @@ for (const [flag, ax] of [['--flatten-x', 0], ['--flatten-z', 2]]) for (let i = 
     const d = Math.hypot(dOut(P[j + 1], y0, y1), dOut(P[j + o1], lo[o1], hi[o1]));
     if (d === 0) core.push(j); else if (d < F) ring.push([j, 1 - d / F]);
   }
-  const xs = core.map((j) => P[j + ax]).sort((p, q) => p - q), xm = xs[xs.length >> 1];
+  const xs = core.map((j) => P[j + ax]).sort((p, q) => p - q), xm = Number.isFinite(t8) ? t8 : xs[xs.length >> 1];
   for (const j of core) P[j + ax] = xm;
   for (const [j, w] of ring) P[j + ax] = P[j + ax] * (1 - w) + xm * w;
   console.log(`đã là phẳng ${core.length} đỉnh (+${ring.length} đỉnh mép) về ${'xyz'[ax]} = ${(xm * 100).toFixed(2)} cm`);
@@ -71,6 +72,7 @@ const uvs = prim.getAttribute('TEXCOORD_0')?.getArray();
 const triCount = idx ? idx.length / 3 : P.length / 9;
 const vi = (t, k) => (idx ? idx[t * 3 + k] : t * 3 + k);
 const V = (v) => [P[v * 3], P[v * 3 + 1], P[v * 3 + 2]];
+
 
 // mặt trước gần nhất (z lớn nhất) mà tia song song trục Z chạm tại (x, y)
 function frontZ(x, y) {
@@ -434,6 +436,64 @@ if (args.includes('--unify') && texRaw) {
   if (clean) console.log(`đã xoá đường kẻ / vệt mảnh: ${lines} điểm ảnh`);
   await flushTexture();
   console.log(`đã đồng bộ màu vỏ: ${n} điểm ảnh về rgb(${BODY.join(',')}), bóng đổ giữ ${k * 100}% (${(vals[Math.floor(vals.length * 0.05)] / mid).toFixed(2)}…${(vals[Math.floor(vals.length * 0.95)] / mid).toFixed(2)})`);
+}
+
+// --side-gaps z0,z1[,xmin] (m) [--gap-shade 0.7]: vùng bình Bio-Tank ở 2 bên hông (z0…z1, |x| > xmin, mặc định 8,5 cm). AI vẽ
+// viền tối quanh bình mỗi bên một kiểu, lại đậm và dày. (1) Lấy màu bên trái (−x) theo ô 1,5 mm trong không gian (|x|, y, z);
+// ô "khe" = tối hơn 70% màu thân tại chỗ. (2) Khe mảnh (≤ ~3 mm) giữ nguyên nét, tô 1 mức xám chung = màu thân × --gap-shade; dải khe
+// dày chỉ giữ phần giữa, phần mép gần như về màu thân. (3) Tô lại cả 2 bên theo bản đồ này (bên phải = soi gương bên trái)
+// → 2 bình giống nhau, khe mảnh và nhạt hơn. Chỉ đụng điểm ảnh trung tính (trắng/xám/đen), không đụng mảng xanh.
+if (opt('side-gaps') && texRaw) {
+  const [z0, z1, xmin = 0.085] = opt('side-gaps').split(',').map(Number), C = 0.0015, gapShade = +opt('gap-shade', 0.7);
+  const neutral = (d, o) => Math.max(d[o], d[o + 1], d[o + 2]) - Math.min(d[o], d[o + 1], d[o + 2]) < 30;
+  const inZone = (p) => Math.abs(p[0]) > xmin && p[2] >= z0 && p[2] <= z1 && p[1] < 0.37;
+  const pre = (ps) => ps.some(inZone);
+  const tgt = (p, nrm) => (unifyAt ? unifyAt(p, nrm) : BODY), lum3 = (c) => (c[0] + c[1] + c[2]) / 3;
+  // ô theo vị trí + hướng mặt (trục chính, dấu; bên phải lật dấu x): AI hay dựng vỏ 2 lớp sát nhau (ngoài trắng, trong đen)
+  // → không tách theo hướng thì 1 ô gộp cả 2 lớp thành xám loang lổ
+  const ck = (a, b, c, nn = '') => `${a},${b},${c},${nn}`;
+  const nkey = (p, n) => { const m = [Math.abs(n[0]), Math.abs(n[1]), Math.abs(n[2])], ax = m.indexOf(Math.max(...m)); const sg = Math.sign(n[ax]) * (ax === 0 && p[0] > 0 ? -1 : 1); return 'xyz'[ax] + (sg < 0 ? '-' : '+'); };
+  const cell = (p, n) => [Math.round(Math.abs(p[0]) / C), Math.round(p[1] / C), Math.round(p[2] / C), nkey(p, n)];
+  const cells = new Map(); // [r, g, b, tổng độ sáng màu thân, số điểm]
+  paintTexels(pre, (p, nrm, o) => {
+    const d = texRaw.data; if (p[0] > 0 || !inZone(p) || !neutral(d, o)) return null;
+    const k = ck(...cell(p, nrm)), v = cells.get(k) ?? [0, 0, 0, 0, 0];
+    v[0] += d[o]; v[1] += d[o + 1]; v[2] += d[o + 2]; v[3] += lum3(tgt(p, nrm)); v[4]++; cells.set(k, v); return null;
+  });
+  const avg = (v) => [0, 1, 2].map((i) => v[i] / v[4]);
+  const gap = new Map([...cells].map(([k, v]) => [k, lum3(avg(v)) < 0.7 * (v[3] / v[4])]));
+  // khoảng cách (số ô) từ ô khe tới ô thân gần nhất (tối đa 6)
+  const dist = new Map();
+  for (const [k, g] of gap) {
+    if (!g) continue;
+    const [a, b, c, nn] = k.split(','), [A, B, Cc] = [a, b, c].map(Number); let best = 7;
+    for (let r = 1; r <= 6 && best > r; r++) for (let i = -r; i <= r; i++) for (let j = -r; j <= r; j++) for (let l = -r; l <= r; l++)
+      if (Math.max(Math.abs(i), Math.abs(j), Math.abs(l)) === r && gap.get(ck(A + i, B + j, Cc + l, nn)) === false) best = r;
+    dist.set(k, best);
+  }
+  // mức giữ của mỗi ô khe: khe mảnh (bề dày lớn nhất quanh đó ≤ 1 ô) → giữ nét; dải dày → chỉ phần giữa giữ nét
+  const keep = new Map();
+  for (const [k, dk] of dist) {
+    const [a, b, c, nn] = k.split(','), [A, B, Cc] = [a, b, c].map(Number); let mx = 0;
+    for (let i = -2; i <= 2; i++) for (let j = -2; j <= 2; j++) for (let l = -2; l <= 2; l++) mx = Math.max(mx, dist.get(ck(A + i, B + j, Cc + l, nn)) ?? 0);
+    keep.set(k, mx <= 1 || dk >= mx);
+  }
+  let nL = 0, nR = 0, nMiss = 0, nGap = 0;
+  const n = paintTexels(pre, (p, nrm, o) => {
+    const d = texRaw.data; if (!inZone(p) || !neutral(d, o)) return null;
+    const target = tgt(p, nrm), [a, b, c, nn] = cell(p, nrm); let k = null;
+    for (const dx of [0, -1, 1, -2, 2, -3, 3, -4, 4]) { if (cells.has(ck(a + dx, b, c, nn))) { k = ck(a + dx, b, c, nn); break; } }
+    if (p[0] < 0) nL++; else nR++;
+    if (!k) { nMiss++; return lum3([d[o], d[o + 1], d[o + 2]]) < 0.7 * lum3(target) ? target : null; } // vệt tối riêng bên phải → màu thân
+    const col = avg(cells.get(k));
+    if (!gap.get(k)) return col.map(Math.round);
+    nGap++;
+    // 1 mức xám chung cho cả khe (giữ độ tối riêng từng ô thì nét lấm tấm đậm nhạt)
+    const sh = keep.get(k) ? gapShade : 0.95;
+    return target.map((v) => Math.round(v * sh));
+  });
+  await flushTexture();
+  console.log(`đã làm khe bình 2 bên: ${n} điểm ảnh (trái ${nL}, phải ${nR} soi gương, ${nMiss} không khớp), ${dist.size} ô khe, ${nGap} điểm ảnh khe nhạt đi`);
 }
 
 // --ports z0,y0,z1,y1 (m): vẽ lại cụm nút / cổng USB / nút nguồn trên mặt TRÁI (−x) theo ảnh SP: 2 nút tròn ở trên, cổng USB,

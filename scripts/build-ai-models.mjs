@@ -2,7 +2,8 @@
 // Mỗi cấu hình = file nguồn trong models-src/ai/ + bộ tuỳ chọn cho scripts/fix-ai-glb.mjs (giải thích từng tuỳ chọn ở đầu
 // mỗi khối trong file đó). Toạ độ tính bằng mét, máy quay mặt trước ra +z, đáy y = 0.
 //  - grid-plus: ĐANG DÙNG trên web (public/models/ecohub-grid-plus.glb), chủ web duyệt 07/11/2026.
-//  - sol-plus: bản thử, CHƯA duyệt lên web (web vẫn dùng bản CAD của npm run models) → phải truyền --out.
+//  - sol-plus: ĐANG DÙNG trên web (public/models/ecohub-sol-plus.glb), chủ web duyệt 07/11/2026.
+// Không truyền tên = dựng cả 2.
 import { spawnSync } from 'node:child_process';
 
 const CONFIGS = {
@@ -47,24 +48,34 @@ const CONFIGS = {
   },
   'sol-plus': {
     src: 'models-src/ai/sol-plus-trellis.glb',
-    out: null, // chưa duyệt lên web
+    out: 'public/models/ecohub-sol-plus.glb',
     args: [
       '--front', '+z', '--height', '0.50', '--depth', '0.25',
+      // ép gờ nổi 6 mm trên mặt lưng (x 4…6 cm, cao 26,5…33,5 cm) về mặt lưng −11,9 cm – nhìn từ bên phải lộ thành vệt dọc ở mép
+      '--flatten-z', '0.036,0.262,-0.135,0.064,0.338,-0.1205,0.006,-0.119',
       '--pad', '-0.108,0.015,0.108,0.113,0.04', '--pad-y', '0.330,0.3385', '--pad-white-y', '0.330,0.356', '--top-color', '40,100,62',
       '--back-fill', '--back-max-lum', '256', '--back-ymax', '0.69',
       '--white-box', '-0.09,0.33,-0.13,-0.035,0.365,-0.085', '--white-box', '0.0,0.33,-0.13,0.09,0.365,-0.085',
+      // chấm đen nhỏ trên viền trắng trước nắp (ngay ngoài mảng xanh)
+      '--white-box', '0.008,0.325,0.1135,0.03,0.345,0.13',
       '--seam-fill',
-      '--logo', 'models-src/decals/logo-vio-green.png', '--logo-box', '-0.052,0.266,0.066,0.341', '--logo-height', '0.066', '--logo-center', '0.0,0.286',
+      // vùng xoá logo méo: mép trên 33,0 cm (trước 34,1 cm chạm tam giác lớn ở mép trước nắp → tô trắng thành răng cưa trên mảng xanh)
+      '--logo', 'models-src/decals/logo-vio-green.png', '--logo-box', '-0.052,0.266,0.066,0.33', '--logo-height', '0.066', '--logo-center', '0.0,0.286',
       '--fill-box', '-0.06,0.026,-0.10,0.06,0.206,0.08',
       '--panel-grid', '6,5', '--rods-remove', '--rods-ymin', '0.69', '--pole', '-0.067,-0.106,0.33,0.009',
+      // như Grid Plus: đồng bộ màu vỏ trắng (giữ 35% bóng đổ) + xoá vệt mảnh; chỉ phần thân (dưới 36 cm), không đụng tấm pin
+      '--unify', '--unify-k', '0.35', '--unify-ymax', '0.36', '--clean-lines',
+      // bình Bio-Tank 2 bên hông: bên phải soi gương màu bên trái (2 bình giống nhau), khe giữ lại nhưng mảnh và nhạt hơn
+      '--side-gaps', '-0.07,0.06',
+      '--smooth-normals',
     ],
   },
 };
 
 const argv = process.argv.slice(2);
 const oi = argv.indexOf('--out'), outArg = oi >= 0 ? argv[oi + 1] : null;
-const names = argv.filter((a, i) => !a.startsWith('--') && i !== oi + 1);
-for (const name of names.length ? names : ['grid-plus']) {
+const names = argv.filter((a, i) => !a.startsWith('--') && !(oi >= 0 && i === oi + 1));
+for (const name of names.length ? names : Object.keys(CONFIGS)) {
   const c = CONFIGS[name];
   if (!c) { console.error(`Không có cấu hình "${name}" (có: ${Object.keys(CONFIGS).join(', ')})`); process.exit(1); }
   const out = outArg ?? c.out;

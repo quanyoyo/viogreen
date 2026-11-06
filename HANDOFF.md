@@ -14,7 +14,7 @@
 ## Đang dở / chờ
 - **Thông số trên ảnh khách gửi lệch dữ liệu web** (số chậu, Sol Pro/Grid Pro dùng nước trực tiếp, công suất, kích thước) – chờ chủ web quyết (CLAUDE.md mục 9).
 - **AR:** `npm run models` chuyển STL → GLB. Đã gắn 3D (bản tạm 05/11, dựng thêm tấm pin, hộp Bio-Tank, nút bấm, sọc, logo theo ảnh SP vì CAD thiếu): Sol Plus + Grid Plus (`models-src/may-nho/`), Sol Pro + Grid Pro (12 STL gốc trong `models-src/`, thân 40×40×50 cm). Còn thiếu 3D bản thường Sol / Grid. Chờ khách: file 3D dùng để render ảnh SP (để giống hoàn toàn).
-  **07/11/2026: Grid Plus trên web = bản 3D AI đã chỉnh** (`npm run models:ai`, chi tiết CLAUDE.md mục 8.4); Sol Plus vẫn bản CAD (bản AI chưa duyệt); Sol Pro / Grid Pro tạm tắt AR. Với 3D: chủ web muốn **giải thích + hỏi trước khi sửa**, chỉ sửa đúng máy được yêu cầu, kiểm tra ảnh mọi góc trước khi báo xong.
+  **07/11/2026: Grid Plus và Sol Plus trên web = bản 3D AI đã chỉnh** (`npm run models:ai`, chi tiết CLAUDE.md mục 8.4); Sol Pro / Grid Pro tạm tắt AR. Với 3D: chủ web muốn **giải thích + hỏi trước khi sửa**, chỉ sửa đúng máy được yêu cầu, kiểm tra ảnh mọi góc trước khi báo xong.
 - **Đăng ký tài khoản bằng email:** code xong, chưa ai test thật (Claude không được tạo tài khoản) → chủ web tự thử theo các bước đã gửi trong chat.
 - **Địa chỉ cửa hàng** trong `site.ts` vẫn theo đơn vị hành chính cũ ("…Hạ Bằng, Thạch Thất, TP Hà Nội") → chờ khách xác nhận cách ghi mới (Xã Hạ Bằng, Thành phố Hà Nội).
 - Việc treo bàn giao (thẻ thanh toán Cloudflare, Firebase support email, UID khách vào `admins`, xoá 3 đơn test, App Check, email báo đơn cần gói Blaze, Chính sách bảo mật): CLAUDE.md mục 8.

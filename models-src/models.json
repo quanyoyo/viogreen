@@ -257,6 +257,7 @@
     {
       "out": "ecohub-sol-plus",
       "extends": "ecohub-grid-plus",
+      "skipWrite": "web dùng bản 3D AI từ 07/11/2026 (npm run models:ai)",
       "_note": "Sol Plus = Grid Plus + cột + tấm pin (dựng tay theo ảnh SP, file CAD không có tấm pin).",
       "extras": [
         {

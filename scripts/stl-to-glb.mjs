@@ -277,6 +277,7 @@ function resolve(model) {
   const base = resolve(config.models.find((m) => m.out === model.extends) ?? (() => { throw new Error(`extends: không có model "${model.extends}"`); })());
   return {
     ...base, ...model,
+    skipWrite: model.skipWrite, // không kế thừa (Sol Plus kế thừa Grid Plus nhưng vẫn ghi bản CAD)
     parts: { ...base.parts, ...model.parts },
     regions: [...(base.regions ?? []), ...(model.regions ?? [])],
     extras: [...(base.extras ?? []), ...(model.extras ?? [])],
@@ -393,6 +394,8 @@ async function build(input) {
     await work.transform(prune(), meshopt({ encoder: MeshoptEncoder, level: 'medium' }));
     const glb = await io.writeBinary(work);
     if (glb.byteLength <= MAX_BYTES || attempt >= 6) {
+      // "skipWrite": web đang dùng bản khác (VD Grid Plus = bản 3D AI, scripts/build-ai-models.mjs) → không ghi đè public/models/
+      if (model.skipWrite) { console.log(`– bỏ qua ghi ${model.out}.glb: ${model.skipWrite}`); return; }
       fs.mkdirSync(OUT, { recursive: true });
       fs.writeFileSync(path.join(OUT, `${model.out}.glb`), glb);
       const size = (mn, mx) => mx.map((v, k) => ((v - mn[k]) * 100).toFixed(1));

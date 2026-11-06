@@ -55,6 +55,7 @@
   "models": [
     {
       "out": "ecohub-grid-plus",
+      "skipWrite": "web dùng bản 3D AI từ 07/11/2026 (npm run models:ai)",
       "dir": "may-nho",
       "default": "white",
       "_note": "3D Drive \"3D máy nhỏ\" = bản Plus (25×25×35,6 cm). Khối extras dựng tay theo ảnh SP (file CAD thiếu): hộp Bio-Tank, nút bấm, cổng USB, đèn, nút nguồn.",

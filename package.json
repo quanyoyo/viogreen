@@ -9,6 +9,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "models": "node scripts/stl-to-glb.mjs",
+    "models:ai": "node scripts/build-ai-models.mjs",
     "dvhc": "node scripts/fetch-dvhc.mjs",
     "images": "node scripts/optimize-images.mjs"
   },

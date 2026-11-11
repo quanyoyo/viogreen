@@ -205,8 +205,8 @@ const raw: Raw[] = [
     variants: warranty,
     price: 3_399_000,
     images: [img('ecohub-sol-pro')],
-    // 3D bản Pro (12 STL gốc, thân 40×40×50 cm). Cột + tấm pin, sọc xanh, nút bấm, logo dựng thêm theo ảnh – bản tạm 05/11/2026
-    // Tạm tắt AR bản Pro (06/11/2026, khách chỉ cần AR bản Plus). Bật lại: model: { glb: '/models/ecohub-sol-pro.glb' }
+    // 3D bản Pro (12 STL gốc, thân 40×40×50 cm) dựng theo ảnh máy thật 11/11/2026 (cột + tấm pin, sọc đen, cụm nút, logo); màu chỉnh theo ảnh (ΔE2000)
+    model: { glb: '/models/ecohub-sol-pro.glb' },
     info: [img('ecohub-sol-pro-info')],
   },
   {
@@ -233,7 +233,8 @@ const raw: Raw[] = [
     variants: warranty,
     price: 2_499_000,
     images: [img('ecohub-grid-pro')],
-    // Tạm tắt AR (06/11/2026). Bật lại: model: { glb: '/models/ecohub-grid-pro.glb' }
+    // 3D = thân Sol Pro bỏ cột + tấm pin (chưa có ảnh máy Grid Pro thật, 11/11/2026)
+    model: { glb: '/models/ecohub-grid-pro.glb' },
     info: [img('ecohub-grid-pro-info')],
   },
 

@@ -17,6 +17,9 @@
 //         "rotX": 30, "pivot": [x, y, z] }        ← tuỳ chọn: xoay quanh trục X (độ) qua điểm pivot (mặc định center)
 //       { "name": "...", "shape": "cylinder", "radius": r, "axis": "x" | "y" | "z", "from": [x, y, z], "length": l,
 //         "material": "grey", "segments": 32 }    ← trụ: tâm đáy ở "from", kéo dài "length" theo trục
+//       { "name": "...", "shape": "bend", "radius": r, "bend": R, "from": [x, y, z], "dir": "+z", "to": "+x", "angle": 90 }
+//                                                 ← đoạn ống cong (1 phần xuyến): tâm ống bắt đầu ở "from" theo hướng "dir",
+//                                                   uốn dần sang hướng "to" với bán kính cong R (VD ống nước gập 90°)
 //       { "name": "...", "shape": "band", "size": [w, d], "radius": r, "center": [x, y], "z": [z0, z1], "offset": 1,
 //         "skip": { "min": [x, y], "max": [x, y] }, "material": "green" }
 //                                                 ← vòng bo quanh thân hình chữ nhật bo góc (VD sọc xanh), nổi ra "offset" mm;
@@ -27,11 +30,17 @@
 //                                                   lên bề mặt các bộ phận STL ("parts", mặc định tất cả) nên ôm theo mặt cong;
 //                                                   width bỏ trống = theo tỉ lệ ảnh. Ảnh đặt trong models-src/.
 //                                                   Không có "image" mà có "material" + "width" = miếng vá trơn (bịt lỗ trên vỏ).
+//                                                   "roughness" / "metalness" (tuỳ chọn) = độ nhám / kim loại của ảnh (mặc định 0.55 / 0).
+//       { "name": "...", "shape": "plane", "size": [sx, sy], "center": [x, y, z], "image": "decals/x.png",
+//         "rotX": 30, "pivot": [x, y, z], "roughness": 0.3, "metalness": 0 }
+//                                                 ← mặt phẳng chữ nhật (pháp tuyến +z, 1 mặt) dán ảnh đục, VD bề mặt ô pin;
+//                                                   mép trên ảnh nằm ở phía +y. Không có "image" thì tô "material".
 //   - stripes (tuỳ chọn): sọc màu sơn thẳng lên vách thân (cắt tam giác đúng tại z0, z1 nên mép sọc thẳng, liền thân):
 //       { "parts": ["Component19", "Component21"], "z": [z0, z1], "material": "green", "skip": { "min": [x, y], "max": [x, y] } }
 //   - exclude (tuỳ chọn): danh sách file STL (không đuôi) bỏ qua, VD tấm pin / cột cũ thay bằng bản dựng lại.
 //   - extends (tuỳ chọn): tên "out" của model khác → kế thừa dir, default, parts, regions, extras, exclude rồi cộng thêm
 //     của mình (VD Sol Plus = Grid Plus + tấm pin).
+//   - abstract (tuỳ chọn): model chỉ để kế thừa (phần chung của 2 bản), không dựng file GLB.
 // Các bước: đọc STL → mm sang m, Z-up sang Y-up (chuẩn glTF) → căn giữa theo thân máy (STL), đáy chạm sàn (y = 0)
 //   → gán chất liệu → hàn đỉnh trùng → giảm đa giác nếu quá ngân sách → nén meshopt → kiểm tra < 5MB.
 import fs from 'node:fs';
@@ -151,6 +160,32 @@ function cylinderTris({ radius, axis = 'z', from, length, segments = 32 }) {
   }
   return list;
 }
+/** Đoạn ống cong: tâm ống đi từ `from` theo hướng `dir`, uốn sang hướng `to` (bán kính cong `bend`) hết góc `angle` độ */
+function bendTris({ radius: r, bend: R, from, dir = '+z', to = '+x', angle = 90, segments = 12, sides = 24 }) {
+  const unit = (s) => { const v = [0, 0, 0]; v['xyz'.indexOf(s[1])] = s[0] === '-' ? -1 : 1; return v; };
+  const d1 = unit(dir), d2 = unit(to), B = cross(d1, d2);
+  const C = from.map((v, k) => v + R * d2[k]); // tâm cong
+  const ring = (t) => {
+    const th = (t / segments) * ((angle * Math.PI) / 180), [c, s] = [Math.cos(th), Math.sin(th)];
+    const N = d1.map((v, k) => s * v - c * d2[k]); // hướng từ tâm cong ra tâm ống
+    const P = C.map((v, k) => v + R * N[k]);
+    return Array.from({ length: sides }, (_, j) => {
+      const f = (j / sides) * 2 * Math.PI, o = N.map((v, k) => Math.cos(f) * v + Math.sin(f) * B[k]);
+      return { p: P.map((v, k) => v + r * o[k]), o };
+    });
+  };
+  const list = [];
+  let prev = ring(0);
+  for (let t = 1; t <= segments; t++) {
+    const cur = ring(t);
+    for (let j = 0; j < sides; j++) {
+      const k = (j + 1) % sides, out = prev[j].o.map((v, i) => v + prev[k].o[i] + cur[j].o[i] + cur[k].o[i]);
+      quad(list, prev[j].p, prev[k].p, cur[k].p, cur[j].p, out);
+    }
+    prev = cur;
+  }
+  return list;
+}
 /** Vòng bo quanh thân hình chữ nhật bo góc (mặt ngoài + gờ trên/dưới), nổi ra ngoài `offset` mm */
 function bandTris({ size, radius: r, center = [0, 0], z: [z0, z1], offset = 1, skip, segments = 10 }) {
   const [hw, hd] = [size[0] / 2 - r, size[1] / 2 - r];
@@ -212,11 +247,19 @@ function decalTris(e, targets, aspect) {
   const idx = (i, j) => j * (nx + 1) + i;
   const near = (i, j, src) => [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]
     .map(([di, dj]) => [i + di, j + dj]).filter(([a, b]) => a >= 0 && a <= nx && b >= 0 && b <= nz).map(([a, b]) => src[idx(a, b)]).filter((v) => v !== null);
-  const med = (a) => { const s = [...a].sort((p, q) => p - q); return s[s.length >> 1]; };
-  for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) {
-    const v = ys[idx(i, j)], n = near(i, j, ys);
-    if (v !== null && n.length >= 3 && v - med(n) > 2) ys[idx(i, j)] = null; // lõm sâu > 2mm so với xung quanh = lỗ
-  }
+  // lỗ = điểm lõm sâu hơn 2 mm so với mặt quanh nó; "mặt" = mức 25% điểm nổi nhất trong ô ±12 mm,
+  // nên lỗ to (VD lỗ Ø20) cũng bắt được, không chỉ lỗ nhỏ hơn 1 ô lưới
+  const R = Math.max(1, Math.round(12 / Math.min(w / nx, h / nz)));
+  const ref = ys.map((v, k) => {
+    if (v === null) return null;
+    const i = k % (nx + 1), j = Math.floor(k / (nx + 1)), a = [];
+    for (let dj = -R; dj <= R; dj++) for (let di = -R; di <= R; di++) {
+      const [ii, jj] = [i + di, j + dj];
+      if (ii >= 0 && ii <= nx && jj >= 0 && jj <= nz && ys[idx(ii, jj)] !== null) a.push(ys[idx(ii, jj)]);
+    }
+    return a.sort((p, q) => p - q)[Math.floor(a.length / 4)];
+  });
+  for (let k = 0; k < ys.length; k++) if (ys[k] !== null && ys[k] - ref[k] > 2) ys[k] = null;
   for (let pass = 0; pass < 20 && ys.includes(null); pass++) {
     const copy = [...ys];
     for (let k = 0; k < ys.length; k++) if (copy[k] === null) { const n = near(k % (nx + 1), Math.floor(k / (nx + 1)), copy); if (n.length >= 2) ys[k] = n.reduce((s, v) => s + v, 0) / n.length; }
@@ -240,6 +283,28 @@ function decalTris(e, targets, aspect) {
   return { pos: Float32Array.from(pos), uv: Float32Array.from(uv) };
 }
 
+/** Xoay danh sách toạ độ quanh trục X (độ) qua điểm pivot (mặc định center / from) */
+function rotateX(list, e) {
+  if (!e.rotX) return;
+  const a = (e.rotX * Math.PI) / 180, [c, s] = [Math.cos(a), Math.sin(a)];
+  const pv = e.pivot ?? e.center ?? e.from;
+  for (let i = 0; i < list.length; i += 3) {
+    const y = list[i + 1] - pv[1], z = list[i + 2] - pv[2];
+    list[i + 1] = pv[1] + y * c - z * s; list[i + 2] = pv[2] + y * s + z * c;
+  }
+}
+
+/** Mặt phẳng chữ nhật (pháp tuyến +z) + toạ độ ảnh: (0,0) ở góc -x/+y = góc trên trái của ảnh */
+function planeTris(e) {
+  const [sx, sy] = e.size, [cx, cy, cz] = e.center;
+  const P = [[cx - sx / 2, cy - sy / 2, cz], [cx + sx / 2, cy - sy / 2, cz], [cx + sx / 2, cy + sy / 2, cz], [cx - sx / 2, cy + sy / 2, cz]];
+  const UV = [[0, 1], [1, 1], [1, 0], [0, 0]];
+  const order = [0, 1, 2, 0, 2, 3]; // ngược chiều kim đồng hồ nhìn từ +z → mặt quay lên
+  const pos = order.flatMap((i) => P[i]);
+  rotateX(pos, e);
+  return { pos: Float32Array.from(pos), uv: Float32Array.from(order.flatMap((i) => UV[i])) };
+}
+
 /** Toạ độ tam giác (mm, Z-up) của 1 khối extras */
 function extraTris(e) {
   let list = [];
@@ -253,15 +318,9 @@ function extraTris(e) {
         boxTris([cw, ch, e.size[2]], [e.center[0] - e.size[0] / 2 + cw / 2 + i * (cw + gap), e.center[1] - e.size[1] / 2 + ch / 2 + j * (ch + gap), e.center[2]], list);
     } else boxTris(e.size, e.center, list);
   } else if (e.shape === 'cylinder') list = cylinderTris(e);
+  else if (e.shape === 'bend') list = bendTris(e);
   else throw new Error(`Không biết shape "${e.shape}"`);
-  if (e.rotX) { // xoay quanh trục X qua pivot
-    const a = (e.rotX * Math.PI) / 180, [c, s] = [Math.cos(a), Math.sin(a)];
-    const pv = e.pivot ?? e.center ?? e.from;
-    for (let i = 0; i < list.length; i += 3) {
-      const y = list[i + 1] - pv[1], z = list[i + 2] - pv[2];
-      list[i + 1] = pv[1] + y * c - z * s; list[i + 2] = pv[2] + y * s + z * c;
-    }
-  }
+  rotateX(list, e);
   return Float32Array.from(list);
 }
 
@@ -278,6 +337,7 @@ function resolve(model) {
   return {
     ...base, ...model,
     skipWrite: model.skipWrite, // không kế thừa: mỗi model tự khai báo
+    abstract: model.abstract,
     parts: { ...base.parts, ...model.parts },
     regions: [...(base.regions ?? []), ...(model.regions ?? [])],
     extras: [...(base.extras ?? []), ...(model.extras ?? [])],
@@ -320,14 +380,25 @@ async function build(input) {
   });
   const stlCount = parts.length;
   // 2) Khối tự dựng
+  const imageOpts = {}; // khoá chất liệu ảnh → { roughness, metalness } (lấy từ khối đầu tiên dùng ảnh đó)
   for (const e of model.extras ?? []) {
-    if (e.shape === 'decal') {
+    if (e.shape === 'plane') {
+      const { pos, uv } = planeTris(e);
+      if (e.image) {
+        const key = `image:${e.image}`;
+        imageOpts[key] ??= { roughness: e.roughness, metalness: e.metalness };
+        parts.push({ name: e.name ?? 'plane', mat: key, pos: toGltf(pos), uv });
+      } else parts.push({ name: e.name ?? 'plane', mat: e.material ?? model.default ?? 'body', pos: toGltf(pos) });
+    } else if (e.shape === 'decal') {
       // decal không có ảnh ("material" + "width"): miếng vá ôm mặt cong, VD bịt lỗ bắt vít trên vỏ
       const [iw, ih] = e.image ? pngSize(fs.readFileSync(path.join(SRC, e.image))) : [e.width, e.height];
       const targets = (e.parts ?? Object.keys(rawByName)).map((n) => rawByName[n] ?? (() => { throw new Error(`decal: không có bộ phận "${n}"`); })());
       const { pos, uv } = decalTris(e, targets, iw / ih);
       if (!pos.length) throw new Error(`decal "${e.name}": không chiếu được lên bề mặt nào – kiểm tra center/height`);
-      if (e.image) parts.push({ name: e.name ?? 'decal', mat: `decal:${e.image}`, pos: toGltf(pos), uv });
+      if (e.image) {
+        imageOpts[`decal:${e.image}`] ??= { roughness: e.roughness, metalness: e.metalness };
+        parts.push({ name: e.name ?? 'decal', mat: `decal:${e.image}`, pos: toGltf(pos), uv });
+      }
       else parts.push({ name: e.name ?? 'patch', mat: e.material ?? model.default ?? 'body', pos: toGltf(pos) });
     } else parts.push({ name: e.name ?? e.shape, mat: e.material ?? model.default ?? 'body', pos: toGltf(extraTris(e)) });
   }
@@ -348,10 +419,11 @@ async function build(input) {
   const buffer = doc.createBuffer();
   const mats = {};
   const material = (key) => (mats[key] ??= (() => {
-    if (key.startsWith('decal:')) { // ảnh PNG nền trong suốt
-      const file = key.slice(6);
+    if (key.startsWith('decal:') || key.startsWith('image:')) { // ảnh PNG: decal = nền trong suốt, image = ảnh đục
+      const file = key.slice(6), opt = imageOpts[key] ?? {};
       const tex = doc.createTexture(path.basename(file)).setImage(fs.readFileSync(path.join(SRC, file))).setMimeType('image/png');
-      const mat = doc.createMaterial(key).setBaseColorTexture(tex).setAlphaMode('BLEND').setRoughnessFactor(0.55).setMetallicFactor(0);
+      const mat = doc.createMaterial(key).setBaseColorTexture(tex).setAlphaMode(key.startsWith('decal:') ? 'BLEND' : 'OPAQUE')
+        .setRoughnessFactor(opt.roughness ?? 0.55).setMetallicFactor(opt.metalness ?? 0);
       // không lặp ảnh ở mép (lặp sẽ kéo màu mép đối diện vào, thành vệt lạ quanh logo)
       mat.getBaseColorTextureInfo().setWrapS(33071).setWrapT(33071);
       return mat;
@@ -411,4 +483,6 @@ async function build(input) {
   }
 }
 
-for (const model of config.models) await build(model);
+// Chỉ dựng vài model: npm run models -- ecohub-sol-pro ecohub-grid-pro
+const only = process.argv.slice(2);
+for (const model of config.models) if (!model.abstract && (!only.length || only.includes(model.out))) await build(model);

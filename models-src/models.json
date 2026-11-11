@@ -50,6 +50,96 @@
       "color": "#1e2b45",
       "roughness": 0.25,
       "metalness": 0.35
+    },
+    "proBody": {
+      "color": "#bcc4cc",
+      "roughness": 0.5,
+      "metalness": 0
+    },
+    "proPole": {
+      "color": "#abb3bd",
+      "roughness": 0.45,
+      "metalness": 0
+    },
+    "proBand": {
+      "color": "#191d21",
+      "roughness": 0.25,
+      "metalness": 0
+    },
+    "proLid": {
+      "color": "#273641",
+      "roughness": 0.85,
+      "metalness": 0
+    },
+    "proNiche": {
+      "color": "#030303",
+      "roughness": 0.9,
+      "metalness": 1
+    },
+    "proPost": {
+      "color": "#7e7e7f",
+      "roughness": 0.6,
+      "metalness": 0
+    },
+    "proTank": {
+      "color": "#bcc5ca",
+      "roughness": 0.5,
+      "metalness": 0
+    },
+    "proFrame": {
+      "color": "#a9b2bc",
+      "roughness": 0.4,
+      "metalness": 0
+    },
+    "proChrome": {
+      "color": "#bfbeba",
+      "roughness": 0.25,
+      "metalness": 1
+    },
+    "proLed": {
+      "color": "#5e5957",
+      "roughness": 0.3,
+      "metalness": 0
+    },
+    "proSwitch": {
+      "color": "#2d5230",
+      "roughness": 0.4,
+      "metalness": 0
+    },
+    "proSwitchBase": {
+      "color": "#120f06",
+      "roughness": 0.5,
+      "metalness": 1
+    },
+    "proHose": {
+      "color": "#12161c",
+      "roughness": 0.5,
+      "metalness": 0
+    },
+    "proHole": {
+      "color": "#050505",
+      "roughness": 0.9,
+      "metalness": 1
+    },
+    "proBodyLow": {
+      "color": "#bdc0c9",
+      "roughness": 0.5,
+      "metalness": 0
+    },
+    "proLedRing": {
+      "color": "#525151",
+      "roughness": 0.4,
+      "metalness": 0
+    },
+    "proFrameUnder": {
+      "color": "#cbc8c1",
+      "roughness": 0.4,
+      "metalness": 0
+    },
+    "proFrameTop": {
+      "color": "#e8f5fc",
+      "roughness": 0.4,
+      "metalness": 0
     }
   },
   "models": [
@@ -333,143 +423,56 @@
       ]
     },
     {
-      "out": "ecohub-grid-pro",
+      "out": "ecohub-pro-chung",
+      "abstract": true,
+      "_note": "Phần chung Sol Pro / Grid Pro, dựng theo ảnh máy NLMT thật (Drive 11/11/2026, images-src/2026-11/may-that/nlmt). 12 STL gốc = thân 40×40×50,6 cm. Màu đã hiệu chỉnh bằng ảnh chụp model-viewer so với ảnh thật (ΔE2000).",
       "dir": ".",
-      "default": "white",
-      "_note": "12 STL gốc trong models-src/ = bản Pro (thân 40×40×50 cm khớp ảnh thông số Pro). Bỏ cột + tấm pin cũ (đặt giữa, nằm ngang) để làm giống ảnh SP.",
-      "exclude": [
-        "Component2",
-        "Component3"
-      ],
+      "default": "proBody",
       "parts": {
-        "Component16": "grey",
-        "Body25": "black",
-        "Body26": "black",
-        "Body27": "black",
-        "Body28": "black"
+        "Component20": "proLid",
+        "Component15": "proTank",
+        "Component16": "proTank",
+        "Component17": "proBodyLow",
+        "Component21": "proBodyLow",
+        "Body25": "proBodyLow",
+        "Body26": "proBodyLow",
+        "Body27": "proBodyLow",
+        "Body28": "proBodyLow"
       },
       "regions": [
         {
-          "part": "Component20",
-          "material": "green",
+          "part": "Component17",
+          "material": "proPost",
           "min": [
-            -210,
-            -210,
-            470
+            -17,
+            -201,
+            22
           ],
           "max": [
-            210,
-            210,
-            505
+            17,
+            -170,
+            188
           ],
-          "normal": [
-            0,
-            0,
-            1
-          ],
-          "minDot": 0.85,
-          "_note": "mặt hướng lên của nắp (cả đáy hốc vít) → xanh; mép bo đứng giữ trắng"
-        },
-        {
-          "part": "Component20",
-          "material": "green",
-          "min": [
-            -194,
-            -194,
-            470
-          ],
-          "max": [
-            194,
-            -30,
-            505
-          ],
-          "_note": "vách hốc vít trong nắp → xanh (chừa viền ngoài + hốc hộp bên hông)"
-        },
-        {
-          "part": "Component20",
-          "material": "green",
-          "min": [
-            -96,
-            -30,
-            470
-          ],
-          "max": [
-            194,
-            120,
-            505
-          ]
-        },
-        {
-          "part": "Component20",
-          "material": "green",
-          "min": [
-            -194,
-            120,
-            470
-          ],
-          "max": [
-            194,
-            194,
-            505
-          ]
+          "_note": "trụ giữa vòm (x ±15) → xám như ảnh nlmt/06"
         },
         {
           "part": "Component17",
-          "material": "green",
+          "material": "proNiche",
           "min": [
-            -60,
-            -199,
-            20
+            -63,
+            -197.5,
+            22
           ],
           "max": [
-            60,
-            -5,
-            185
-          ],
-          "normals": [
-            "+x",
-            "-x",
-            "+z",
-            "-z"
-          ],
-          "_note": "lòng vòm: vách, trần, sàn"
-        },
-        {
-          "part": "Component17",
-          "material": "green",
-          "min": [
-            -60,
-            -190,
-            20
-          ],
-          "max": [
-            60,
-            -5,
-            185
-          ],
-          "normals": [
-            "-y"
-          ],
-          "_note": "lòng vòm: vách sau (không lấy mép bo sát mặt trước)"
-        },
-        {
-          "part": "Component21",
-          "material": "green",
-          "min": [
-            -60,
-            -200,
-            15
-          ],
-          "max": [
-            60,
-            0,
+            63,
+            -125,
             190
           ],
-          "_note": "phần thân dưới nhìn thấy qua vòm"
+          "_note": "lòng vòm (hốc nửa trụ + vòm) → đen; chừa mặt trước"
         },
         {
           "part": "Component19",
-          "material": "green",
+          "material": "proLid",
           "min": [
             -196,
             -196,
@@ -480,11 +483,11 @@
             -28,
             505
           ],
-          "_note": "chân vít dưới nắp trên → lỗ vít trên nắp không lộ trắng (chừa vách quanh hộp bên hông)"
+          "_note": "chân vít dưới nắp → lỗ vít trên nắp không lộ trắng (chừa vách quanh hốc hộp bên hông)"
         },
         {
           "part": "Component19",
-          "material": "green",
+          "material": "proLid",
           "min": [
             -98,
             -28,
@@ -494,12 +497,11 @@
             196,
             118,
             505
-          ],
-          "_note": "chân vít dưới nắp trên → lỗ vít trên nắp không lộ trắng (chừa vách quanh hộp bên hông)"
+          ]
         },
         {
           "part": "Component19",
-          "material": "green",
+          "material": "proLid",
           "min": [
             -196,
             118,
@@ -509,96 +511,28 @@
             196,
             196,
             505
+          ]
+        }
+      ],
+      "stripes": [
+        {
+          "parts": [
+            "Component19",
+            "Component21"
           ],
-          "_note": "chân vít dưới nắp trên → lỗ vít trên nắp không lộ trắng (chừa vách quanh hộp bên hông)"
+          "z": [
+            220,
+            257
+          ],
+          "material": "proBand",
+          "_note": "sọc đen quanh thân: mặt trước = dải C21 lộ ra giữa bình trước (z 220) và thân trên (z 256); đo ảnh nlmt/06–07: z 217–261"
         }
       ],
       "extras": [
         {
-          "name": "nap-lo-cot",
-          "shape": "cylinder",
-          "axis": "z",
-          "radius": 72,
-          "from": [
-            0,
-            0,
-            499.4
-          ],
-          "length": 1,
-          "material": "green",
-          "_note": "bịt lỗ cột tấm pin cũ trên nắp"
-        },
-        {
-          "name": "nut-1",
-          "shape": "cylinder",
-          "axis": "x",
-          "radius": 5.8,
-          "from": [
-            -203,
-            25.9,
-            236.6
-          ],
-          "length": 4.5,
-          "material": "grey"
-        },
-        {
-          "name": "nut-2",
-          "shape": "cylinder",
-          "axis": "x",
-          "radius": 5.8,
-          "from": [
-            -203,
-            58.9,
-            236.6
-          ],
-          "length": 4.5,
-          "material": "grey"
-        },
-        {
-          "name": "cong-usb",
-          "shape": "box",
-          "size": [
-            4,
-            35,
-            17
-          ],
-          "center": [
-            -201,
-            38.6,
-            201.5
-          ],
-          "material": "black"
-        },
-        {
-          "name": "den-bao",
-          "shape": "cylinder",
-          "axis": "x",
-          "radius": 3.6,
-          "from": [
-            -202.5,
-            3.4,
-            201.5
-          ],
-          "length": 4,
-          "material": "black"
-        },
-        {
-          "name": "nut-nguon",
-          "shape": "cylinder",
-          "axis": "x",
-          "radius": 11,
-          "from": [
-            -203,
-            31.9,
-            161.7
-          ],
-          "length": 4.5,
-          "material": "green"
-        },
-        {
           "name": "va-lo-truoc",
           "shape": "decal",
-          "material": "white",
+          "material": "proBody",
           "center": [
             0,
             370
@@ -610,138 +544,404 @@
             68,
             34
           ],
-          "_note": "miếng vá trắng ôm mặt trước, bịt 5 lỗ bắt vít quanh logo (x ±75, z 335…405)"
+          "_note": "miếng vá bịt 5 lỗ bắt vít ở mặt trước (máy thật mặt trước trơn)"
         },
         {
           "name": "logo",
           "shape": "decal",
-          "image": "decals/logo-vio-green.png",
+          "image": "decals/logo-may-that.png",
           "center": [
             0,
-            375
+            398
           ],
-          "height": 120,
+          "height": 92,
           "offset": 0.6,
           "grid": [
             48,
-            28
+            48
           ],
-          "_note": "logo cắt từ ảnh SP (models-src/decals/logo-vio-green.png), dán ôm mặt trước"
+          "roughness": 0.5,
+          "_note": "logo + khẩu hiệu tách từ ảnh nlmt/06 (scripts/make-pro-decals.mjs); tâm z 398, cao 92 mm đo trên ảnh 06/07"
         },
         {
-          "name": "bit-lo-hop",
+          "name": "nut-1-vien",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 7.2,
+          "from": [
+            -201.6,
+            -64,
+            412
+          ],
+          "length": 2.1,
+          "material": "proChrome",
+          "_note": "nút kim loại hông trái (ảnh nlmt/04, đo phóng to): viền Ø14,4, rãnh tối mảnh, nắp Ø8,4; y −64 đo theo mép trước hộp Bio-Tank"
+        },
+        {
+          "name": "nut-1-ranh",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 4.9,
+          "from": [
+            -201.9,
+            -64,
+            412
+          ],
+          "length": 2.4,
+          "material": "proHole"
+        },
+        {
+          "name": "nut-1-nap",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 4.2,
+          "from": [
+            -203.5,
+            -64,
+            412
+          ],
+          "length": 4,
+          "material": "proChrome"
+        },
+        {
+          "name": "nut-2-vien",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 7.2,
+          "from": [
+            -201.6,
+            -64,
+            380
+          ],
+          "length": 2.1,
+          "material": "proChrome"
+        },
+        {
+          "name": "nut-2-ranh",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 4.9,
+          "from": [
+            -201.9,
+            -64,
+            380
+          ],
+          "length": 2.4,
+          "material": "proHole"
+        },
+        {
+          "name": "nut-2-nap",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 4.2,
+          "from": [
+            -203.5,
+            -64,
+            380
+          ],
+          "length": 4,
+          "material": "proChrome"
+        },
+        {
+          "name": "den-vien",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 3.3,
+          "from": [
+            -201.2,
+            -64,
+            338
+          ],
+          "length": 1.7,
+          "material": "proLedRing",
+          "_note": "đèn báo dưới 2 nút: viền xám đen Ø6,6, mắt đèn xám (ảnh nlmt/04, 05)"
+        },
+        {
+          "name": "den-mat",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 2.3,
+          "from": [
+            -201.8,
+            -64,
+            338
+          ],
+          "length": 2.3,
+          "material": "proLed"
+        },
+        {
+          "name": "cong-tac-de",
+          "shape": "box",
+          "size": [
+            3,
+            26,
+            30
+          ],
+          "center": [
+            -201,
+            113,
+            80
+          ],
+          "material": "proSwitchBase",
+          "_note": "công tắc bập bênh xanh, đế đen 26×30 mm (ảnh nlmt/04), thẳng mép sau hộp Bio-Tank"
+        },
+        {
+          "name": "cong-tac-phim",
+          "shape": "box",
+          "size": [
+            2.5,
+            19,
+            23
+          ],
+          "center": [
+            -203.5,
+            113,
+            80
+          ],
+          "material": "proSwitch"
+        },
+        {
+          "name": "ong-1-dung",
           "shape": "cylinder",
           "axis": "z",
-          "radius": 6.3,
+          "radius": 3,
           "from": [
             -151,
             75.5,
-            439.5
+            438
           ],
-          "length": 3.8,
-          "material": "grey",
-          "_note": "bịt lỗ Ø12 trên nắp hộp bên hông"
-        }
-      ],
-      "stripes": [
+          "length": 15,
+          "material": "proHose",
+          "_note": "2 ống đen Ø6 trên nắp hộp Bio-Tank (ảnh nlmt/04, 05): ống 1 ở lỗ Ø12 có sẵn trên C16 (y 75,5), ống 2 ở y 12 (đo 2 ảnh); đứng lên, uốn cong rồi chui vào vách hốc (x −102); đỉnh ống z 462 như ảnh"
+        },
         {
-          "parts": [
-            "Component19",
-            "Component21"
+          "name": "ong-1-cong",
+          "shape": "bend",
+          "radius": 3,
+          "bend": 6,
+          "from": [
+            -151,
+            75.5,
+            453
           ],
-          "z": [
-            258,
-            284
+          "dir": "+z",
+          "to": "+x",
+          "angle": 90,
+          "material": "proHose"
+        },
+        {
+          "name": "ong-1-ngang",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 3,
+          "from": [
+            -145,
+            75.5,
+            459
           ],
-          "material": "green",
-          "skip": {
-            "min": [
-              -210,
-              -35
-            ],
-            "max": [
-              -185,
-              125
-            ]
-          },
-          "_note": "sọc xanh sơn lên vách thân (chừa đoạn hộp bên hông che)"
+          "length": 45,
+          "material": "proHose"
+        },
+        {
+          "name": "ong-2-dung",
+          "shape": "cylinder",
+          "axis": "z",
+          "radius": 3,
+          "from": [
+            -151,
+            12,
+            438
+          ],
+          "length": 15,
+          "material": "proHose"
+        },
+        {
+          "name": "ong-2-cong",
+          "shape": "bend",
+          "radius": 3,
+          "bend": 6,
+          "from": [
+            -151,
+            12,
+            453
+          ],
+          "dir": "+z",
+          "to": "+x",
+          "angle": 90,
+          "material": "proHose"
+        },
+        {
+          "name": "ong-2-ngang",
+          "shape": "cylinder",
+          "axis": "x",
+          "radius": 3,
+          "from": [
+            -145,
+            12,
+            459
+          ],
+          "length": 45,
+          "material": "proHose"
+        },
+        {
+          "name": "khe-trai",
+          "shape": "box",
+          "size": [
+            0.6,
+            1.6,
+            200
+          ],
+          "center": [
+            -200.2,
+            -5,
+            120
+          ],
+          "material": "proHole",
+          "_note": "khe nối nắp trước C17 với thân dưới C21 ở 2 bên hông (ảnh nlmt/04: khe đen ~1,6 mm tại y −5, từ dưới sọc đen xuống z 20); CAD 2 mặt liền nên phải vẽ thêm"
+        },
+        {
+          "name": "khe-phai",
+          "shape": "box",
+          "size": [
+            0.6,
+            1.6,
+            200
+          ],
+          "center": [
+            200.2,
+            -5,
+            120
+          ],
+          "material": "proHole"
+        },
+        {
+          "name": "lo-sau",
+          "shape": "box",
+          "size": [
+            14,
+            5,
+            8
+          ],
+          "center": [
+            -145.5,
+            191,
+            25.5
+          ],
+          "material": "proHole",
+          "_note": "khối đen sau khe nhỏ ở lưng (để khe tối như ảnh, không lộ vách trắng bên trong)"
+        },
+        {
+          "name": "lo-day",
+          "shape": "box",
+          "size": [
+            4,
+            14,
+            14
+          ],
+          "center": [
+            192,
+            85.8,
+            219.6
+          ],
+          "material": "proHole",
+          "_note": "khối đen sau lỗ luồn dây hông phải"
+        }
+      ]
+    },
+    {
+      "out": "ecohub-grid-pro",
+      "extends": "ecohub-pro-chung",
+      "_note": "Grid Pro = thân Pro không cột, không tấm pin. Chưa có ảnh máy Grid Pro thật → màu + cụm nút theo máy NLMT (cần chủ web xác nhận).",
+      "exclude": [
+        "Component2",
+        "Component3"
+      ],
+      "extras": [
+        {
+          "name": "nap-lo-cot",
+          "shape": "cylinder",
+          "axis": "z",
+          "radius": 64,
+          "from": [
+            0,
+            0,
+            499.5
+          ],
+          "length": 1,
+          "material": "proLid",
+          "_note": "đậy lỗ Ø120 của cột trên nắp"
         }
       ]
     },
     {
       "out": "ecohub-sol-pro",
-      "extends": "ecohub-grid-pro",
-      "_note": "Sol Pro = Grid Pro + cột + tấm pin ở góc sau trái như ảnh SP.",
+      "extends": "ecohub-pro-chung",
+      "_note": "Sol Pro = máy NLMT trong ảnh: cột C3 giữa nắp + khay pin C2 nghiêng 30° (CAD gốc) + bề mặt ô pin vẽ lại theo ảnh nlmt/01.",
+      "parts": {
+        "Component2": "proFrame",
+        "Component3": "proPole"
+      },
+      "regions": [
+        {
+          "part": "Component2",
+          "material": "proFrameUnder",
+          "min": [
+            -300,
+            -300,
+            300
+          ],
+          "max": [
+            300,
+            300,
+            900
+          ],
+          "normal": [
+            0,
+            0.5,
+            -0.866
+          ],
+          "minDot": 0.9,
+          "_note": "khay pin C2 là nhựa trắng nhưng mỗi hướng mặt có màu khác trên ảnh: mặt dưới (quay xuống, ra sau) xám ấm #9d9b95 (ảnh nlmt/03), mặt trên vành trắng (ảnh 01), vách + mép trước xám lạnh #98a0aa (ảnh 07) → 3 màu theo hướng mặt"
+        },
+        {
+          "part": "Component2",
+          "material": "proFrameTop",
+          "min": [
+            -300,
+            -300,
+            300
+          ],
+          "max": [
+            300,
+            300,
+            900
+          ],
+          "normal": [
+            0,
+            -0.5,
+            0.866
+          ],
+          "minDot": 0.9
+        }
+      ],
       "extras": [
         {
-          "name": "cot-pin",
-          "shape": "cylinder",
-          "axis": "z",
-          "radius": 12,
-          "from": [
-            -150,
-            160,
-            499
-          ],
-          "length": 172,
-          "material": "metal"
-        },
-        {
-          "name": "khop-pin",
-          "shape": "box",
+          "name": "mat-pin",
+          "shape": "plane",
           "size": [
-            34,
-            28,
-            28
+            532,
+            352
           ],
           "center": [
-            -150,
-            155,
-            676
+            0,
+            -13.47,
+            657.33
           ],
-          "material": "metal"
-        },
-        {
-          "name": "khung-pin",
-          "shape": "box",
-          "size": [
-            380,
-            240,
-            12
-          ],
-          "center": [
-            -10,
-            70,
-            640
-          ],
-          "rotX": 28,
-          "material": "white"
-        },
-        {
-          "name": "o-pin",
-          "shape": "box",
-          "size": [
-            364,
-            224,
-            2
-          ],
-          "center": [
-            -10,
-            70,
-            647
-          ],
-          "grid": [
-            8,
-            5,
-            3
-          ],
-          "rotX": 28,
-          "pivot": [
-            -10,
-            70,
-            640
-          ],
-          "material": "solarCell"
+          "rotX": 30,
+          "image": "decals/pin-mat-tren.png",
+          "roughness": 0.3,
+          "metalness": 0,
+          "_note": "bề mặt ô pin trong lòng khay C2 (u ±266, v 141…493), thấp hơn mép vành 3 mm (w 576); ảnh từ scripts/make-pro-decals.mjs"
         }
       ]
     }

@@ -856,6 +856,17 @@
         "Component2",
         "Component3"
       ],
+      "stripes": [],
+      "_noteStripes": "Grid Pro không có sọc đen quanh thân (chủ web yêu cầu 11/11/2026); Sol Pro vẫn giữ sọc như ảnh máy thật",
+      "parts": {
+        "Component17": "proBody",
+        "Component21": "proBody",
+        "Body25": "proBody",
+        "Body26": "proBody",
+        "Body27": "proBody",
+        "Body28": "proBody"
+      },
+      "_noteParts": "thân dưới cùng màu thân trên (chủ web 11/11/2026: proBodyLow nhìn hơi hồng); Sol Pro vẫn 2 màu theo ảnh máy thật",
       "extras": [
         {
           "name": "nap-lo-cot",

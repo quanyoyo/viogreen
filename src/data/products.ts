@@ -96,6 +96,8 @@ const raw: Raw[] = [
     variants: warranty,
     price: 1_999_000,
     images: [img('ecohub-sol')],
+    // 3D TẠM (11/11/2026, chủ web yêu cầu): model Sol Pro thu nhỏ ×0,77 cho đúng cỡ máy (npm run models:tam) – thay khi có 3D riêng
+    model: { glb: '/models/ecohub-sol-tam.glb' },
     info: [img('ecohub-sol-info')],
   },
   {
@@ -122,6 +124,8 @@ const raw: Raw[] = [
     variants: warranty,
     price: 1_499_000,
     images: [img('ecohub-grid')],
+    // 3D TẠM (11/11/2026, chủ web yêu cầu): model Grid Pro thu nhỏ ×0,77 cho đúng cỡ máy (npm run models:tam) – thay khi có 3D riêng
+    model: { glb: '/models/ecohub-grid-tam.glb' },
     info: [img('ecohub-grid-info')],
   },
   {
@@ -149,8 +153,8 @@ const raw: Raw[] = [
     variants: warranty,
     price: 2_299_000,
     images: [img('ecohub-sol-plus')],
-    // 3D bản Plus (Drive '3D máy nhỏ', 25×25×35,6 cm). Tấm pin, hộp Bio-Tank, nút bấm dựng tay theo ảnh (file CAD thiếu) – bản tạm 05/11/2026
-    model: { glb: '/models/ecohub-sol-plus.glb' },
+    // 3D TẠM (11/11/2026, chủ web yêu cầu): model Sol Pro thu nhỏ ×0,66 cho đúng cỡ máy (npm run models:tam) – bản 3D AI cũ vẫn giữ ở /models/ecohub-sol-plus.glb
+    model: { glb: '/models/ecohub-sol-plus-tam.glb' },
     info: [img('ecohub-sol-plus-info')],
   },
   {
@@ -177,7 +181,8 @@ const raw: Raw[] = [
     variants: warranty,
     price: 1_799_000,
     images: [img('ecohub-grid-plus')],
-    model: { glb: '/models/ecohub-grid-plus.glb' },
+    // 3D TẠM (11/11/2026, chủ web yêu cầu): model Grid Pro thu nhỏ ×0,66 cho đúng cỡ máy (npm run models:tam) – bản 3D AI cũ vẫn giữ ở /models/ecohub-grid-plus.glb
+    model: { glb: '/models/ecohub-grid-plus-tam.glb' },
     info: [img('ecohub-grid-plus-info')],
     note: 'Việc lắp đặt phải tuân thủ hướng dẫn kỹ thuật của sản phẩm.',
   },

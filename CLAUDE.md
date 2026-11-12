@@ -216,14 +216,16 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Sản phẩm:**
   - ✅ Giá 6 ECOHUB + Bio-Nutri 25g / Box (11/11/2026, bảng "Price setting"). ECOBOX Bio-Tank, Aqua-Tank, Bio-Dripper, Hose nay là **hàng tặng – không bán** nên không cần giá. Không còn mục nào ghi "Liên hệ".
   - Phí gói bảo hành 18 / 24 tháng (nếu có) – chủ web: "update later"
-  - **Tên phụ kiện:** bảng giá ghi "VIO Dripper Set", "VIO Micro-Hose"; web giữ Bio-Dripper, VIO GREEN Hose – hỏi khách có đổi không (link trang giữ nguyên).
+  - **Tên 2 phụ kiện tưới – ĐANG HỎI KHÁCH (12/11/2026), web giữ tên cũ:** chính tài liệu của khách dùng cả hai bộ tên.
+    Tên mới ở **bảng giá** (`docs/Thông tin làm web.docx`, dòng 13–14: "VIO Dripper Set" | Box, "VIO Micro-Hose" | Meter) và ở **ảnh thông số** đang hiện trên trang (`public/products/dripper-info.webp` in "VIO Dripper Set – VIO DRIP-01", `hose-info.webp`).
+    Tên cũ ở **phần mô tả sản phẩm trong cùng tài liệu đó**: "Phụ kiện tương thích theo tài liệu gốc: Bio-Tank S, Aqua-Tank S, **Bio-Dripper**, **VIO GREEN Hose** và Bio-Nutri".
+    Nếu khách chốt đổi: chỉ đổi `name` / `shortName` trong `products.ts`, **giữ nguyên slug** `bio-dripper` và `vio-green-hose` để không hỏng link cũ.
   - ✅ Số chậu và chế độ cấp nước: web đã theo đúng bảng khách gửi 11/11/2026. **Còn chờ:** công suất (100 / 130 / 250 W) và kích thước (30×30×40 / 25×25×35 / 40×40×50 cm) in trên ảnh thông số nhưng **web chưa đưa vào bảng thông số sản phẩm** – hỏi khách có muốn thêm không. (Kích thước này đã dùng để chỉnh cỡ model AR, xem mục 7.)
   - ✅ ~~Số gói trong Multi-Pack~~ → đổi thành Bio-Nutri Box 250 g
   - Phụ kiện **đi kèm** trong hộp từng model
   - ✅ Cảm biến / Web App / AI Chat: chủ web xác nhận đúng cho các dòng ECOHUB (theo nội dung blog, 05/11/2026)
   - Mô tả **Bio-Tank Pro** (dung tích, kích thước) – trang Bio-Tank hiện dùng mô tả chung cho 3 dòng máy
   - ✅ Ảnh 6 ECOHUB + Bio-Tank, Aqua-Tank, Bio-Dripper, Hose (05/11/2026); ✅ ảnh Bio-Nutri 25g + Box (11/11/2026, Drive "Bộ sản phẩm"). Bao bì in **"VIO-NUTRI"**, web giữ tên "Bio-Nutri" theo bảng giá
-  - Tên trên ảnh phụ kiện khác tên trên web: "VIO Dripper Set (VIO DRIP-01)" ↔ Bio-Dripper, "VIO Micro-Hose" ↔ VIO GREEN Hose – web giữ tên cũ, hỏi khách nếu muốn đổi
 - **Bảo hành / vận chuyển:**
   - ✅ Bảo hành tiêu chuẩn 12 tháng (khách ghi trong thanh chữ chạy 18/10/2026)
   - Dòng chữ chạy "Giao hàng miễn phí từ 2.000.000đ" rộng hơn chính sách vận chuyển (chỉ miễn phí ở Hà Nội) – nay đã có giá thật (Sol Plus, Grid Pro, Sol Pro trên 2 triệu) nên càng cần chốt; chủ web: "update later"

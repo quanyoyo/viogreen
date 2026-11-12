@@ -40,7 +40,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   const theAr = (() => { try { const a = document.createElement('a'); return !!(a.relList && a.relList.supports && a.relList.supports('ar')); } catch { return false; } })();
   const coWebXR = 'xr' in navigator;
 
-  const ten = laIOS ? (trinhDuyetKhacTrenIOS ? 'iPhone/iPad – trình duyệt khác Safari' : 'iPhone/iPad – Safari hoặc trình duyệt trong ứng dụng')
+  const ten = laIOS ? (trinhDuyetKhacTrenIOS ? 'iPhone/iPad – trình duyệt KHÔNG phải Safari' : 'iPhone/iPad – Safari hoặc trình duyệt trong ứng dụng')
     : laAndroid ? 'Android' : 'Máy tính';
 
   const dong: [string, string][] = [
@@ -86,8 +86,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const duoc = !!mv.canActivateAR;
       dong.splice(1, 0, ['Web bật được nút AR (canActivateAR)', duoc ? 'CÓ' : 'KHÔNG']);
       ve();
-      if (duoc) dat(true, 'Máy này ướm AR được', 'Mở trang sản phẩm, bấm “Thử với AR” rồi bấm “Xem trong không gian của bạn”.');
-      else if (laIOS) dat(false, 'Máy này chưa ướm AR được', 'iPhone/iPad: hãy mở trang bằng Safari hoặc Chrome. Nếu đang mở từ Zalo hoặc Facebook, bấm dấu ⋯ rồi chọn “Mở trong Safari”. Nếu vẫn không được, kiểm tra Cài đặt → Quyền riêng tư & Bảo mật → Chế độ khoá (Lockdown Mode) xem có đang bật không.');
+      // Trên iPhone, chế độ ướm chỉ chạy trong Safari (trình duyệt khác chỉ chạy nếu web tự cung cấp file .usdz)
+      if (trinhDuyetKhacTrenIOS) dat(false, 'Trình duyệt này không ướm được',
+        'Trên iPhone, chế độ ướm chỉ chạy trong Safari. Hãy mở lại trang bằng Safari rồi thử lại.');
+      else if (duoc) dat(true, 'Máy này ướm AR được', 'Mở trang sản phẩm, bấm “Thử với AR” rồi bấm “Xem trong không gian của bạn”.');
+      else if (laIOS) dat(false, 'Máy này chưa ướm AR được', 'iPhone/iPad: hãy mở trang bằng Safari. Nếu đang mở từ Zalo hoặc Facebook, bấm dấu ⋯ rồi chọn “Mở trong Safari”. Nếu vẫn không được, kiểm tra Cài đặt → Quyền riêng tư & Bảo mật → Chế độ khoá (Lockdown Mode) xem có đang bật không.');
       else if (laAndroid) dat(false, 'Máy này chưa ướm AR được', 'Android: hãy dùng Chrome và cài “Google Play Services for AR” từ CH Play. Một số máy không nằm trong danh sách Google hỗ trợ thì không chạy được.');
       else dat(false, 'Máy tính không ướm AR được', 'Đây là điều bình thường: máy tính không có chế độ ướm AR. Hãy mở trang này trên điện thoại.');
     } catch {

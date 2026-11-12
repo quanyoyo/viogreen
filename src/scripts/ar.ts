@@ -28,11 +28,21 @@ const loadModelViewer = () =>
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
+// Trên iPhone, chế độ ướm (AR Quick Look của Apple) chỉ chạy trong Safari (chủ web kiểm chứng 12/11/2026).
+// Trong mã model-viewer: điều kiện bật quick-look là `Gd && !kd && (!Od || ios-src != null)`, với Od = Chrome /
+// Edge / Firefox / DuckDuckGo / ứng dụng Google trên iPhone. Tức các trình duyệt đó chỉ chạy được nếu web tự
+// cung cấp sẵn file .usdz qua `ios-src`; web đang để model-viewer tự chuyển đổi nên nút bị ẩn ở đó.
+const laIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const iosKhongPhaiSafari = laIOS && /CriOS\/|EdgiOS\/|FxiOS\/|GSA\/|DuckDuckGo\//.test(navigator.userAgent);
+
 /** Dòng hướng dẫn dưới khung xem, tuỳ máy có ướm được AR hay không */
 const CHI_DAN = {
   co: 'Kéo để xoay 360°, chụm hai ngón để phóng to. Bấm “Xem trong không gian của bạn” để ướm máy vào chỗ bạn định đặt.',
+  iosKhacSafari: 'Kéo để xoay 360°, chụm hai ngón để phóng to. Trên iPhone, chế độ ướm vào không gian thật '
+    + 'chỉ chạy trong Safari – hãy mở lại trang này bằng Safari rồi bấm “Xem trong không gian của bạn”.',
   khong: 'Kéo để xoay 360°, lăn chuột hoặc chụm hai ngón để phóng to. Muốn ướm máy vào không gian thật, hãy mở trang này '
-    + 'trên điện thoại: iPhone dùng Safari hoặc Chrome (mở từ Zalo, Facebook thì chọn “Mở trong Safari”), '
+    + 'trên điện thoại: iPhone mở bằng Safari (đang ở trong Zalo hay Facebook thì bấm ⋯ rồi chọn “Mở trong Safari”), '
     + 'Android dùng Chrome và cần cài “Google Play Services for AR”.',
 };
 
@@ -59,7 +69,9 @@ async function openAR(slug: string) {
       // tưởng web hỏng. Máy tính không bao giờ có AR; trên iPhone, trình duyệt trong Zalo / Facebook cũng không.
       // canActivateAR chỉ đúng sau khi model tải xong, nên phải đợi sự kiện "load".
       const mv = $('model-viewer', stage) as (HTMLElement & { canActivateAR?: boolean; loaded?: boolean }) | null;
-      const datChiDan = () => { hint.textContent = mv?.canActivateAR ? CHI_DAN.co : CHI_DAN.khong; };
+      const datChiDan = () => {
+        hint.textContent = iosKhongPhaiSafari ? CHI_DAN.iosKhacSafari : mv?.canActivateAR ? CHI_DAN.co : CHI_DAN.khong;
+      };
       if (mv?.loaded) datChiDan(); else mv?.addEventListener('load', datChiDan, { once: true });
     } catch {
       stage.innerHTML = `<p class="p-8 text-center text-muted">Không tải được trình xem 3D. Vui lòng kiểm tra kết nối mạng và thử lại.</p>`;

@@ -28,6 +28,14 @@ const loadModelViewer = () =>
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
+/** Dòng hướng dẫn dưới khung xem, tuỳ máy có ướm được AR hay không */
+const CHI_DAN = {
+  co: 'Kéo để xoay 360°, chụm hai ngón để phóng to. Bấm “Xem trong không gian của bạn” để ướm máy vào chỗ bạn định đặt.',
+  khong: 'Kéo để xoay 360°, lăn chuột hoặc chụm hai ngón để phóng to. Muốn ướm máy vào không gian thật, hãy mở trang này '
+    + 'trên điện thoại: iPhone dùng Safari hoặc Chrome (mở từ Zalo, Facebook thì chọn “Mở trong Safari”), '
+    + 'Android dùng Chrome và cần cài “Google Play Services for AR”.',
+};
+
 async function openAR(slug: string) {
   const p = bySlug[slug];
   if (!modal || !p) return;
@@ -37,7 +45,7 @@ async function openAR(slug: string) {
 
   if (p.model) {
     stage.innerHTML = `<div class="flex aspect-square items-center justify-center text-sm text-muted sm:aspect-[4/3]">Đang tải mô hình 3D…</div>`;
-    hint.textContent = 'Kéo để xoay 360°, chụm hai ngón để phóng to. Trên điện thoại bấm “Xem trong không gian của bạn”.';
+    hint.textContent = 'Kéo để xoay 360°, chụm hai ngón để phóng to.';
     openLayer(modal);
     try {
       await loadModelViewer();
@@ -47,6 +55,12 @@ async function openAR(slug: string) {
         style="display:block;width:100%;height:auto;aspect-ratio:4/3;background:var(--color-cream)">
         <button slot="ar-button" class="btn btn-primary absolute bottom-4 left-1/2 -translate-x-1/2">Xem trong không gian của bạn</button>
       </model-viewer>`;
+      // Máy không ướm được AR thì model-viewer tự ẩn nút → dòng hướng dẫn phải nói đúng, nếu không khách
+      // tưởng web hỏng. Máy tính không bao giờ có AR; trên iPhone, trình duyệt trong Zalo / Facebook cũng không.
+      // canActivateAR chỉ đúng sau khi model tải xong, nên phải đợi sự kiện "load".
+      const mv = $('model-viewer', stage) as (HTMLElement & { canActivateAR?: boolean; loaded?: boolean }) | null;
+      const datChiDan = () => { hint.textContent = mv?.canActivateAR ? CHI_DAN.co : CHI_DAN.khong; };
+      if (mv?.loaded) datChiDan(); else mv?.addEventListener('load', datChiDan, { once: true });
     } catch {
       stage.innerHTML = `<p class="p-8 text-center text-muted">Không tải được trình xem 3D. Vui lòng kiểm tra kết nối mạng và thử lại.</p>`;
     }

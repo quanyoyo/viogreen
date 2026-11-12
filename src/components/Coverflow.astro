@@ -8,7 +8,7 @@ const { slides, label } = Astro.props;
 <div data-coverflow aria-roledescription="carousel" aria-label={label}>
   <div class="relative aspect-[2/1] w-full sm:aspect-[2.75/1]">
     {slides.map((s, i) => (
-      <button type="button" class="cf-slide absolute top-0 left-1/2 h-full w-[80%] overflow-hidden rounded-3xl bg-cream sm:w-[58%]"
+      <button type="button" class="cf-slide absolute top-0 left-1/2 h-full w-[86%] overflow-hidden rounded-3xl bg-cream sm:w-[64%]"
         data-cf-slide={i} data-pos={i === 0 ? '0' : i === 1 ? '1' : i === slides.length - 1 ? '-1' : '2'}
         aria-label={`Xem ảnh ${i + 1}: ${s.alt}`} aria-roledescription="slide">
         <img src={s.small} srcset={`${s.small} 800w, ${s.src} 1600w`} sizes="(min-width: 640px) 58vw, 80vw" alt={s.alt}
@@ -35,8 +35,8 @@ const { slides, label } = Astro.props;
     transition: transform 0.75s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.75s, filter 0.75s, box-shadow 0.75s;
   }
   .cf-slide[data-pos='0'] { transform: translateX(-50%) scale(1); opacity: 1; z-index: 3; pointer-events: auto; cursor: default; box-shadow: var(--shadow-lift); }
-  .cf-slide[data-pos='-1'] { transform: translateX(-110%) scale(0.8); opacity: 1; z-index: 2; pointer-events: auto; cursor: pointer; filter: brightness(0.82) saturate(0.9); }
-  .cf-slide[data-pos='1'] { transform: translateX(10%) scale(0.8); opacity: 1; z-index: 2; pointer-events: auto; cursor: pointer; filter: brightness(0.82) saturate(0.9); }
+  .cf-slide[data-pos='-1'] { transform: translateX(-106%) scale(0.74); opacity: 1; z-index: 2; pointer-events: auto; cursor: pointer; filter: brightness(0.74) saturate(0.85) blur(3px); }
+  .cf-slide[data-pos='1'] { transform: translateX(6%) scale(0.74); opacity: 1; z-index: 2; pointer-events: auto; cursor: pointer; filter: brightness(0.74) saturate(0.85) blur(3px); }
   .cf-slide[data-pos='-2'] { transform: translateX(-150%) scale(0.6); }
   .cf-slide[data-pos='2'] { transform: translateX(50%) scale(0.6); }
   .cf-slide[data-pos='-1']:hover, .cf-slide[data-pos='1']:hover { filter: none; }

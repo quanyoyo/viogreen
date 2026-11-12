@@ -18,17 +18,18 @@ const info = [
 <BaseLayout title="Liên hệ" active="contact" description="Liên hệ VIO GREEN để được tư vấn giải pháp chăm sóc cây thông minh ECOHUB cho ban công, sân thượng, văn phòng.">
   <Breadcrumbs items={[['Liên hệ']]} />
 
-  <!-- HERO: ảnh bìa (chuyển từ trang Sản phẩm sang, 05/11/2026) – nửa phải mờ trắng, chữ đặt bên phải -->
+  <!-- HERO: ảnh bìa (chuyển từ trang Sản phẩm sang, 05/11/2026) – nửa phải mờ trắng, chữ đặt bên phải.
+       object-[0%_72%]: trên máy tính ảnh bị cắt trên/dưới, lấy khung thấp xuống để thấy trọn máy (khách yêu cầu 11/11/2026) -->
   <section class="relative isolate overflow-hidden bg-white">
     <div class="relative aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto">
       <img src="/assets/banner-san-pham.webp" srcset="/assets/banner-san-pham-800.webp 800w, /assets/banner-san-pham.webp 1680w" sizes="100vw"
-        alt="Máy VIO GREEN ECOHUB bên các luống rau trên sân thượng" class="size-full animate-breath object-cover object-left" fetchpriority="high" />
+        alt="Máy VIO GREEN ECOHUB bên các luống rau trên sân thượng" class="size-full animate-breath object-cover object-[0%_72%]" fetchpriority="high" />
       <div aria-hidden="true" class="absolute inset-0 bg-[linear-gradient(to_top,white,transparent_35%)] lg:bg-[linear-gradient(to_left,rgb(255_255_255/.96)_0%,rgb(255_255_255/.9)_40%,rgb(255_255_255/.55)_52%,transparent_68%)]"></div>
     </div>
     <div class="container-x relative grid lg:min-h-[480px] lg:grid-cols-[1.35fr_1fr] lg:items-center">
       <div class="-mt-6 pb-12 lg:col-start-2 lg:mt-0 lg:py-16" data-reveal>
         <p class="eyebrow">Liên hệ VIO GREEN</p>
-        <h1 class="h-display">Cùng nhau vun trồng lối sống xanh.</h1>
+        <h1 class="h-display">Cùng nhau vun trồng<br class="hidden lg:inline" /> lối sống xanh.</h1>
         <p class="mt-4 text-lg text-muted">Bạn đã sẵn sàng mang thiên nhiên xanh mát vào không gian sống của mình? Hãy để lại thông tin, đội ngũ chuyên gia VIO GREEN sẽ đồng hành cùng bạn hiện thực hóa khu vườn mơ ước.</p>
         <div class="mt-6 flex flex-wrap gap-3">
           <a href="#tu-van" class="btn btn-primary">Gửi yêu cầu tư vấn</a>
@@ -61,7 +62,7 @@ const info = [
           </div>
           <div class="flex items-center gap-4 rounded-card bg-brand p-6 text-white shadow-lift">
             <span class="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/15"><Icon name="globe" class="size-6" /></span>
-            <div><p class="font-bold">Cam kết xanh 100%</p><p class="text-sm text-brand-100">Mỗi sản phẩm VIO GREEN đều hướng tới sự phát triển bền vững và giảm thiểu dấu chân carbon cho đô thị.</p></div>
+            <div><p class="font-bold">Cam kết chất lượng</p><p class="text-sm text-brand-100">Mỗi sản phẩm VIO GREEN đều được chú trọng về chất lượng, độ bền và hiệu quả vận hành, mang đến giải pháp chăm sóc cây thông minh, an toàn và đáng tin cậy cho người dùng.</p></div>
           </div>
         </div>
 

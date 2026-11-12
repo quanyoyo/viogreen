@@ -32,8 +32,8 @@ const priced = !!p.price || !!p.variants?.prices?.some((x) => x);
     <p class="line-clamp-2 text-sm text-muted">{p.summary}</p>
     {tags.length > 0 && <ul class="flex flex-wrap gap-1.5">{tags.map((t) => <li class="tag">{t}</li>)}</ul>}
     <div class="mt-auto flex items-center justify-between gap-3 pt-3">
-      <span class:list={['font-bold', priced ? 'text-lg text-ink' : 'text-base text-brand']}>{formatPrice(p, site.priceFallback)}</span>
-      {p.variants?.pick ? (
+      <span class:list={['font-bold', p.gift ? 'text-sm text-brand' : priced ? 'text-lg text-ink' : 'text-base text-brand']}>{p.gift ? 'Hàng tặng – không bán' : formatPrice(p, site.priceFallback)}</span>
+      {p.gift ? null : p.variants?.pick ? (
         <a href={href} aria-label={`Chọn máy cho ${p.shortName}`}
           class="relative z-10 inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-brand px-4 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-brand-700">
           Chọn máy <Icon name="arrowRight" class="size-4" />

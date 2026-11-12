@@ -2,7 +2,7 @@
 import Icon from './Icon.astro';
 interface Props { source: string; compact?: boolean }
 const { source, compact = false } = Astro.props;
-const spaces = ['Ban công', 'Sân thượng', 'Căn hộ', 'Văn phòng', 'Quán cà phê', 'Khác'];
+const spaces = ['Ban công', 'Sân thượng', 'Căn hộ', 'Khác']; // bỏ Văn phòng, Quán cà phê (khách yêu cầu 11/11/2026)
 // Số lượng cây thay cho diện tích (khách yêu cầu 18/10/2026). Vẫn lưu vào trường `area` của lead.
 const areas = ['Dưới 15 cây', 'Dưới 20 cây', 'Dưới 30 cây', 'Trên 30 cây', 'Chưa rõ'];
 ---

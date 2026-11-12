@@ -45,9 +45,9 @@ npm run models:tam # 3D TẠM: Sol Pro / Grid Pro thu nhỏ → ecohub-{sol,grid
 npm run models:ai  # bản 3D AI Grid Plus + Sol Plus → public/models/ecohub-{grid,sol}-plus.glb (scripts/build-ai-models.mjs; thêm tên grid-plus / sol-plus để dựng 1 máy)
 ```
 
-- **Ảnh gốc khách gửi:** `images-src/` (không commit; bản gốc ở Google Drive "Ảnh làm web"). Đã đổi tên cho rõ nghĩa. Danh sách ảnh nào → file nào trong `public/` khai báo ở `scripts/optimize-images.mjs`; ảnh máy Sol có nền "ô cờ" giả in liền → script tự tô trắng (`clearChecker`).
+- **Ảnh gốc khách gửi:** `images-src/` (không commit; bản gốc ở Google Drive "Ảnh làm web"). Đã đổi tên cho rõ nghĩa. Danh sách ảnh nào → file nào trong `public/` khai báo ở `scripts/optimize-images.mjs`; ảnh máy Sol có nền "ô cờ" giả in liền → script tự tô trắng (`clearChecker`); ảnh chụp thật trên phông trơn (Bio-Nutri) dùng `rotate` + `white` (cân trắng phông) + `trim` (cắt sát sản phẩm, khung vuông) – xem `framed()`.
   - Đợt 05/11/2026: `images-src/2026-11/san-pham/` (Drive "ảnh sản phẩm" + thư mục con "SẢN PHẨM PHỤ KIỆN"), `images-src/2026-11/blog-doc/` (ảnh bài blog, lấy từ `web_information.docx`). Các thư mục Drive trong tài liệu để chế độ "ai có link cũng xem được" → tải được thẳng bằng script, không cần khách tải hộ.
-- **Tài liệu khách:** `docs/web_information.docx` (05/11/2026, bản mới nhất; `docs/` không commit) = bản `D:\Thông tin làm web.docx` (18/10) + phần mới ở đầu (giá, ECOBOX theo máy, Bio-Nutri Box, ảnh, bố cục) + 5 bài blog. Máy chưa có pandoc → đọc bằng `zipfile`/unzip + XML.
+- **Tài liệu khách:** `docs/Thông tin làm web.docx` (11/11/2026, **bản mới nhất**) = bản 05/11 + 15 yêu cầu mới ở đầu (giá mới, hàng tặng, bảng số chậu / chế độ cấp nước, địa chỉ, chữ và bố cục các trang). Bản trước: `docs/web_information.docx` (05/11/2026; `docs/` không commit) = bản `D:\Thông tin làm web.docx` (18/10) + phần mới ở đầu (giá, ECOBOX theo máy, Bio-Nutri Box, ảnh, bố cục) + 5 bài blog. Máy chưa có pandoc → đọc bằng `zipfile`/unzip + XML.
 
 ## 4. Cấu trúc thư mục
 
@@ -109,7 +109,8 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 ## 6. Quy ước dữ liệu
 
 - `price: null` → hiển thị "Liên hệ"; giỏ hàng ghi "Nhân viên sẽ báo giá".
-- **Giá (05/11/2026, bảng giá khách gửi):** Grid 1.499.000, Sol 1.999.000, Grid Plus 1.799.000, Sol Plus 2.299.000, Grid Pro 2.499.000, Sol Pro 3.399.000, Bio-Tank máy S và máy Plus 39.000 (đ). Còn lại "Liên hệ" (khách dặn chưa có giá thì để Liên hệ; Bio-Nutri chưa cần giá).
+- **Giá (11/11/2026, bảng "Price setting" khách gửi):** Grid 2.199.000, Sol 2.599.000, Grid Plus 2.799.000, Sol Plus 3.299.000, Grid Pro 4.399.000, Sol Pro 5.099.000, Bio-Nutri 25g 29.000, Bio-Nutri Box 209.000 (đ).
+- **Hàng tặng (`gift: true`, 11/11/2026):** ECOBOX Bio-Tank, ECOBOX Aqua-Tank, Bio-Dripper, Hose → thẻ SP và trang chi tiết ghi **"Hàng tặng – không bán"**, bỏ giá / số lượng / nút giỏ hàng / Mua ngay, không có `offers` trong JSON-LD. Giỏ hàng cũ của khách còn các món này thì `cart.ts` tự bỏ ra kèm 1 thông báo. Vẫn giữ trang riêng và nút "Chọn máy" (để link `?may=` từ trang máy chọn sẵn đúng dòng). Tài liệu chưa nói tặng kèm máy nào → web không ghi.
 - `variants.prices` = giá riêng từng lựa chọn (cùng thứ tự `options`, `null` = Liên hệ); thẻ SP hiện "Từ …" khi các lựa chọn khác giá. Giỏ hàng + đơn lưu **đơn giá theo lựa chọn** (`cart.ts → unitPrice`). `variants.pick: true` = nút trên thẻ SP thành "Chọn máy" (mở trang chi tiết) thay vì thêm ngay.
 - `images` = khung ảnh trang chi tiết (ảnh đầu hiện to, bấm để phóng to: nút +/−, cuộn chuột, chụm 2 ngón, nhấp đúp, kéo). `thumb` = ảnh trên thẻ SP / giỏ hàng (mặc định `images[0]`, dùng bản `-800`). `info` = ảnh có chữ, hiện trong phần mô tả (ECOHUB). Phụ kiện: ảnh có chữ đứng **trước**, ảnh nền trắng sau (khách yêu cầu). `images: []` → ảnh tạm.
 - `model: null` → nút "Thử với AR" hiện "Đang cập nhật". File 3D đặt trong `public/models/`, dạng `{ glb, usdz }`.
@@ -121,8 +122,9 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Viết khối lượng:** số và "g" viết liền: **25g, 250g** (khách yêu cầu 05/11/2026). Riêng chữ "gram" trong mô tả giữ nguyên.
   - ~~VIO-Care (2)~~ đã bỏ: bảo hành chọn ngay ở trang chi tiết máy ECOHUB (`variants` = `warrantyOptions`: 12 / 18 / 24 tháng, lưu vào đơn như biến thể "Bảo hành 18 tháng"). Giá máy kèm gói 12 tháng; phí gói 18/24 tháng chờ khách.
 - **Mô tả SP** lấy từ tài liệu, đã bỏ ghi chú nội bộ ("Lưu ý kỹ thuật… chưa được xác nhận", "Thông tin cần xác nhận", "Theo định vị trong tài liệu hiện tại"). `highlights` = Đặc điểm chính / Công dụng.
-- **Số lượng cây thay cho diện tích:** `plants` = `<15` ("Dưới 15 cây", máy cho không gian dưới 10 m²) / `<30` ("Dưới 30 cây", 10–20 m²). Form liên hệ: Dưới 15 / 20 / 30 / Trên 30 cây / Chưa rõ (vẫn lưu trường `area` của lead).
-- **Bộ lọc ECOHUB:** số lượng cây (`<15` / `<30`), nguồn điện (`solar` / `grid`), nguồn nước (`tank` / `direct`).
+- **Số lượng cây (bảng khách 11/11/2026):** `plants` = `<10` (Sol, Grid) / `<15` (Plus) / `<30` (Pro). Khách ghi "chậu", web giữ chữ "cây". Form liên hệ: Dưới 15 / 20 / 30 / Trên 30 cây / Chưa rõ (vẫn lưu trường `area` của lead).
+- **Chế độ cấp nước (thay "nguồn nước", 11/11/2026):** `water` = `manual` ("Thủ công" – Sol, Grid) / `auto` ("Tự động" – Plus, Pro). **Mô tả sản phẩm vẫn là chữ cũ** ("bình chứa nước" / "nước trực tiếp") vì tài liệu chỉ đổi cách phân loại; Sol Pro / Grid Pro nay là "Tự động" nhưng mô tả vẫn nói bình chứa → chờ khách (mục 9).
+- **Bộ lọc ECOHUB:** số lượng cây (`<10` / `<15` / `<30`), nguồn điện (`solar` / `grid`), chế độ cấp nước (`manual` / `auto`).
 - **Địa chỉ (từ 14/10/2026):** Tỉnh/thành và Phường/xã chọn từ danh sách theo **danh mục hành chính mới** (34 tỉnh/thành, 3.321 phường/xã/đặc khu, hiệu lực 01/07/2025; bỏ cấp quận/huyện). Dữ liệu `public/data/dvhc.json` tạo bằng `npm run dvhc` (`scripts/fetch-dvhc.mjs`, nguồn provinces.open-api.vn API v2; script tự kiểm tra đủ 34 / 3.321). Chỉ tải khi trang có `<select data-province>`: trang Đặt hàng, Tài khoản (hồ sơ), form Liên hệ (chỉ tỉnh). Lưu tên đầy đủ ("Thành phố Hà Nội", "Phường Ba Đình"). Địa chỉ cũ đã lưu ("Hà Nội", "Ba Đình") tự khớp gần đúng qua `setAddress()`; không khớp thì để trống cho khách chọn. Không tải được danh sách thì tự đổi về ô nhập tay.
 - **Thanh toán:** `paymentMethod` = `cod` | `bank` (đơn trước 07/10/2026 không có → hiển thị "—"). Nhãn hiển thị ở `order-view.ts → PAYMENT_LABEL`.
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
@@ -130,6 +132,8 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 ## 7. Trạng thái (cập nhật 11/11/2026)
 
 **Đã xong:** 34 trang build OK, `astro check` 0 lỗi, đã thử trên mobile (360px) và desktop.
+
+**Đợt sửa 11/11/2026 theo `docs/Thông tin làm web.docx` (15 yêu cầu; plan: `docs/superpowers/plans/2026-11-11-cap-nhat-thong-tin-lam-web.md`):** giá mới 8 mục + 4 phụ kiện thành hàng tặng (mục 6); bộ lọc theo bảng số chậu / chế độ cấp nước + chatbot chọn máy sửa theo; ảnh thật Bio-Nutri 25g và Box (Drive "Bộ sản phẩm", mỗi SP 4 ảnh); địa chỉ mới trong `site.ts`; Liên hệ: "Cam kết xanh 100%" → "Cam kết chất lượng", tiêu đề 2 dòng, ảnh bìa hạ khung (`object-[0%_72%]`) để thấy trọn máy; trang chủ bỏ dải xanh 4 ý dưới hero; Sản phẩm: tiêu đề "ECOHUB – Hệ thống chăm sóc cây thông minh" 1 dòng (từ `xl`, khối rộng `max-w-5xl`) + mô tả AIoT; Giới thiệu: tiêu đề tách 3 dòng; form liên hệ bỏ "Văn phòng", "Quán cà phê"; thanh trên header to hơn (logo `lg:h-20`), dải bản quyền mỏng hơn, nút MIO nhỏ hơn (60 / 76px), băng ảnh Sản phẩm: ảnh giữa 64% + 2 ảnh bên mờ hơn (`blur(3px)`), chatbot còn 4 câu hỏi thường gặp + dòng lưu ý 2 dòng.
 
 **Đợt sửa 05/11/2026 theo `docs/web_information.docx` (chưa commit / chưa push lúc viết):** giá 8 mục (mục 6); gộp ECOBOX thành 2 SP chọn theo máy (16 → 12 SP); Multi-Pack → Bio-Nutri Box 250 g; ảnh thật cho 6 ECOHUB + 4 phụ kiện, khung ảnh + phóng to, ảnh có chữ trong phần mô tả; trang Sản phẩm: đầu trang là băng ảnh trượt (`Coverflow`, bố cục lấy từ trang Liên hệ), mục Bio-Nutri đổi nền xanh đậm `brand-900` (trước trùng màu thanh menu); trang Liên hệ: đầu trang là ảnh bìa cũ của trang Sản phẩm + chữ "Cùng nhau vun trồng lối sống xanh."; viền chia rõ: thanh menu có viền trắng + bóng, chữ chạy ngang và breadcrumb có viền `brand-200`, breadcrumb nền trắng; AR: "Phòng khách / Ban công" → "Trong nhà / Ngoài trời"; blog: 5 bài (SEO title, meta description, slug theo tài liệu; ảnh trong `public/blog/`) → menu "Tin tức" + mục tin trên trang chủ tự hiện; chatbot trả lời giá theo dữ liệu sản phẩm.
 
@@ -208,12 +212,14 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Sản phẩm:**
   - ✅ Giá 6 ECOHUB + Bio-Tank S/Plus (05/11/2026). Còn "Liên hệ": Bio-Tank máy Pro, Aqua-Tank (cả 3), Bio-Dripper, Hose (theo cỡ, độ dài), Bio-Nutri (chủ web: chưa cần giá)
   - Phí gói bảo hành 18 / 24 tháng (nếu có) – chủ web: "update later"
+  - **Mô tả "bình chứa nước" của Sol Pro / Grid Pro lệch bảng mới:** bảng 11/11 xếp cả 4 máy Plus + Pro vào "Tự động", nhưng mô tả 2 máy Pro vẫn nói bình chứa nước – chờ khách xác nhận.
+  - **Tên phụ kiện:** bảng giá ghi "VIO Dripper Set", "VIO Micro-Hose"; web giữ Bio-Dripper, VIO GREEN Hose – hỏi khách có đổi không (link trang giữ nguyên).
   - **Thông số trên ảnh khách gửi (05/11/2026) lệch dữ liệu web – chờ quyết:** ảnh ghi Sol/Grid "< 10 chậu", Plus "< 15 chậu", Pro "< 30 chậu" (web: Sol/Grid/Plus = Dưới 15 cây, Pro = Dưới 30 cây); ảnh ghi Sol Pro/Grid Pro dùng **nước trực tiếp** (web: bình chứa nước); ảnh có công suất (100 / 130 / 250 W) và kích thước (30×30×40 / 25×25×35 / 40×40×50 cm) – web chưa đưa vào bảng thông số. Ảnh có chữ đang hiện trong phần mô tả nên khách xem trang sẽ thấy hai số khác nhau.
   - ✅ ~~Số gói trong Multi-Pack~~ → đổi thành Bio-Nutri Box 250 g
   - Phụ kiện **đi kèm** trong hộp từng model
   - ✅ Cảm biến / Web App / AI Chat: chủ web xác nhận đúng cho các dòng ECOHUB (theo nội dung blog, 05/11/2026)
   - Mô tả **Bio-Tank Pro** (dung tích, kích thước) – trang Bio-Tank hiện dùng mô tả chung cho 3 dòng máy
-  - ✅ Ảnh 6 ECOHUB + Bio-Tank, Aqua-Tank, Bio-Dripper, Hose (05/11/2026). Còn thiếu: ảnh **Bio-Nutri** 25 g và Box
+  - ✅ Ảnh 6 ECOHUB + Bio-Tank, Aqua-Tank, Bio-Dripper, Hose (05/11/2026); ✅ ảnh Bio-Nutri 25g + Box (11/11/2026, Drive "Bộ sản phẩm"). Bao bì in **"VIO-NUTRI"**, web giữ tên "Bio-Nutri" theo bảng giá
   - Tên trên ảnh phụ kiện khác tên trên web: "VIO Dripper Set (VIO DRIP-01)" ↔ Bio-Dripper, "VIO Micro-Hose" ↔ VIO GREEN Hose – web giữ tên cũ, hỏi khách nếu muốn đổi
 - **Bảo hành / vận chuyển:**
   - ✅ Bảo hành tiêu chuẩn 12 tháng (khách ghi trong thanh chữ chạy 18/10/2026)

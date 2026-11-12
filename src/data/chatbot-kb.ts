@@ -40,7 +40,7 @@ export const kb: KbEntry[] = [
     id: 'price',
     keys: ['gia', 'bao nhieu tien', 'gia ban', 'bao gia', 'chi phi', 'gia bao nhieu', 'mac khong', 're khong'],
     // Chatbot tự ghép bảng giá từ products.ts (chatbot.ts → priceHtml); câu dưới chỉ là phần kết.
-    answer: 'Sản phẩm ghi "Liên hệ" sẽ được nhân viên báo giá khi xác nhận đơn. Phí vận chuyển được thông báo trước khi bạn quyết định. Bạn cũng có thể để lại số điện thoại để được tư vấn ngay.',
+    answer: 'ECOBOX Bio-Tank, Aqua-Tank, bộ tưới nhỏ giọt và ống tưới là hàng tặng, không bán riêng. Sản phẩm ghi "Liên hệ" sẽ được nhân viên báo giá khi xác nhận đơn. Phí vận chuyển được thông báo trước khi bạn quyết định. Bạn cũng có thể để lại số điện thoại để được tư vấn ngay.',
     links: [['Xem sản phẩm', '/san-pham/']],
   },
   {
@@ -88,14 +88,11 @@ export const kb: KbEntry[] = [
 /** Câu hỏi soạn sẵn hiện ở màn hình chào của khung chat (bấm là trả lời ngay).
  *  kb = id trong `kb` ở trên; faq = vị trí câu trong src/data/faq.ts; action: pick = hỏi 3 câu chọn máy, lead = xin SĐT. */
 export const quickQuestions: { q: string; kb?: string; faq?: number; action?: 'pick' | 'lead' }[] = [
+  // Chỉ 4 câu (khách yêu cầu 11/11/2026) + nút gặp nhân viên
   { q: 'Nên chọn ECOHUB nào cho không gian của tôi?', action: 'pick' },
-  { q: 'Hệ thống có tự động tưới hoàn toàn không?', faq: 1 },
-  { q: 'Tôi có cần biết về chăm cây để sử dụng không?', faq: 2 },
   { q: 'Bảo hành bao lâu?', kb: 'warranty' },
   { q: 'Phí vận chuyển thế nào?', kb: 'ship-fee' },
-  { q: 'Giao hàng mất bao lâu?', kb: 'ship-time' },
   { q: 'Có những hình thức thanh toán nào?', kb: 'payment' },
-  { q: 'Chính sách đổi trả thế nào?', kb: 'return' },
   { q: 'Gặp nhân viên tư vấn', action: 'lead' },
 ];
 

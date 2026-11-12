@@ -10,7 +10,17 @@ const bySlug = Object.fromEntries(clientProducts.map((p) => [p.slug, p])) as Rec
 const safe = <T>(fn: () => T, fallback: T): T => { try { return fn(); } catch { return fallback; } };
 
 export const readCart = (): CartLine[] =>
-  safe(() => (JSON.parse(localStorage.getItem(KEY) || '[]') as CartLine[]).filter((l) => bySlug[l.slug] && l.qty > 0), []);
+  safe(() => (JSON.parse(localStorage.getItem(KEY) || '[]') as CartLine[]).filter((l) => bySlug[l.slug] && !bySlug[l.slug].gift && l.qty > 0), []);
+
+// Giỏ cũ còn hàng tặng (trước 11/11/2026 Bio-Tank có giá) → bỏ ra khỏi giỏ + báo 1 lần
+safe(() => {
+  const raw = JSON.parse(localStorage.getItem(KEY) || '[]') as CartLine[];
+  const gifts = raw.filter((l) => bySlug[l.slug]?.gift);
+  if (!gifts.length) return;
+  localStorage.setItem(KEY, JSON.stringify(raw.filter((l) => !bySlug[l.slug]?.gift)));
+  const names = [...new Set(gifts.map((l) => bySlug[l.slug].shortName))].join(', ');
+  window.addEventListener('DOMContentLoaded', () => toast(`Đã bỏ ${names} khỏi giỏ: đây là hàng tặng kèm, không bán riêng.`, 6000));
+}, undefined);
 const writeCart = (lines: CartLine[]) => {
   safe(() => localStorage.setItem(KEY, JSON.stringify(lines)), undefined);
   render();

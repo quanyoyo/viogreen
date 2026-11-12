@@ -8,7 +8,7 @@ import { site, telHref } from '../data/site';
     <Icon name="phone" class="size-5" />
   </a>
   <!-- Lời chào nổi cạnh MIO: hiện mỗi lần vào web / tải lại trang; khách bấm × thì không hiện lại khi chuyển trang -->
-  <div class="absolute right-full bottom-12 mr-1 w-[min(15rem,calc(100vw-7rem))] translate-y-2 opacity-0 transition-all duration-300 data-[show]:translate-y-0 data-[show]:opacity-100 sm:bottom-16"
+  <div class="absolute right-full bottom-9 mr-1 w-[min(15rem,calc(100vw-7rem))] translate-y-2 opacity-0 transition-all duration-300 data-[show]:translate-y-0 data-[show]:opacity-100 sm:bottom-12"
     data-mio-hint hidden>
     <div class="relative rounded-2xl rounded-br-md border border-brand-200 bg-white px-4 py-3 text-sm leading-snug text-ink shadow-lift">
       <button type="button" data-open-chat class="text-left">Xin chào, mình là <b class="text-brand">MIO</b>! 👋<br />MIO giúp gì cho bạn?</button>
@@ -20,7 +20,7 @@ import { site, telHref } from '../data/site';
   <!-- MIO đứng toàn thân, nhún nhẹ; bấm vào mở khung chat -->
   <button type="button" data-open-chat aria-label="Mở trợ lý MIO" title="Chat với MIO" class="group relative -mb-1 block rounded-3xl pb-2 transition-transform duration-300 ease-(--ease-soft) hover:-translate-y-1">
     <span aria-hidden="true" class="absolute bottom-0.5 left-1/2 h-3 w-3/5 -translate-x-1/2 animate-mio-shadow rounded-[50%] bg-ink/30 blur-[3px]"></span>
-    <img src={site.mio.stand} alt="" width="231" height="280" class="relative h-[75px] w-auto animate-mio-float drop-shadow-[0_6px_10px_rgb(3_119_0/0.3)] sm:h-24" />
+    <img src={site.mio.stand} alt="" width="231" height="280" class="relative h-[60px] w-auto animate-mio-float drop-shadow-[0_6px_10px_rgb(3_119_0/0.3)] sm:h-[76px]" />
   </button>
 </div>
 
@@ -41,5 +41,5 @@ import { site, telHref } from '../data/site';
     <input type="text" name="msg" placeholder="Nhập câu hỏi của bạn…" autocomplete="off" aria-label="Nhập câu hỏi" maxlength="300" class="input min-h-11 rounded-full py-2" />
     <button type="submit" aria-label="Gửi" class="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-white transition-colors hover:bg-brand-700"><Icon name="send" class="size-5" /></button>
   </form>
-  <p class="bg-white px-4 pb-2.5 text-center text-[11px] leading-snug text-muted">MIO trả lời theo thông tin có sẵn của VIO GREEN và có thể chưa đầy đủ. Xem <a href="/chinh-sach/van-chuyen/" class="underline hover:text-brand">Chính sách</a> · <a href="/lien-he/" class="underline hover:text-brand">Liên hệ</a></p>
+  <p class="bg-white px-3 pb-2.5 text-center text-[10px] leading-snug whitespace-nowrap text-muted">MIO trả lời theo thông tin có sẵn của VIO GREEN và có thể chưa đầy đủ.<br /><a href="/chinh-sach/van-chuyen/" class="underline hover:text-brand">Chính sách</a> · <a href="/lien-he/" class="underline hover:text-brand">Liên hệ</a></p>
 </section>

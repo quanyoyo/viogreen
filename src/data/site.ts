@@ -17,7 +17,7 @@ export const site = {
   // ---- Thông tin liên hệ (TẠM – chờ khách xác nhận) ----
   phone: '035 717 0062',
   email: 'viogreen102@gmail.com',
-  address: 'Số 9, Ngõ 45, Hạ Bằng, Thạch Thất, TP Hà Nội',
+  address: 'Đường Mậu Lương, Phường Kiến Hưng, Quận Hà Đông, Hà Nội', // khách gửi 11/11/2026 (giữ nguyên chữ khách, kể cả "Quận")
   hours: 'Thứ 2 – Thứ 7: 8h00 – 16h55',
   // Giờ làm việc cho chatbot (giờ Việt Nam). day: 1 = Thứ 2 … 6 = Thứ 7
   workingHours: { days: [1, 2, 3, 4, 5, 6], start: '08:00', end: '16:55' },

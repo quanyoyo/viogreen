@@ -20,7 +20,7 @@ const heroSlides = [
 const filters = [
   ['plants', 'Số lượng cây', plantLabels],
   ['power', 'Nguồn điện', powerLabels],
-  ['water', 'Nguồn nước', waterLabels],
+  ['water', 'Chế độ cấp nước', waterLabels],
 ] as const;
 
 const sections: { key: CategoryKey; title: string; sub: string; cols: string; tint: boolean }[] = [
@@ -42,10 +42,10 @@ const nutriInfo = [
   <section class="overflow-hidden bg-white pt-8 sm:pt-12">
     <div class="container-x">
       <Coverflow label="Hình ảnh ECOHUB trong không gian sống" slides={heroSlides} />
-      <div class="mx-auto mt-10 max-w-3xl text-center" data-reveal>
+      <div class="mx-auto mt-10 max-w-5xl text-center" data-reveal>
         <p class="eyebrow">Sản phẩm VIO GREEN</p>
-        <h1 class="h-display">ECOHUB – Thiết bị chăm sóc cây thông minh.</h1>
-        <p class="mt-4 text-lg text-muted">Hệ thống chăm sóc cây trồng đô thị thông minh tích hợp toàn diện các công nghệ tiên tiến.</p>
+        <h1 class="h-display xl:whitespace-nowrap">ECOHUB – Hệ thống chăm sóc cây thông minh</h1>
+        <p class="mx-auto mt-4 max-w-3xl text-lg text-muted">Ứng dụng công nghệ AIoT và cảm biến thông minh, hỗ trợ quản lý và tự động cung cấp nước tưới, dinh dưỡng cho cây trồng.</p>
         <nav aria-label="Nhóm sản phẩm" class="mt-6 flex flex-wrap justify-center gap-2">
           {categories.map((c) => <a class="chip" href={`#${c.key}`}>{c.short}</a>)}
         </nav>
@@ -77,7 +77,7 @@ const nutriInfo = [
     <!-- ECOHUB + bộ lọc -->
     <section class="section scroll-mt-28" id="ecohub">
       <div class="container-x">
-        <SectionHead eyebrow="Hệ thống ECOHUB" title="Chọn ECOHUB phù hợp không gian của bạn" sub="6 phiên bản theo số lượng cây, nguồn điện và nguồn nước. Tất cả đều xem được bằng AR." />
+        <SectionHead eyebrow="Hệ thống ECOHUB" title="Chọn ECOHUB phù hợp không gian của bạn" sub="6 phiên bản theo số lượng cây, nguồn điện và chế độ cấp nước. Tất cả đều xem được bằng AR." />
         <div class="card mb-8 grid gap-4 p-5 sm:p-6 lg:grid-cols-3" data-filters data-reveal>
           {filters.map(([name, label, map]) => (
             <div role="group" aria-label={label}>

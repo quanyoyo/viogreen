@@ -3,6 +3,7 @@
 //  và "web_information.docx" (05/11/2026: giá, gộp ECOBOX theo máy S / Plus / Pro, Bio-Nutri Box, ảnh sản phẩm).
 //  Mô tả lấy từ tài liệu, đã bỏ các ghi chú nội bộ ("Lưu ý kỹ thuật… chưa được xác nhận", "Thông tin cần xác nhận").
 //  price: null  => hiển thị "Liên hệ" (site.priceFallback)
+//  gift: true   => "Hàng tặng – không bán" (không giá, không có nút thêm giỏ / mua ngay)
 //  variants.prices: giá riêng từng lựa chọn (cùng thứ tự options; null = Liên hệ). Không có thì dùng price.
 //  images: []   => hiển thị khung ảnh tạm. Ảnh trong public/products/ (tạo bằng `npm run images`, mỗi ảnh có bản -800)
 //               ảnh đầu tiên hiện to; bấm vào để phóng to.
@@ -13,9 +14,9 @@
 // ============================================================
 
 export type CategoryKey = 'ecohub' | 'ecobox' | 'irrigation' | 'nutrition';
-export type Plants = '<15' | '<30';
+export type Plants = '<10' | '<15' | '<30';
 export type Power = 'solar' | 'grid';
-export type Water = 'tank' | 'direct';
+export type Water = 'manual' | 'auto';
 
 export interface Product {
   slug: string;
@@ -37,6 +38,8 @@ export interface Product {
   variants?: { label: string; options: string[]; hint?: string; prices?: (number | null)[]; pick?: boolean };
   note?: string;
   price: number | null;
+  /** Hàng tặng kèm – không bán: không giá, không cho vào giỏ (11/11/2026) */
+  gift?: boolean;
   images: string[];
   thumb?: string;
   info?: string[];
@@ -50,10 +53,11 @@ export const categories: { key: CategoryKey; label: string; short: string }[] = 
   { key: 'nutrition', label: 'Dinh dưỡng Bio-Nutri', short: 'Dinh dưỡng' },
 ];
 
-// Số lượng cây thay cho diện tích (khách yêu cầu 18/10/2026): dưới 10 m² → dưới 15 cây; 10–20 m² → dưới 30 cây
-export const plantLabels: Record<Plants, string> = { '<15': 'Dưới 15 cây', '<30': 'Dưới 30 cây' };
+// Theo bảng khách gửi 11/11/2026: Sol/Grid dưới 10 · Plus dưới 15 · Pro dưới 30 (khách ghi "chậu", web giữ "cây")
+export const plantLabels: Record<Plants, string> = { '<10': 'Dưới 10 cây', '<15': 'Dưới 15 cây', '<30': 'Dưới 30 cây' };
 export const powerLabels: Record<Power, string> = { solar: 'Năng lượng mặt trời', grid: 'Điện lưới' };
-export const waterLabels: Record<Water, string> = { tank: 'Bình chứa nước', direct: 'Nước trực tiếp' };
+// Chế độ cấp nước: Sol/Grid = thủ công; Plus/Pro = tự động (bảng khách gửi 11/11/2026)
+export const waterLabels: Record<Water, string> = { manual: 'Thủ công', auto: 'Tự động' };
 
 // Gói bảo hành chọn ở trang chi tiết máy ECOHUB (lưu vào đơn như một biến thể). 12 tháng = tiêu chuẩn.
 export const warrantyOptions = ['Bảo hành 12 tháng', 'Bảo hành 18 tháng', 'Bảo hành 24 tháng'];
@@ -78,7 +82,7 @@ const raw: Raw[] = [
     shortName: 'ECOHUB Sol',
     edition: 'Solar Edition',
     category: 'ecohub',
-    plants: '<15', power: 'solar', water: 'tank',
+    plants: '<10', power: 'solar', water: 'manual',
     hasAR: true,
     summary: 'Hệ thống chăm sóc cây đô thị dùng năng lượng mặt trời, cho ban công và góc trồng cây nhỏ.',
     description: [
@@ -94,7 +98,7 @@ const raw: Raw[] = [
     ] },
     accessories: acc,
     variants: warranty,
-    price: 1_999_000,
+    price: 2_599_000,
     images: [img('ecohub-sol')],
     // 3D TẠM (11/11/2026, chủ web yêu cầu): model Sol Pro thu nhỏ ×0,77 cho đúng cỡ máy (npm run models:tam) – thay khi có 3D riêng
     model: { glb: '/models/ecohub-sol-tam.glb' },
@@ -106,7 +110,7 @@ const raw: Raw[] = [
     shortName: 'ECOHUB Grid',
     edition: 'Electric Edition',
     category: 'ecohub',
-    plants: '<15', power: 'grid', water: 'tank',
+    plants: '<10', power: 'grid', water: 'manual',
     hasAR: true,
     summary: 'Hệ thống chăm sóc cây dùng nguồn điện trực tiếp, cho ban công và sân thượng nhỏ có sẵn ổ điện.',
     description: [
@@ -122,7 +126,7 @@ const raw: Raw[] = [
     ] },
     accessories: acc,
     variants: warranty,
-    price: 1_499_000,
+    price: 2_199_000,
     images: [img('ecohub-grid')],
     // 3D TẠM (11/11/2026, chủ web yêu cầu): model Grid Pro thu nhỏ ×0,77 cho đúng cỡ máy (npm run models:tam) – thay khi có 3D riêng
     model: { glb: '/models/ecohub-grid-tam.glb' },
@@ -134,7 +138,7 @@ const raw: Raw[] = [
     shortName: 'ECOHUB Sol Plus',
     edition: 'Solar & Direct Water Edition',
     category: 'ecohub',
-    plants: '<15', power: 'solar', water: 'direct',
+    plants: '<15', power: 'solar', water: 'auto',
     hasAR: true,
     summary: 'Kết hợp năng lượng mặt trời và kết nối nguồn nước trực tiếp, cho ban công, sân thượng nhỏ.',
     description: [
@@ -151,7 +155,7 @@ const raw: Raw[] = [
     ] },
     accessories: acc,
     variants: warranty,
-    price: 2_299_000,
+    price: 3_299_000,
     images: [img('ecohub-sol-plus')],
     // 3D TẠM (11/11/2026, chủ web yêu cầu): model Sol Pro thu nhỏ ×0,66 cho đúng cỡ máy (npm run models:tam) – bản 3D AI cũ vẫn giữ ở /models/ecohub-sol-plus.glb
     model: { glb: '/models/ecohub-sol-plus-tam.glb' },
@@ -163,7 +167,7 @@ const raw: Raw[] = [
     shortName: 'ECOHUB Grid Plus',
     edition: 'Electric & Direct Water Edition',
     category: 'ecohub',
-    plants: '<15', power: 'grid', water: 'direct',
+    plants: '<15', power: 'grid', water: 'auto',
     hasAR: true,
     summary: 'Dùng điện trực tiếp và nước trực tiếp – cho không gian nhỏ có sẵn cả nguồn điện và nguồn nước.',
     description: [
@@ -179,7 +183,7 @@ const raw: Raw[] = [
     ] },
     accessories: acc,
     variants: warranty,
-    price: 1_799_000,
+    price: 2_799_000,
     images: [img('ecohub-grid-plus')],
     // 3D TẠM (11/11/2026, chủ web yêu cầu): model Grid Pro thu nhỏ ×0,66 cho đúng cỡ máy (npm run models:tam) – bản 3D AI cũ vẫn giữ ở /models/ecohub-grid-plus.glb
     model: { glb: '/models/ecohub-grid-plus-tam.glb' },
@@ -192,7 +196,7 @@ const raw: Raw[] = [
     shortName: 'ECOHUB Sol Pro',
     edition: 'Solar Edition',
     category: 'ecohub',
-    plants: '<30', power: 'solar', water: 'tank',
+    plants: '<30', power: 'solar', water: 'auto',
     hasAR: true,
     summary: 'Bản năng lượng mặt trời cho không gian xanh lớn hơn: sân thượng, ban công lớn, nhiều chậu cây.',
     description: [
@@ -208,7 +212,7 @@ const raw: Raw[] = [
     ] },
     accessories: acc,
     variants: warranty,
-    price: 3_399_000,
+    price: 5_099_000,
     images: [img('ecohub-sol-pro')],
     // 3D bản Pro (12 STL gốc, thân 40×40×50 cm) dựng theo ảnh máy thật 11/11/2026 (cột + tấm pin, sọc đen, cụm nút, logo); màu chỉnh theo ảnh (ΔE2000)
     model: { glb: '/models/ecohub-sol-pro.glb' },
@@ -220,7 +224,7 @@ const raw: Raw[] = [
     shortName: 'ECOHUB Grid Pro',
     edition: 'Electric Edition',
     category: 'ecohub',
-    plants: '<30', power: 'grid', water: 'tank',
+    plants: '<30', power: 'grid', water: 'auto',
     hasAR: true,
     summary: 'Bản điện lưới cho không gian xanh lớn hơn có sẵn nguồn điện: sân thượng, ban công lớn.',
     description: [
@@ -236,7 +240,7 @@ const raw: Raw[] = [
     ] },
     accessories: acc,
     variants: warranty,
-    price: 2_499_000,
+    price: 4_399_000,
     images: [img('ecohub-grid-pro')],
     // 3D = thân Sol Pro bỏ cột + tấm pin (chưa có ảnh máy Grid Pro thật, 11/11/2026)
     model: { glb: '/models/ecohub-grid-pro.glb' },
@@ -263,7 +267,8 @@ const raw: Raw[] = [
       'Hỗ trợ cung cấp nước cho quá trình tưới cây.',
       'Có thể thay thế hoặc bổ sung khi cần thiết.',
     ] },
-    variants: { label: 'Dùng cho máy', options: machineOptions, hint: machineHint, prices: [null, null, null], pick: true },
+    variants: { label: 'Dùng cho máy', options: machineOptions, hint: machineHint, pick: true },
+    gift: true,
     accessories: ['ecohub-sol', 'ecohub-grid', 'ecohub-sol-plus', 'ecohub-grid-plus', 'ecohub-sol-pro', 'ecohub-grid-pro'],
     images: [img('aqua-tank-info'), img('aqua-tank')],
     thumb: img('aqua-tank'),
@@ -286,8 +291,8 @@ const raw: Raw[] = [
       'Hỗ trợ việc bổ sung dinh dưỡng trong quá trình chăm sóc cây.',
       'Có thể sử dụng để thay thế hoặc bổ sung bình chứa theo nhu cầu.',
     ] },
-    variants: { label: 'Dùng cho máy', options: machineOptions, hint: machineHint, prices: [39_000, 39_000, null], pick: true },
-    price: 39_000,
+    variants: { label: 'Dùng cho máy', options: machineOptions, hint: machineHint, pick: true },
+    gift: true,
     accessories: ['ecohub-sol', 'ecohub-grid', 'ecohub-sol-plus', 'ecohub-grid-plus', 'ecohub-sol-pro', 'ecohub-grid-pro'],
     images: [img('bio-tank-info'), img('bio-tank')],
     thumb: img('bio-tank'),
@@ -317,6 +322,7 @@ const raw: Raw[] = [
     // Phụ kiện: ảnh có chữ đứng trước, ảnh nền trắng sau (khách yêu cầu 05/11/2026)
     images: [img('dripper-info'), img('dripper-set'), img('dripper-set-2'), img('dripper')],
     thumb: img('dripper-set'),
+    gift: true,
   },
   {
     slug: 'vio-green-hose',
@@ -339,6 +345,7 @@ const raw: Raw[] = [
     ] },
     accessories: ['bio-dripper'],
     images: [img('hose-info'), img('hose-1'), img('hose-2')],
+    gift: true,
     thumb: img('hose-1'),
     note: 'Các cỡ ống không mặc định thay thế trực tiếp cho nhau – vui lòng chọn đúng đường kính theo cấu hình hệ thống hoặc liên hệ để được tư vấn.',
   },
@@ -346,6 +353,7 @@ const raw: Raw[] = [
   // ---------------- DINH DƯỠNG ----------------
   {
     slug: 'bio-nutri-25g',
+    price: 29_000,
     name: 'VIO GREEN Bio-Nutri 25g pack – Phân bón sinh học gói 25g',
     shortName: 'Bio-Nutri 25g pack',
     category: 'nutrition',
@@ -363,11 +371,14 @@ const raw: Raw[] = [
       'Có thể kết hợp với hệ thống ECOHUB khi cấu hình và hướng dẫn sử dụng cho phép.',
       'Thuận tiện cho việc bảo quản và sử dụng theo từng gói.',
     ] },
+    // Ảnh chụp thật (Drive "Bộ sản phẩm", 11/11/2026). Bao bì in "VIO-NUTRI", tên trên web giữ "Bio-Nutri" theo bảng giá khách.
+    images: [img('bio-nutri-25g'), img('bio-nutri-25g-sau'), img('bio-nutri-25g-tay'), img('bio-nutri-25g-nhieu')],
     note: 'Sử dụng theo nhãn sản phẩm và hướng dẫn chính thức của VIO GREEN. Không tự ý tăng liều lượng hoặc sử dụng theo cách chưa được hướng dẫn.',
   },
   {
     // 05/11/2026: thay "Bio-Nutri Multi-Pack" (slug cũ có 301). Mô tả theo tài liệu, bỏ dòng "Lưu ý kỹ thuật" nội bộ.
     slug: 'bio-nutri-box',
+    price: 209_000,
     name: 'VIO GREEN Bio-Nutri Box – Hộp 250g',
     shortName: 'Bio-Nutri Box',
     category: 'nutrition',
@@ -385,6 +396,7 @@ const raw: Raw[] = [
       'Có thể kết hợp với hệ thống bổ sung dinh dưỡng tự động của ECOHUB.',
       'Phù hợp với người dùng ECOHUB có nhu cầu bổ sung dinh dưỡng định kỳ cho cây.',
     ] },
+    images: [img('bio-nutri-box'), img('bio-nutri-box-goi'), img('bio-nutri-box-nhieu'), img('bio-nutri-box-tay')],
     note: 'Sử dụng theo nhãn sản phẩm và hướng dẫn chính thức của VIO GREEN. Không tự ý tăng liều lượng hoặc sử dụng theo cách chưa được hướng dẫn.',
   },
 ];
@@ -429,7 +441,7 @@ export const thumbOf = (p: Product) => p.thumb ?? p.images[0];
 
 export const productTags = (p: Product): string[] => {
   if (p.category === 'ecohub' && p.plants && p.power && p.water)
-    return [plantLabels[p.plants], powerLabels[p.power], waterLabels[p.water]];
+    return [plantLabels[p.plants], powerLabels[p.power], 'Cấp nước ' + waterLabels[p.water].toLowerCase()];
   if (p.fits) return ['Dùng cho ' + p.fits.replace(/^Mọi/, 'mọi')];
   return [];
 };
@@ -444,6 +456,7 @@ export const clientProducts = products.map((p) => ({
   power: p.power ?? null,
   water: p.water ?? null,
   price: p.price,
+  gift: !!p.gift,
   image: thumbOf(p) ? smallImage(thumbOf(p)!) : null,
   hasAR: p.hasAR,
   model: p.model,

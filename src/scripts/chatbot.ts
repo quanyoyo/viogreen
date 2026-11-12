@@ -93,6 +93,7 @@ const kbHtml = (k: (typeof kb)[number]) =>
 
 /* ---------- Gợi ý sản phẩm ---------- */
 const priceOf = (p: ClientProduct) => {
+  if (p.gift) return 'Hàng tặng – không bán';
   const known = (p.prices ?? [p.price]).filter((x): x is number => x != null);
   if (!known.length) return site.priceFallback;
   const min = Math.min(...known);
@@ -103,7 +104,7 @@ const productCard = (p: ClientProduct) => `
     <p class="font-semibold">${esc(p.shortName)} <span class="font-bold text-brand">· ${priceOf(p)}</span></p>
     <p class="mt-0.5 text-xs text-muted">${esc(p.summary)}</p>
     <div class="mt-2 flex flex-wrap gap-1.5">${link('Xem chi tiết', `/san-pham/${p.slug}/`)}
-      ${p.prices ? '' : `<button type="button" data-chat-add="${p.slug}" class="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700">+ Thêm vào giỏ</button>`}
+      ${p.prices || p.gift ? '' : `<button type="button" data-chat-add="${p.slug}" class="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700">+ Thêm vào giỏ</button>`}
       ${p.hasAR ? `<button type="button" data-ar="${p.slug}" class="rounded-full px-3 py-1 text-xs font-semibold text-brand ring-1 ring-brand-200 hover:bg-brand-50">Thử AR</button>` : ''}</div>
   </div>`;
 
@@ -132,7 +133,7 @@ function recommend(plants: string, power: string, water: string): ClientProduct[
 /* ---------- Kịch bản ---------- */
 const startPick = () => {
   mode = { kind: 'pick', step: 'plants' };
-  return bot('Mình hỏi nhanh 3 câu để gợi ý đúng ECOHUB nhé 🌱<br><b>1/3.</b> Bạn chăm khoảng bao nhiêu cây (chậu)?', ['Dưới 15 cây', 'Dưới 30 cây', 'Trên 30 cây', 'Chưa rõ']);
+  return bot('Mình hỏi nhanh 3 câu để gợi ý đúng ECOHUB nhé 🌱<br><b>1/3.</b> Bạn chăm khoảng bao nhiêu cây (chậu)?', ['Dưới 10 cây', 'Dưới 15 cây', 'Dưới 30 cây', 'Trên 30 cây', 'Chưa rõ']);
 };
 const startLead = (topic: string, intro?: string) => {
   mode = { kind: 'lead', step: 'name', topic };
@@ -144,15 +145,14 @@ async function handlePick(text: string) {
   if (mode.kind !== 'pick') return;
   const t = norm(text);
   if (mode.step === 'plants') {
-    // Số cây: "duoi 15 cay", "20 chau", "tren 30"… Khách ghi diện tích (m2) thì quy đổi: <10m² → <15 cây, 10–20m² → <30 cây
+    // Số cây: "duoi 10 cay", "12 chau", "tren 30"… (≤ 10 → Sol/Grid, ≤ 15 → Plus, ≤ 30 → Pro).
+    // Khách ghi diện tích (m²) → coi như chưa rõ: bảng của khách (11/11/2026) chỉ theo số chậu.
     const sqm = /\d\s*m\b|m2|met/.test(t);
-    const nums = (t.match(/\d+/g) ?? []).map(Number).filter((n) => n !== 2 || !/m2/.test(t));
+    const nums = (t.match(/\d+/g) ?? []).map(Number);
     const max = nums.length ? Math.max(...nums) : NaN;
-    const plants = sqm
-      ? (max < 10 ? '<15' : max <= 20 ? '<30' : max > 20 ? 'big' : 'any')
-      : t.includes('duoi 15') || max < 15 ? '<15'
+    const plants = sqm || !nums.length ? 'any'
       : t.includes('tren 30') || max > 30 ? 'big'
-      : max >= 15 ? '<30' : 'any';
+      : max <= 10 ? '<10' : max <= 15 ? '<15' : '<30';
     if (plants === 'big') {
       mode = { kind: 'idle' };
       return startLead('Tư vấn trên 30 cây', 'Với hơn 30 cây, VIO GREEN sẽ khảo sát và đề xuất cấu hình nhiều ECOHUB phù hợp.<br>');
@@ -163,9 +163,9 @@ async function handlePick(text: string) {
   if (mode.step === 'power') {
     const power = has(t, 'mat troi') || has(t, 'solar') ? 'solar' : has(t, 'dien luoi') || has(t, 'o dien') || has(t, 'co san') ? 'grid' : 'any';
     mode = { kind: 'pick', step: 'water', plants: mode.plants, power };
-    return bot('<b>3/3.</b> Bạn có thể nối ống từ vòi nước gần đó không, hay dùng bình chứa nước?', ['Nối nước trực tiếp', 'Dùng bình chứa', 'Chưa rõ']);
+    return bot('<b>3/3.</b> Bạn muốn chế độ cấp nước nào?<br><span class="text-xs text-muted">Thủ công: tự đổ nước vào bình chứa · Tự động: nối nguồn nước trực tiếp</span>', ['Thủ công', 'Tự động', 'Chưa rõ']);
   }
-  const water = has(t, 'truc tiep') || has(t, 'noi') || has(t, 'voi') ? 'direct' : has(t, 'binh') ? 'tank' : 'any';
+  const water = has(t, 'tu dong') || has(t, 'truc tiep') || has(t, 'noi') || has(t, 'voi') ? 'auto' : has(t, 'thu cong') || has(t, 'tay') || has(t, 'binh') ? 'manual' : 'any';
   const list = recommend(mode.plants ?? 'any', mode.power ?? 'any', water);
   mode = { kind: 'idle' };
   return bot(`Dựa trên lựa chọn của bạn, MIO gợi ý:${list.map(productCard).join('')}<p class="mt-2">Mỗi bộ ECOHUB nên dùng kèm bình chứa ECOBOX, đầu tưới Bio-Dripper, ống Hose và phân bón Bio-Nutri.</p>`,

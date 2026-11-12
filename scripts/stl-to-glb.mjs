@@ -49,6 +49,7 @@ import { Document, NodeIO } from '@gltf-transform/core';
 import { EXTMeshoptCompression, KHRMeshQuantization } from '@gltf-transform/extensions';
 import { weld, simplify, meshopt, prune, dedup, cloneDocument } from '@gltf-transform/functions';
 import { MeshoptEncoder, MeshoptSimplifier } from 'meshoptimizer';
+import sharp from 'sharp';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const SRC = path.join(ROOT, 'models-src');
@@ -264,7 +265,7 @@ function smoothDecal(ys, ref, nx, nz, name = 'decal') {
   if (lech > 0.3) console.log(`  ⚠ ${name}: mặt dán lệch vỏ tới ${lech.toFixed(2)} mm (vỏ không đủ trơn để khớp)`);
 }
 
-function decalTris(e, targets, aspect) {
+function decalTris(e, targets, aspect, coNet) {
   const [nx, nz] = e.grid ?? [48, 24];
   const h = e.height, w = e.width ?? h * aspect;
   const [cx, cz] = e.center;
@@ -341,6 +342,7 @@ function decalTris(e, targets, aspect) {
   const pos = [], uv = [], nor = [];
   const at = (i, j) => grid[j * (nx + 1) + i];
   for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+    if (coNet && !coNet(i, j)) continue;
     const a = at(i, j), b = at(i + 1, j), c = at(i + 1, j + 1), d = at(i, j + 1);
     if (!a || !b || !c || !d) continue;
     for (const tri of [[a, b, c], [a, c, d]]) {
@@ -417,6 +419,25 @@ function resolve(model) {
 /** Kích thước ảnh PNG (đọc header) */
 const pngSize = (buf) => [buf.readUInt32BE(16), buf.readUInt32BE(20)];
 
+/**
+ * Độ trong suốt của ảnh dán, gom theo ô lưới: trả về hàm (i, j) → ô đó có nét vẽ hay không.
+ * Ô hoàn toàn trong suốt sẽ bị bỏ khỏi lưới, vì trình xem AR của iPhone (Quick Look) vẫn để mặt
+ * trong suốt bắt sáng → cả khung ảnh dán hiện thành một ô sáng hơn vỏ (trình xem web thì không).
+ */
+async function coNetVe(file, nx, nz, nguong = 8) {
+  const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { width: W, height: H, channels: C } = info;
+  const co = new Uint8Array(nx * nz);
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+    // uv của ô: u = i/nx…(i+1)/nx, v = 1−(j+1)/nz…1−j/nz; ảnh có gốc (0,0) ở góc trên trái
+    const x0 = Math.floor((i * W) / nx), x1 = Math.min(W, Math.ceil(((i + 1) * W) / nx));
+    const y0 = Math.floor(((nz - 1 - j) * H) / nz), y1 = Math.min(H, Math.ceil(((nz - j) * H) / nz));
+    for (let y = y0; y < y1 && !co[j * nx + i]; y++) for (let x = x0; x < x1; x++)
+      if (data[(y * W + x) * C + C - 1] >= nguong) { co[j * nx + i] = 1; break; }
+  }
+  return (i, j) => !!co[j * nx + i];
+}
+
 async function build(input) {
   const model = resolve(input);
   const dir = path.join(SRC, model.dir ?? '.');
@@ -463,7 +484,10 @@ async function build(input) {
       // decal không có ảnh ("material" + "width"): miếng vá ôm mặt cong, VD bịt lỗ bắt vít trên vỏ
       const [iw, ih] = e.image ? pngSize(fs.readFileSync(path.join(SRC, e.image))) : [e.width, e.height];
       const targets = (e.parts ?? Object.keys(rawByName)).map((n) => rawByName[n] ?? (() => { throw new Error(`decal: không có bộ phận "${n}"`); })());
-      const { pos, uv, nor } = decalTris(e, targets, iw / ih);
+      const [gx, gz] = e.grid ?? [48, 24];
+      // ảnh dán: bỏ hẳn những ô lưới không có nét vẽ (xem coNetVe)
+      const coNet = e.image ? await coNetVe(path.join(SRC, e.image), gx, gz) : null;
+      const { pos, uv, nor } = decalTris(e, targets, iw / ih, coNet);
       if (!pos.length) throw new Error(`decal "${e.name}": không chiếu được lên bề mặt nào – kiểm tra center/height`);
       if (e.image) {
         imageOpts[`decal:${e.image}`] ??= { roughness: e.roughness, metalness: e.metalness };

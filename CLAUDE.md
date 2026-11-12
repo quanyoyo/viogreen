@@ -216,7 +216,6 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Sản phẩm:**
   - ✅ Giá 6 ECOHUB + Bio-Nutri 25g / Box (11/11/2026, bảng "Price setting"). ECOBOX Bio-Tank, Aqua-Tank, Bio-Dripper, Hose nay là **hàng tặng – không bán** nên không cần giá. Không còn mục nào ghi "Liên hệ".
   - Phí gói bảo hành 18 / 24 tháng (nếu có) – chủ web: "update later"
-  - **Mô tả "bình chứa nước" của Sol Pro / Grid Pro lệch bảng mới:** bảng 11/11 xếp cả 4 máy Plus + Pro vào "Tự động", nhưng mô tả 2 máy Pro vẫn nói bình chứa nước – chờ khách xác nhận.
   - **Tên phụ kiện:** bảng giá ghi "VIO Dripper Set", "VIO Micro-Hose"; web giữ Bio-Dripper, VIO GREEN Hose – hỏi khách có đổi không (link trang giữ nguyên).
   - ✅ Số chậu và chế độ cấp nước: web đã theo đúng bảng khách gửi 11/11/2026. **Còn chờ:** công suất (100 / 130 / 250 W) và kích thước (30×30×40 / 25×25×35 / 40×40×50 cm) in trên ảnh thông số nhưng **web chưa đưa vào bảng thông số sản phẩm** – hỏi khách có muốn thêm không. (Kích thước này đã dùng để chỉnh cỡ model AR, xem mục 7.)
   - ✅ ~~Số gói trong Multi-Pack~~ → đổi thành Bio-Nutri Box 250 g

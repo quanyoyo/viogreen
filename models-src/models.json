@@ -550,6 +550,7 @@
           "name": "logo",
           "shape": "decal",
           "image": "decals/logo-may-that.png",
+          "opaque": true,
           "center": [
             0,
             398
@@ -557,11 +558,11 @@
           "height": 92,
           "offset": 1.1,
           "grid": [
-            112,
-            112
+            48,
+            48
           ],
           "roughness": 0.5,
-          "_note": "logo + khẩu hiệu tách từ ảnh nlmt/06 (scripts/make-pro-decals.mjs); lưới mịn 112×112 để phần mặt giữ lại bám sát nét logo (ô trống bị cắt bỏ); tâm z 398, cao 92 mm đo trên ảnh 06/07"
+          "_note": "logo + khẩu hiệu tách từ ảnh nlmt/06 (scripts/make-pro-decals.mjs), ghép sẵn lên màu vỏ nên ảnh ĐỤC (opaque) – mặt trong suốt bị trình xem AR iPhone xử lý khác, lộ ô vuông quanh logo; tâm z 398, cao 92 mm đo trên ảnh 06/07"
         },
         {
           "name": "nut-1-vien",

@@ -81,18 +81,24 @@ async function logo() {
     const D = det(A); return [0, 1, 2].map((i) => det(A.map((row, r) => row.map((v, c) => (c === i ? b[r] : v)))) / D);
   };
   const fit = S.map((s) => solve3([[s.n, s.x, s.y], [s.x, s.xx, s.xy], [s.y, s.xy, s.yy]], [s.v, s.xv, s.yv]));
-  const out = Buffer.alloc(w * h * 4);
+  // Ảnh ra KHÔNG có kênh trong suốt: logo được ghép sẵn lên đúng màu vỏ máy.
+  // Lý do: trình xem AR của iPhone xử lý mặt trong suốt khác trình xem web (mặt trong suốt vẫn bắt sáng,
+  // và khi chuyển đổi file thì màu ở điểm trong suốt bị mất thành đen) → lộ ô vuông quanh logo.
+  // Dán cả mảng như ảnh đục thì trình xem nào cũng chỉ còn một cách hiển thị.
+  const out = Buffer.alloc(w * h * 3);
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const c = px(x, y), B = fit.map(([a, b, cc]) => a + b * x + cc * y);
     const [Lc, ac, bc] = lab(c), [LB, aB, bB] = lab(B);
     const muc = Math.hypot(Math.max(0, LB - Lc), ac - aB, bc - bB);   // chỉ tính phần tối đi và phần lệch màu
     const a = Math.min(1, Math.max(0, (muc - LOGO.d0) / (LOGO.d1 - LOGO.d0)));
     const F = a > 0 ? c.map((v, k) => Math.min(255, Math.max(0, (v - (1 - a) * B[k]) / a))) : B;
-    const i = (y * w + x) * 4;
-    for (let k = 0; k < 3; k++) out[i + k] = Math.round(toSrgb((toLin(F[k]) * body[k] * (1 + (LOGO.gain[k] - 1) * a)) / toLin(B[k]))); // cùng tỉ lệ sáng với thân
-    out[i + 3] = Math.round(a * 255);
+    const i = (y * w + x) * 3;
+    for (let k = 0; k < 3; k++) {
+      const muc_k = (toLin(F[k]) * body[k] * (1 + (LOGO.gain[k] - 1) * a)) / toLin(B[k]); // cùng tỉ lệ sáng với thân
+      out[i + k] = Math.round(toSrgb(a * muc_k + (1 - a) * body[k]));                     // ghép lên màu vỏ
+    }
   }
-  await sharp(out, { raw: { width: w, height: h, channels: 4 } }).png().toFile(path.join(OUT, 'logo-may-that.png'));
+  await sharp(out, { raw: { width: w, height: h, channels: 3 } }).png().toFile(path.join(OUT, 'logo-may-that.png'));
   console.log(`✔ logo-may-that.png ${w}×${h}  nền ảnh ~rgb(${fit.map(([a, b, c]) => Math.round(a + (b * w) / 2 + (c * h) / 2)).join(',')}) → thân ${materials.proBody.color}`);
 }
 

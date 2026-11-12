@@ -24,7 +24,7 @@
 //         "skip": { "min": [x, y], "max": [x, y] }, "material": "green" }
 //                                                 ← vòng bo quanh thân hình chữ nhật bo góc (VD sọc xanh), nổi ra "offset" mm;
 //                                                   "skip": bỏ đoạn nằm trong vùng này (VD chỗ hộp bên hông che)
-//       { "name": "...", "shape": "decal", "image": "decals/logo.png", "center": [x, z], "height": h, "width": w?,
+//       { "name": "...", "shape": "decal", "image": "decals/logo.png", "opaque": true?, "center": [x, z], "height": h, "width": w?,
 //         "offset": 0.8, "grid": [48, 24], "parts": ["Body1 aa"] }
 //                                                 ← miếng dán ảnh (PNG nền trong suốt) ở mặt trước (nhìn từ -y): chiếu thẳng
 //                                                   lên bề mặt các bộ phận STL ("parts", mặc định tất cả) nên ôm theo mặt cong;
@@ -485,13 +485,15 @@ async function build(input) {
       const [iw, ih] = e.image ? pngSize(fs.readFileSync(path.join(SRC, e.image))) : [e.width, e.height];
       const targets = (e.parts ?? Object.keys(rawByName)).map((n) => rawByName[n] ?? (() => { throw new Error(`decal: không có bộ phận "${n}"`); })());
       const [gx, gz] = e.grid ?? [48, 24];
-      // ảnh dán: bỏ hẳn những ô lưới không có nét vẽ (xem coNetVe)
-      const coNet = e.image ? await coNetVe(path.join(SRC, e.image), gx, gz) : null;
+      // ảnh dán có nền trong suốt: bỏ hẳn những ô lưới không có nét vẽ (xem coNetVe).
+      // Ảnh dán đục ("opaque") thì không cần: ảnh đã ghép sẵn lên màu vỏ, không có chỗ nào trong suốt.
+      const coNet = e.image && !e.opaque ? await coNetVe(path.join(SRC, e.image), gx, gz) : null;
       const { pos, uv, nor } = decalTris(e, targets, iw / ih, coNet);
       if (!pos.length) throw new Error(`decal "${e.name}": không chiếu được lên bề mặt nào – kiểm tra center/height`);
       if (e.image) {
-        imageOpts[`decal:${e.image}`] ??= { roughness: e.roughness, metalness: e.metalness };
-        parts.push({ name: e.name ?? 'decal', mat: `decal:${e.image}`, pos: toGltf(pos), uv, nor: norGltf(nor) });
+        const key = `${e.opaque ? 'image' : 'decal'}:${e.image}`;
+        imageOpts[key] ??= { roughness: e.roughness, metalness: e.metalness };
+        parts.push({ name: e.name ?? 'decal', mat: key, pos: toGltf(pos), uv, nor: norGltf(nor) });
       }
       else parts.push({ name: e.name ?? 'patch', mat: e.material ?? model.default ?? 'body', pos: toGltf(pos), nor: norGltf(nor) });
     } else parts.push({ name: e.name ?? e.shape, mat: e.material ?? model.default ?? 'body', pos: toGltf(extraTris(e)) });

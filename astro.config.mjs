@@ -11,6 +11,7 @@ const hasPosts = fs.existsSync(BLOG) && fs.readdirSync(BLOG).some((f) =>
 
 // Trang noindex (giỏ hàng, đặt hàng, tài khoản, quản trị) không đưa vào sitemap
 const NO_SITEMAP = ['/gio-hang/', '/dat-hang/', '/dat-hang-thanh-cong/', '/dang-nhap/', '/tai-khoan/', '/quan-tri/', '/404/',
+  '/kiem-tra-ar/', // trang chẩn đoán AR, chỉ gửi riêng cho khách khi cần
   ...(hasPosts ? [] : ['/tin-tuc/'])];
 
 export default defineConfig({

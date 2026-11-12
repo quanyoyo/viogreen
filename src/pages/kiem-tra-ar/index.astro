@@ -1,0 +1,102 @@
+---
+// Trang chẩn đoán AR (không có trong menu, noindex, không vào sitemap).
+// Dùng khi khách báo "không thấy nút Xem trong không gian của bạn": nhờ khách mở trang này rồi chụp màn hình,
+// các dòng dưới cho biết máy báo gì với web — đủ để biết lỗi ở thiết bị / trình duyệt hay ở web.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Kiểm tra AR" noindex>
+  <section class="section">
+    <div class="container-x mx-auto max-w-2xl">
+      <h1 class="text-2xl font-extrabold sm:text-3xl">Kiểm tra khả năng xem AR</h1>
+      <p class="mt-2 text-muted">Trang này chỉ để kiểm tra kỹ thuật. Bạn chụp lại màn hình này và gửi cho VIO GREEN giúp nhé.</p>
+
+      <div class="card mt-6 p-5 sm:p-6">
+        <p class="text-sm font-bold tracking-[0.16em] text-muted uppercase">Kết luận</p>
+        <p class="mt-2 text-xl font-bold" data-ket-luan>Đang kiểm tra…</p>
+        <p class="mt-1 text-sm text-muted" data-goi-y></p>
+      </div>
+
+      <div class="card mt-5 overflow-hidden">
+        <dl class="divide-y divide-line text-sm" data-bang></dl>
+      </div>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        <button type="button" class="btn btn-dark" data-chep>Sao chép kết quả</button>
+        <a href="/san-pham/" class="btn btn-light">Về trang sản phẩm</a>
+      </div>
+      <p class="mt-3 text-sm text-muted" data-chep-xong hidden>Đã sao chép. Bạn dán vào tin nhắn gửi VIO GREEN nhé.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Lặp lại đúng cách model-viewer nhận biết máy có ướm được AR hay không, để biết máy vướng ở bước nào.
+  const MV = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js';
+  const ua = navigator.userAgent;
+  const laIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const laAndroid = /android/i.test(ua);
+  const trinhDuyetKhacTrenIOS = laIOS && /CriOS\/|EdgiOS\/|FxiOS\/|GSA\/|DuckDuckGo\//.test(ua);
+  const theAr = (() => { try { const a = document.createElement('a'); return !!(a.relList && a.relList.supports && a.relList.supports('ar')); } catch { return false; } })();
+  const coWebXR = 'xr' in navigator;
+
+  const ten = laIOS ? (trinhDuyetKhacTrenIOS ? 'iPhone/iPad – trình duyệt khác Safari' : 'iPhone/iPad – Safari hoặc trình duyệt trong ứng dụng')
+    : laAndroid ? 'Android' : 'Máy tính';
+
+  const dong: [string, string][] = [
+    ['Loại máy web nhận ra', ten],
+    ['Trình duyệt hỗ trợ AR (thẻ rel="ar")', theAr ? 'CÓ' : 'KHÔNG'],
+    ['Có WebXR', coWebXR ? 'CÓ' : 'KHÔNG'],
+    ['Kết nối bảo mật (https)', window.isSecureContext ? 'CÓ' : 'KHÔNG'],
+    ['Màn hình', `${screen.width}×${screen.height}, tỉ lệ ${devicePixelRatio}`],
+    ['Chuỗi nhận dạng trình duyệt', ua],
+  ];
+
+  const bang = document.querySelector('[data-bang]')!;
+  const ve = () => {
+    bang.innerHTML = dong.map(([k, v]) => `<div class="flex flex-wrap gap-x-4 gap-y-1 p-4">
+      <dt class="w-full font-semibold sm:w-64 sm:shrink-0">${k}</dt><dd class="break-all text-muted">${v}</dd></div>`).join('');
+  };
+  ve();
+
+  const ketLuan = document.querySelector('[data-ket-luan]')!;
+  const goiY = document.querySelector('[data-goi-y]')!;
+  const dat = (ok: boolean | null, text: string, huong: string) => {
+    ketLuan.textContent = text;
+    ketLuan.className = `mt-2 text-xl font-bold ${ok === true ? 'text-brand' : ok === false ? 'text-ink' : 'text-muted'}`;
+    goiY.textContent = huong;
+  };
+
+  // model-viewer tự quyết định cuối cùng: nạp thư viện rồi hỏi canActivateAR trên một model thật
+  (async () => {
+    try {
+      await new Promise<void>((ok, fail) => {
+        const s = document.createElement('script');
+        s.type = 'module'; s.src = MV; s.onload = () => ok(); s.onerror = () => fail(new Error('không tải được'));
+        document.head.append(s);
+      });
+      await customElements.whenDefined('model-viewer');
+      const mv = document.createElement('model-viewer') as HTMLElement & { canActivateAR?: boolean };
+      mv.setAttribute('src', '/models/ecohub-sol-tam.glb');
+      mv.setAttribute('ar', '');
+      mv.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
+      mv.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
+      document.body.append(mv);
+      await new Promise<void>((ok) => { mv.addEventListener('load', () => ok(), { once: true }); setTimeout(ok, 20000); });
+      const duoc = !!mv.canActivateAR;
+      dong.splice(1, 0, ['Web bật được nút AR (canActivateAR)', duoc ? 'CÓ' : 'KHÔNG']);
+      ve();
+      if (duoc) dat(true, 'Máy này ướm AR được', 'Mở trang sản phẩm, bấm “Thử với AR” rồi bấm “Xem trong không gian của bạn”.');
+      else if (laIOS) dat(false, 'Máy này chưa ướm AR được', 'iPhone/iPad: hãy mở trang bằng Safari hoặc Chrome. Nếu đang mở từ Zalo hoặc Facebook, bấm dấu ⋯ rồi chọn “Mở trong Safari”. Nếu vẫn không được, kiểm tra Cài đặt → Quyền riêng tư & Bảo mật → Chế độ khoá (Lockdown Mode) xem có đang bật không.');
+      else if (laAndroid) dat(false, 'Máy này chưa ướm AR được', 'Android: hãy dùng Chrome và cài “Google Play Services for AR” từ CH Play. Một số máy không nằm trong danh sách Google hỗ trợ thì không chạy được.');
+      else dat(false, 'Máy tính không ướm AR được', 'Đây là điều bình thường: máy tính không có chế độ ướm AR. Hãy mở trang này trên điện thoại.');
+    } catch {
+      dat(null, 'Không tải được trình xem 3D', 'Kiểm tra kết nối mạng rồi tải lại trang. Nếu mạng chặn cdn.jsdelivr.net thì trình xem 3D cũng không chạy.');
+    }
+  })();
+
+  document.querySelector('[data-chep]')!.addEventListener('click', async () => {
+    const text = dong.map(([k, v]) => `${k}: ${v}`).join('\n') + `\nKết luận: ${ketLuan.textContent}`;
+    try { await navigator.clipboard.writeText(text); (document.querySelector('[data-chep-xong]') as HTMLElement).hidden = false; } catch { /* trình duyệt chặn thì khách chụp màn hình */ }
+  });
+</script>

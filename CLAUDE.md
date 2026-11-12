@@ -129,9 +129,11 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Thanh toán:** `paymentMethod` = `cod` | `bank` (đơn trước 07/10/2026 không có → hiển thị "—"). Nhãn hiển thị ở `order-view.ts → PAYMENT_LABEL`.
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
-## 7. Trạng thái (cập nhật 11/11/2026)
+## 7. Trạng thái (cập nhật 12/11/2026)
 
 **Đã xong:** 34 trang build OK, `astro check` 0 lỗi, đã thử trên mobile (360px) và desktop.
+
+**Đợt sửa 12/11/2026 (AR mặt trước quanh logo – chủ web đã xem và xác nhận hết ô vuông):** xem chi tiết mục 8.4 "Sửa 12/11/2026". Tóm tắt: miếng vá lỗ vít nay khớp vào mặt cong trơn + pháp tuyến trơn (hết 4 vết lồi lõm và hết ô chữ nhật lệch màu), ảnh dán logo chuyển thành **ảnh đục ghép sẵn lên màu vỏ** (hết ô sáng quanh logo khi xem AR trên iPhone). Đã đẩy lên web và kiểm tra lại cả 6 file 3D.
 
 **Đợt sửa 11/11/2026 theo `docs/Thông tin làm web.docx` (15 yêu cầu; plan: `docs/superpowers/plans/2026-11-11-cap-nhat-thong-tin-lam-web.md`):** giá mới 8 mục + 4 phụ kiện thành hàng tặng (mục 6); bộ lọc theo bảng số chậu / chế độ cấp nước + chatbot chọn máy sửa theo; ảnh thật Bio-Nutri 25g và Box (Drive "Bộ sản phẩm", mỗi SP 4 ảnh); địa chỉ mới trong `site.ts`; Liên hệ: "Cam kết xanh 100%" → "Cam kết chất lượng", tiêu đề 2 dòng, ảnh bìa hạ khung (`object-[0%_72%]`) để thấy trọn máy; trang chủ bỏ dải xanh 4 ý dưới hero; Sản phẩm: tiêu đề "ECOHUB – Hệ thống chăm sóc cây thông minh" 1 dòng (từ `xl`, khối rộng `max-w-5xl`) + mô tả AIoT; Giới thiệu: tiêu đề tách 3 dòng; form liên hệ bỏ "Văn phòng", "Quán cà phê"; thanh trên header to hơn (logo `lg:h-20`), dải bản quyền mỏng hơn, nút MIO nhỏ hơn (60 / 76px), băng ảnh Sản phẩm: ảnh giữa 64% + 2 ảnh bên mờ hơn (`blur(3px)`), chatbot còn 4 câu hỏi thường gặp + dòng lưu ý 2 dòng.
 
@@ -212,11 +214,11 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 ## 9. Chờ khách (không tự điền)
 
 - **Sản phẩm:**
-  - ✅ Giá 6 ECOHUB + Bio-Tank S/Plus (05/11/2026). Còn "Liên hệ": Bio-Tank máy Pro, Aqua-Tank (cả 3), Bio-Dripper, Hose (theo cỡ, độ dài), Bio-Nutri (chủ web: chưa cần giá)
+  - ✅ Giá 6 ECOHUB + Bio-Nutri 25g / Box (11/11/2026, bảng "Price setting"). ECOBOX Bio-Tank, Aqua-Tank, Bio-Dripper, Hose nay là **hàng tặng – không bán** nên không cần giá. Không còn mục nào ghi "Liên hệ".
   - Phí gói bảo hành 18 / 24 tháng (nếu có) – chủ web: "update later"
   - **Mô tả "bình chứa nước" của Sol Pro / Grid Pro lệch bảng mới:** bảng 11/11 xếp cả 4 máy Plus + Pro vào "Tự động", nhưng mô tả 2 máy Pro vẫn nói bình chứa nước – chờ khách xác nhận.
   - **Tên phụ kiện:** bảng giá ghi "VIO Dripper Set", "VIO Micro-Hose"; web giữ Bio-Dripper, VIO GREEN Hose – hỏi khách có đổi không (link trang giữ nguyên).
-  - **Thông số trên ảnh khách gửi (05/11/2026) lệch dữ liệu web – chờ quyết:** ảnh ghi Sol/Grid "< 10 chậu", Plus "< 15 chậu", Pro "< 30 chậu" (web: Sol/Grid/Plus = Dưới 15 cây, Pro = Dưới 30 cây); ảnh ghi Sol Pro/Grid Pro dùng **nước trực tiếp** (web: bình chứa nước); ảnh có công suất (100 / 130 / 250 W) và kích thước (30×30×40 / 25×25×35 / 40×40×50 cm) – web chưa đưa vào bảng thông số. Ảnh có chữ đang hiện trong phần mô tả nên khách xem trang sẽ thấy hai số khác nhau.
+  - ✅ Số chậu và chế độ cấp nước: web đã theo đúng bảng khách gửi 11/11/2026. **Còn chờ:** công suất (100 / 130 / 250 W) và kích thước (30×30×40 / 25×25×35 / 40×40×50 cm) in trên ảnh thông số nhưng **web chưa đưa vào bảng thông số sản phẩm** – hỏi khách có muốn thêm không. (Kích thước này đã dùng để chỉnh cỡ model AR, xem mục 7.)
   - ✅ ~~Số gói trong Multi-Pack~~ → đổi thành Bio-Nutri Box 250 g
   - Phụ kiện **đi kèm** trong hộp từng model
   - ✅ Cảm biến / Web App / AI Chat: chủ web xác nhận đúng cho các dòng ECOHUB (theo nội dung blog, 05/11/2026)

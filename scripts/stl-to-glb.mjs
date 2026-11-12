@@ -211,6 +211,59 @@ function bandTris({ size, radius: r, center = [0, 0], z: [z0, z1], offset = 1, s
 }
 
 /** Miếng dán ảnh: lưới điểm chiếu từ phía trước (-y) lên bề mặt STL → tam giác + toạ độ ảnh (uv) */
+/**
+ * Thay độ sâu từng điểm của miếng dán bằng một mặt cong trơn khớp với vỏ máy:
+ * y = Σ c[i][j]·x^i·z^j (i ≤ 4 theo bề ngang, j ≤ 2 theo chiều cao), bình phương tối thiểu,
+ * chỉ lấy những điểm nằm trên vỏ lành (không sâu hơn mức tham chiếu 0,4 mm) để lỗ và khe không kéo mặt dán lõm xuống.
+ * Lặp 3 vòng, mỗi vòng loại tiếp các điểm lệch xa mặt vừa khớp (lọc nhiễu).
+ */
+function smoothDecal(ys, ref, nx, nz, name = 'decal') {
+  const NX = 5, NZ = 3, M = NX * NZ;                       // số hạng x^0..x^4 × z^0..z^2
+  const pts = [];
+  for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) {
+    const k = j * (nx + 1) + i;
+    if (ys[k] === null) continue;
+    // toạ độ chuẩn hoá về [-1, 1] cho số ổn định
+    pts.push({ k, u: (2 * i) / nx - 1, v: (2 * j) / nz - 1, y: ys[k], lanh: ref[k] === null || ys[k] - ref[k] <= 0.4 });
+  }
+  const basis = (u, v) => { const b = []; for (let i = 0; i < NX; i++) for (let j = 0; j < NZ; j++) b.push(u ** i * v ** j); return b; };
+  let dung = pts.filter((p) => p.lanh);
+  let coef = null;
+  for (let vong = 0; vong < 3 && dung.length >= M + 5; vong++) {
+    const A = Array.from({ length: M }, () => new Float64Array(M + 1));
+    for (const p of dung) {
+      const b = basis(p.u, p.v);
+      for (let r = 0; r < M; r++) { for (let c = 0; c < M; c++) A[r][c] += b[r] * b[c]; A[r][M] += b[r] * p.y; }
+    }
+    for (let r = 0; r < M; r++) A[r][r] += 1e-9;            // chặn ma trận suy biến
+    for (let c = 0; c < M; c++) {                           // khử Gauss có chọn hàng trụ
+      let pv = c; for (let r = c + 1; r < M; r++) if (Math.abs(A[r][c]) > Math.abs(A[pv][c])) pv = r;
+      if (Math.abs(A[pv][c]) < 1e-12) return;               // không khớp được → giữ nguyên cách vá cũ
+      [A[c], A[pv]] = [A[pv], A[c]];
+      for (let r = 0; r < M; r++) { if (r === c) continue; const f = A[r][c] / A[c][c]; for (let k = c; k <= M; k++) A[r][k] -= f * A[c][k]; }
+    }
+    coef = Array.from({ length: M }, (_, r) => A[r][M] / A[r][r]);
+    const du = dung.map((p) => Math.abs(p.y - basis(p.u, p.v).reduce((s, b, i) => s + b * coef[i], 0)));
+    const nguong = Math.max(0.15, 2.5 * [...du].sort((a, b) => a - b)[Math.floor(du.length / 2)]);
+    const giu = dung.filter((_, i) => du[i] <= nguong);
+    if (giu.length < M + 5 || giu.length === dung.length) break;
+    dung = giu;
+  }
+  if (!coef) return;
+  let lech = 0;
+  for (const p of pts) {
+    const y = basis(p.u, p.v).reduce((s, b, i) => s + b * coef[i], 0);
+    if (p.lanh) lech = Math.max(lech, Math.abs(p.y - y));
+    ys[p.k] = y;
+  }
+  // điểm trước đó là null (lỗ to, ngoài vỏ) nay cũng có mặt trơn → miếng dán liền
+  for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) {
+    const k = j * (nx + 1) + i;
+    if (ys[k] === null) ys[k] = basis((2 * i) / nx - 1, (2 * j) / nz - 1).reduce((s, b, m) => s + b * coef[m], 0);
+  }
+  if (lech > 0.3) console.log(`  ⚠ ${name}: mặt dán lệch vỏ tới ${lech.toFixed(2)} mm (vỏ không đủ trơn để khớp)`);
+}
+
 function decalTris(e, targets, aspect) {
   const [nx, nz] = e.grid ?? [48, 24];
   const h = e.height, w = e.width ?? h * aspect;
@@ -264,12 +317,28 @@ function decalTris(e, targets, aspect) {
     const copy = [...ys];
     for (let k = 0; k < ys.length; k++) if (copy[k] === null) { const n = near(k % (nx + 1), Math.floor(k / (nx + 1)), copy); if (n.length >= 2) ys[k] = n.reduce((s, v) => s + v, 0) / n.length; }
   }
+  // Làm phẳng: vỏ máy là mặt cong trơn, nên khớp cả miếng dán vào 1 mặt đa thức (bậc 4 theo x, bậc 2 theo z)
+  // tính từ những điểm nằm trên vỏ lành. Nếu chỉ vá riêng từng lỗ thì mép lỗ còn gợn, nhìn ra vết lồi lõm.
+  smoothDecal(ys, ref, nx, nz, e.name);
+  // Pháp tuyến trơn, tính từ độ dốc của chính mặt dán (sai phân trung tâm).
+  // Nếu để pháp tuyến phẳng theo từng tam giác như các bộ phận CAD thì ô lưới của miếng dán to hơn hẳn
+  // tam giác của vỏ → miếng dán bắt sáng khác vỏ, lộ thành một ô chữ nhật khác màu quanh logo.
+  const dx = w / nx, dz = h / nz;
+  const yAt = (i, j) => ys[idx(Math.min(nx, Math.max(0, i)), Math.min(nz, Math.max(0, j)))];
+  const phapTuyen = (i, j) => {
+    const yx = yAt(i + 1, j), yx0 = yAt(i - 1, j), yz = yAt(i, j + 1), yz0 = yAt(i, j - 1);
+    if (yx === null || yx0 === null || yz === null || yz0 === null) return null;
+    const gx = (yx - yx0) / ((Math.min(nx, i + 1) - Math.max(0, i - 1)) * dx);
+    const gz = (yz - yz0) / ((Math.min(nz, j + 1) - Math.max(0, j - 1)) * dz);
+    const n = [gx, -1, gz], l = Math.hypot(...n);
+    return n.map((v) => v / l);
+  };
   const grid = [];
   for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) {
     const x = x0 + (w * i) / nx, z = z0 + (h * j) / nz, y = ys[idx(i, j)];
-    grid.push(y === null ? null : { p: [x, y - off, z], uv: [i / nx, 1 - j / nz] });
+    grid.push(y === null ? null : { p: [x, y - off, z], uv: [i / nx, 1 - j / nz], n: phapTuyen(i, j) ?? [0, -1, 0] });
   }
-  const pos = [], uv = [];
+  const pos = [], uv = [], nor = [];
   const at = (i, j) => grid[j * (nx + 1) + i];
   for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
     const a = at(i, j), b = at(i + 1, j), c = at(i + 1, j + 1), d = at(i, j + 1);
@@ -277,10 +346,10 @@ function decalTris(e, targets, aspect) {
     for (const tri of [[a, b, c], [a, c, d]]) {
       const n = cross(sub(tri[1].p, tri[0].p), sub(tri[2].p, tri[0].p));
       if (n[1] > 0) tri.reverse(); // mặt dán quay về phía trước (-y)
-      for (const v of tri) { pos.push(...v.p); uv.push(...v.uv); }
+      for (const v of tri) { pos.push(...v.p); uv.push(...v.uv); nor.push(...v.n); }
     }
   }
-  return { pos: Float32Array.from(pos), uv: Float32Array.from(uv) };
+  return { pos: Float32Array.from(pos), uv: Float32Array.from(uv), nor: Float32Array.from(nor) };
 }
 
 /** Xoay danh sách toạ độ quanh trục X (độ) qua điểm pivot (mặc định center / from) */
@@ -357,6 +426,7 @@ async function build(input) {
   const rawByName = {}; // toạ độ gốc từng bộ phận – dùng để chiếu decal
   const s = (model.unitScale ?? 0.001); // mm → m
   // CAD (x, y, z↑) → glTF (x, y↑, z) = (x, z, -y), đổi đơn vị
+  const norGltf = (raw) => { const n = new Float32Array(raw.length); for (let i = 0; i < raw.length; i += 3) { n[i] = raw[i]; n[i + 1] = raw[i + 2]; n[i + 2] = -raw[i + 1]; } return n; };
   const toGltf = (raw) => { const pos = new Float32Array(raw.length); for (let i = 0; i < raw.length; i += 3) { pos[i] = raw[i] * s; pos[i + 1] = raw[i + 2] * s; pos[i + 2] = -raw[i + 1] * s; } return pos; };
 
   // 1) Đọc STL + tách vùng tô màu riêng (regions, theo toạ độ gốc)
@@ -393,13 +463,13 @@ async function build(input) {
       // decal không có ảnh ("material" + "width"): miếng vá ôm mặt cong, VD bịt lỗ bắt vít trên vỏ
       const [iw, ih] = e.image ? pngSize(fs.readFileSync(path.join(SRC, e.image))) : [e.width, e.height];
       const targets = (e.parts ?? Object.keys(rawByName)).map((n) => rawByName[n] ?? (() => { throw new Error(`decal: không có bộ phận "${n}"`); })());
-      const { pos, uv } = decalTris(e, targets, iw / ih);
+      const { pos, uv, nor } = decalTris(e, targets, iw / ih);
       if (!pos.length) throw new Error(`decal "${e.name}": không chiếu được lên bề mặt nào – kiểm tra center/height`);
       if (e.image) {
         imageOpts[`decal:${e.image}`] ??= { roughness: e.roughness, metalness: e.metalness };
-        parts.push({ name: e.name ?? 'decal', mat: `decal:${e.image}`, pos: toGltf(pos), uv });
+        parts.push({ name: e.name ?? 'decal', mat: `decal:${e.image}`, pos: toGltf(pos), uv, nor: norGltf(nor) });
       }
-      else parts.push({ name: e.name ?? 'patch', mat: e.material ?? model.default ?? 'body', pos: toGltf(pos) });
+      else parts.push({ name: e.name ?? 'patch', mat: e.material ?? model.default ?? 'body', pos: toGltf(pos), nor: norGltf(nor) });
     } else parts.push({ name: e.name ?? e.shape, mat: e.material ?? model.default ?? 'body', pos: toGltf(extraTris(e)) });
   }
 
@@ -435,10 +505,11 @@ async function build(input) {
   const root = doc.createNode(model.out);
   doc.createScene(model.out).addChild(root);
   let tris = 0;
-  for (const { name, mat, pos, uv } of parts) {
-    // Pháp tuyến phẳng theo mặt (không tin pháp tuyến trong STL); hàn đỉnh sau đó giữ cạnh sắc của CAD
-    const nor = new Float32Array(pos.length);
-    for (let t = 0; t < pos.length; t += 9) {
+  for (const { name, mat, pos, uv, nor: sanCo } of parts) {
+    // Pháp tuyến phẳng theo mặt (không tin pháp tuyến trong STL); hàn đỉnh sau đó giữ cạnh sắc của CAD.
+    // Miếng dán tự đưa pháp tuyến trơn của nó (xem decalTris) để bắt sáng giống vỏ.
+    const nor = sanCo ?? new Float32Array(pos.length);
+    for (let t = 0; !sanCo && t < pos.length; t += 9) {
       const ax = pos[t + 3] - pos[t], ay = pos[t + 4] - pos[t + 1], az = pos[t + 5] - pos[t + 2];
       const bx = pos[t + 6] - pos[t], by = pos[t + 7] - pos[t + 1], bz = pos[t + 8] - pos[t + 2];
       let nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx;

@@ -48,7 +48,11 @@ function pinSvg(p = PIN) {
 const LOGO = {
   photo: path.join(ROOT, 'images-src', '2026-11', 'may-that', 'nlmt', '06.jpg'),
   crop: [772, 716, 420, 412],  // x, y, rộng, cao (px ảnh gốc sau xoay EXIF) – logo nằm ở x 789–1174, y 731–1113
-  d0: 3, d1: 16,               // ΔE2000 so với nền: ≤ d0 = trong suốt, ≥ d1 = đục
+  // Mức "là mực logo" so với nền: ≤ d0 = trong suốt, ≥ d1 = đục.
+  // Mực logo luôn ĐẬM MÀU hơn (xanh lá, vàng) hoặc TỐI hơn vỏ; chỗ vỏ chỉ sáng hơn nền một chút
+  // (ánh sáng chụp không đều) thì không phải logo. Trước đây dùng ΔE2000 nên cả điểm sáng hơn cũng
+  // thành bán trong suốt → đắp lên vỏ một quầng trắng khác màu quanh logo.
+  d0: 3, d1: 16,
   gain: [0.5352, 0.9112, 0.2824],             // hệ số tuyến tính R, G, B cho màu logo: lớp phản xạ bề mặt trên trình xem làm logo nhạt hơn ảnh → bù lại (hiệu chỉnh ΔE)
 };
 const toLin = (c) => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
@@ -59,22 +63,6 @@ function lab([r, g, b]) {
   const f = (t) => (t > 216 / 24389 ? Math.cbrt(t) : (24389 / 27 * t + 16) / 116);
   return [116 * f(Y) - 16, 500 * (f(X) - f(Y)), 200 * (f(Y) - f(Z))];
 }
-function dE00(c1, c2) {
-  const [L1, a1, b1] = lab(c1), [L2, a2, b2] = lab(c2), rad = Math.PI / 180;
-  const Cb = (Math.hypot(a1, b1) + Math.hypot(a2, b2)) / 2, G = 0.5 * (1 - Math.sqrt(Cb ** 7 / (Cb ** 7 + 25 ** 7)));
-  const a1p = (1 + G) * a1, a2p = (1 + G) * a2, C1p = Math.hypot(a1p, b1), C2p = Math.hypot(a2p, b2);
-  const h = (a, b) => { const v = Math.atan2(b, a) / rad; return v < 0 ? v + 360 : v; };
-  const h1p = h(a1p, b1), h2p = h(a2p, b2);
-  let dhp = 0; if (C1p * C2p) { dhp = h2p - h1p; if (dhp > 180) dhp -= 360; else if (dhp < -180) dhp += 360; }
-  const dLp = L2 - L1, dCp = C2p - C1p, dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin((dhp / 2) * rad);
-  const Lbp = (L1 + L2) / 2, Cbp = (C1p + C2p) / 2;
-  let hbp = h1p + h2p; if (C1p * C2p) { if (Math.abs(h1p - h2p) > 180) hbp = hbp < 360 ? hbp + 360 : hbp - 360; hbp /= 2; }
-  const T = 1 - 0.17 * Math.cos((hbp - 30) * rad) + 0.24 * Math.cos(2 * hbp * rad) + 0.32 * Math.cos((3 * hbp + 6) * rad) - 0.2 * Math.cos((4 * hbp - 63) * rad);
-  const Rc = 2 * Math.sqrt(Cbp ** 7 / (Cbp ** 7 + 25 ** 7)), dTh = 30 * Math.exp(-(((hbp - 275) / 25) ** 2));
-  const Sl = 1 + (0.015 * (Lbp - 50) ** 2) / Math.sqrt(20 + (Lbp - 50) ** 2), Sc = 1 + 0.045 * Cbp, Sh = 1 + 0.015 * Cbp * T;
-  return Math.sqrt((dLp / Sl) ** 2 + (dCp / Sc) ** 2 + (dHp / Sh) ** 2 - Math.sin(2 * dTh * rad) * Rc * (dCp / Sc) * (dHp / Sh));
-}
-
 async function logo() {
   const materials = JSON.parse(fs.readFileSync(path.join(ROOT, 'models-src', 'models.json'), 'utf8')).materials;
   const body = materials.proBody.color.replace('#', '').match(/../g).map((h) => toLin(parseInt(h, 16)));
@@ -96,7 +84,9 @@ async function logo() {
   const out = Buffer.alloc(w * h * 4);
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const c = px(x, y), B = fit.map(([a, b, cc]) => a + b * x + cc * y);
-    const a = Math.min(1, Math.max(0, (dE00(c, B) - LOGO.d0) / (LOGO.d1 - LOGO.d0)));
+    const [Lc, ac, bc] = lab(c), [LB, aB, bB] = lab(B);
+    const muc = Math.hypot(Math.max(0, LB - Lc), ac - aB, bc - bB);   // chỉ tính phần tối đi và phần lệch màu
+    const a = Math.min(1, Math.max(0, (muc - LOGO.d0) / (LOGO.d1 - LOGO.d0)));
     const F = a > 0 ? c.map((v, k) => Math.min(255, Math.max(0, (v - (1 - a) * B[k]) / a))) : B;
     const i = (y * w + x) * 4;
     for (let k = 0; k < 3; k++) out[i + k] = Math.round(toSrgb((toLin(F[k]) * body[k] * (1 + (LOGO.gain[k] - 1) * a)) / toLin(B[k]))); // cùng tỉ lệ sáng với thân

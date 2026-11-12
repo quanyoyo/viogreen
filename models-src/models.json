@@ -539,7 +539,7 @@
           ],
           "width": 170,
           "height": 84,
-          "offset": 0.3,
+          "offset": 0.7,
           "grid": [
             68,
             34
@@ -555,7 +555,7 @@
             398
           ],
           "height": 92,
-          "offset": 0.6,
+          "offset": 1.1,
           "grid": [
             48,
             48

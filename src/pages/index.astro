@@ -40,7 +40,11 @@ const whys = [
 // Nền xen kẽ kem – trắng cho các mục cuối trang. Mục đánh giá chỉ hiện khi có đánh giá thật nên danh sách
 // phải tính động, nếu không sẽ có 2 mục cùng màu dính liền nhau.
 // (Mục blog đã bỏ khỏi trang chủ 13/11/2026 theo yêu cầu khách; trang /tin-tuc/ vẫn còn.)
-const tail = ['featured', reviews.length > 0 && 'reviews', 'contact', 'faq'].filter(Boolean) as string[];
+// Lọc chỉ lấy các đánh giá tích cực 4 và 5 sao để đưa lên trang chủ
+const qualifiedReviews = reviews.filter((r) => r.rating >= 4);
+// Chọn ngẫu nhiên 3 đánh giá cho lần build ban đầu
+const initialHomeReviews = [...qualifiedReviews].sort(() => 0.5 - Math.random()).slice(0, 3);
+const tail = ['featured', qualifiedReviews.length > 0 && 'reviews', 'contact', 'faq'].filter(Boolean) as string[];
 const tint = (key: string) => tail.indexOf(key) % 2 === 0;
 
 const jsonLd = {
@@ -194,24 +198,28 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- ĐÁNH GIÁ KHÁCH HÀNG (chỉ hiện khi src/data/reviews.ts có đánh giá thật) -->
-  {reviews.length > 0 && (
+  <!-- ĐÁNH GIÁ KHÁCH HÀNG (chọn ngẫu nhiên 3 đánh giá 4, 5 sao) -->
+  {qualifiedReviews.length > 0 && (
     <section class:list={['section', tint('reviews') && 'bg-cream']} id="danh-gia">
       <div class="container-x">
         <SectionHead eyebrow="Khách hàng nói gì" title="Cảm nhận từ khách hàng VIO GREEN" />
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {reviews.map((r, i) => (
-            <figure class="card flex flex-col p-6" data-reveal style={`--d:${(i % 3) * 80}ms`}>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-home-reviews-grid>
+          {initialHomeReviews.map((r, i) => (
+            <figure class="card flex flex-col p-6 shadow-soft" data-reveal style={`--d:${(i % 3) * 80}ms`}>
               <div class="flex gap-0.5 text-sun" aria-label={`${r.rating}/5 sao`}>
                 {[1, 2, 3, 4, 5].map((n) => <Icon name="star" class:list={['size-4', n <= r.rating ? 'fill-current' : 'opacity-30']} />)}
               </div>
-              <blockquote class="mt-4 flex-1 text-ink/90">“{r.text}”</blockquote>
+              <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed">“{r.text}”</blockquote>
               <figcaption class="mt-5 flex items-center gap-3 border-t border-line pt-4">
                 {r.photo ? <img src={r.photo} alt="" class="size-11 rounded-full object-cover" loading="lazy" />
                          : <span class="inline-flex size-11 items-center justify-center rounded-full bg-brand-50 font-bold text-brand">{r.name.trim().split(' ').pop()?.[0]}</span>}
                 <div class="min-w-0 text-sm">
-                  <p class="font-semibold">{r.name}</p>
-                  <p class="text-muted">{[r.place, r.product].filter(Boolean).join(' · ')}</p>
+                  <p class="font-semibold text-ink">{r.name}</p>
+                  {(r.place || r.product) && (
+                    <p class="truncate text-xs text-muted">
+                      {[r.product, r.place].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
                 </div>
               </figcaption>
             </figure>
@@ -220,6 +228,82 @@ const jsonLd = {
       </div>
     </section>
   )}
+
+  <!-- Template và script xáo trộn ngẫu nhiên 3 đánh giá 4-5 sao mỗi lần xem trang -->
+  <template id="vg-home-review-tmpl">
+    <figure class="card flex flex-col p-6 shadow-soft" data-reveal>
+      <div class="flex gap-0.5 text-sun" data-tmpl-stars aria-label="5/5 sao">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <span data-star-n={n} class="inline-flex">
+            <Icon name="star" class="size-4 fill-current" />
+          </span>
+        ))}
+      </div>
+      <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed" data-tmpl-text></blockquote>
+      <figcaption class="mt-5 flex items-center gap-3 border-t border-line pt-4">
+        <span class="inline-flex size-11 items-center justify-center rounded-full bg-brand-50 font-bold text-brand" data-tmpl-avatar></span>
+        <div class="min-w-0 text-sm">
+          <p class="font-semibold text-ink" data-tmpl-name></p>
+          <p class="truncate text-xs text-muted" data-tmpl-meta></p>
+        </div>
+      </figcaption>
+    </figure>
+  </template>
+
+  <script type="application/json" id="vg-qualified-reviews" set:html={JSON.stringify(qualifiedReviews)} />
+
+  <script>
+    function shuffleHomeReviews() {
+      const dataEl = document.getElementById('vg-qualified-reviews');
+      const grid = document.querySelector<HTMLElement>('[data-home-reviews-grid]');
+      const tmpl = document.querySelector<HTMLTemplateElement>('#vg-home-review-tmpl');
+      if (!dataEl || !grid || !tmpl) return;
+
+      try {
+        const all: Array<{ name: string; place?: string; product?: string; rating: number; text: string; photo?: string }> = JSON.parse(dataEl.textContent || '[]');
+        if (all.length <= 3) return; // Nếu <= 3 thì giữ nguyên kết quả render sẵn
+
+        // Random chọn 3 đánh giá 4-5 sao
+        const shuffled = [...all].sort(() => 0.5 - Math.random()).slice(0, 3);
+
+        grid.innerHTML = '';
+        shuffled.forEach((r, i) => {
+          const clone = tmpl.content.cloneNode(true) as HTMLElement;
+          const fig = clone.querySelector('figure');
+          if (fig) fig.style.setProperty('--d', `${(i % 3) * 80}ms`);
+
+          const starSlots = clone.querySelectorAll<HTMLElement>('[data-star-n]');
+          starSlots.forEach((slot) => {
+            const n = Number(slot.dataset.starN);
+            const svg = slot.querySelector('svg');
+            if (svg && n > r.rating) {
+              svg.classList.remove('fill-current');
+              svg.classList.add('opacity-30');
+            }
+          });
+
+          const textEl = clone.querySelector('[data-tmpl-text]');
+          if (textEl) textEl.textContent = `“${r.text}”`;
+
+          const nameEl = clone.querySelector('[data-tmpl-name]');
+          if (nameEl) nameEl.textContent = r.name;
+
+          const avatarEl = clone.querySelector('[data-tmpl-avatar]');
+          if (avatarEl) avatarEl.textContent = r.name.trim().split(' ').pop()?.[0] || 'K';
+
+          const metaEl = clone.querySelector('[data-tmpl-meta]');
+          if (metaEl) metaEl.textContent = [r.product, r.place].filter(Boolean).join(' · ');
+
+          grid.appendChild(clone);
+        });
+      } catch {
+        /* ignore */
+      }
+    }
+
+    shuffleHomeReviews();
+    document.addEventListener('astro:page-load', shuffleHomeReviews);
+  </script>
 
   <!-- CONTACT -->
   <section class:list={['section', tint('contact') && 'bg-cream']} id="tu-van">

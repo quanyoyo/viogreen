@@ -136,7 +136,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 **Đã xong:** 34 trang build OK, `astro check` 0 lỗi, đã thử trên mobile (360px) và desktop.
 
 **Đợt sửa 13/11/2026 (Đánh giá khách hàng & form nhận xét sản phẩm):**
-- **Trang chủ:** Điền 3 đánh giá 5 sao vào `src/data/reviews.ts` (Mai Lan, Quốc Tuấn, Hoàng Nam – đã bỏ đại từ nhân xưng); mục "Khách hàng nói gì" trên trang chủ tự động hiển thị lưới 3 cột cân đối.
+- **Trang chủ:** Điền danh sách đánh giá vào `src/data/reviews.ts` (đã bỏ đại từ nhân xưng); chỉ lọc các đánh giá tích cực **4 và 5 sao**, tự động **chọn ngẫu nhiên (random) 3 đánh giá** mỗi lần khách ghé thăm hoặc tải lại trang, hiển thị lưới 3 cột cân đối.
 - **Trang chi tiết sản phẩm (`/san-pham/[slug]`):** Thêm component `ProductReviews.astro` hiển thị danh sách đánh giá theo sản phẩm, điểm số trung bình, và form cho khách hàng tự viết đánh giá (chọn 1–5 sao tương tác, họ tên, liên hệ, không gian, nhận xét chi tiết; lưu `localStorage` để hiện ngay trên máy khách và đồng thời gửi lead về Firestore).
 - **Trang chủ ngắn lại:** bỏ 3 mục khỏi `index.astro` – "ECOHUB trong không gian sống", "Một hệ thống / Nhiều cách sống xanh", và "Blog & tin tức". Trang `/tin-tuc/` vẫn giữ nguyên. Đã chạy `npm run check` và `npm run build` 0 lỗi.
 - **AR (Loading xoay tròn trên iPhone Chrome):** Thêm spinner xoay tròn khi bấm "Xem trong không gian của bạn" và overlay thông báo đang tải AR (tự tắt khi mở Quick Look hoặc quay lại từ Quick Look); thêm spinner trên nút tải file AR riêng cho Chrome trên iPhone.

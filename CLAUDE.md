@@ -246,7 +246,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Liên kết:** link Messenger, Zalo, Instagram (icon đang ẩn, điền link vào `site.social` là tự hiện).
 - **Nội dung 5 trang chưa có** (đang ẩn khỏi footer): Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
 - **Hình ảnh và file:** ảnh Bio-Nutri; **file 3D dùng để render ảnh SP** (để 3D giống ảnh hoàn toàn) hoặc CAD đầy đủ (tấm pin + cột, hộp Bio-Tank, nút bấm) cho 6 máy; 3D bản thường Sol / Grid; logo gốc SVG/PNG. Ảnh `nha-phu-cay-xanh-750px.jpg` (Drive) chưa dùng – nhỏ và có vẻ là ảnh trên mạng.
-- **Đánh giá khách hàng:** đã điền 3 đánh giá mẫu 5 sao (Mai Lan, Quốc Tuấn, Hoàng Nam) vào `src/data/reviews.ts`, mục "Khách hàng nói gì" trên trang chủ đã hiển thị. Trang chi tiết từng sản phẩm đã có component `ProductReviews.astro` cho khách tự viết đánh giá. Khi khách gửi nội dung thật mới, chỉ cần cập nhật lại `src/data/reviews.ts`.
+- **Đánh giá khách hàng:** đã điền 3 đánh giá mẫu 5 sao (Mai Lan, Quốc Tuấn, Hoàng Nam) vào `src/data/reviews.ts`, mục "Khách hàng nói gì" trên trang chủ đã hiển thị (ngẫu nhiên 3 đánh giá 4-5 sao, layout chống vỡ tràn viền trên mobile 360px/375px). Trang chi tiết từng sản phẩm đã có component `ProductReviews.astro` cho khách tự viết đánh giá. Khi khách gửi nội dung thật mới, chỉ cần cập nhật lại `src/data/reviews.ts`.
 - **Ô trống trong bảng phí vận chuyển** (Figma để trống): hiện đang hiển thị "—".
 
 ## 10. Ghi chú

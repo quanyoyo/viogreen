@@ -180,7 +180,7 @@ const avgScore = totalCount > 0
 
       <!-- Danh sách thẻ đánh giá -->
       <div
-        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
         data-reviews-list
       >
         <!-- Vị trí chèn đánh giá người dùng gửi trên trình duyệt -->
@@ -188,7 +188,7 @@ const avgScore = totalCount > 0
 
         <!-- Các đánh giá có sẵn từ reviews.ts -->
         {staticReviews.map((r, i) => (
-          <figure class="card flex flex-col p-6 shadow-soft" data-reveal style={`--d:${(i % 3) * 80}ms`}>
+          <figure class="card flex min-w-0 flex-col overflow-hidden p-5 sm:p-6 shadow-soft" data-reveal style={`--d:${(i % 3) * 80}ms`}>
             <div class="flex items-center justify-between gap-2">
               <div class="flex gap-0.5 text-sun" aria-label={`${r.rating}/5 sao`}>
                 {[1, 2, 3, 4, 5].map((n) => (
@@ -200,17 +200,17 @@ const avgScore = totalCount > 0
               </span>
             </div>
 
-            <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed">“{r.text}”</blockquote>
+            <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed break-words">“{r.text}”</blockquote>
 
-            <figcaption class="mt-5 flex items-center gap-3 border-t border-line pt-4">
+            <figcaption class="mt-5 flex min-w-0 items-center gap-3 border-t border-line pt-4">
               {r.photo ? (
-                <img src={r.photo} alt="" class="size-11 rounded-full object-cover" loading="lazy" />
+                <img src={r.photo} alt="" class="size-11 shrink-0 rounded-full object-cover" loading="lazy" />
               ) : (
-                <span class="inline-flex size-11 items-center justify-center rounded-full bg-brand-50 font-bold text-brand">
+                <span class="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-50 font-bold text-brand">
                   {r.name.trim().split(' ').pop()?.[0]}
                 </span>
               )}
-              <div class="min-w-0 text-sm">
+              <div class="min-w-0 flex-1 text-sm">
                 <p class="font-semibold text-ink">{r.name}</p>
                 <p class="truncate text-xs text-muted">
                   {[r.place, r.date].filter(Boolean).join(' · ')}
@@ -225,7 +225,7 @@ const avgScore = totalCount > 0
 
   <!-- Template cho thẻ đánh giá mới thêm bằng JS -->
   <template id="vg-review-card-tmpl">
-    <figure class="card flex flex-col p-6 shadow-soft border-brand-300">
+    <figure class="card flex min-w-0 flex-col overflow-hidden p-5 sm:p-6 shadow-soft border-brand-300">
       <div class="flex items-center justify-between gap-2">
         <div class="flex gap-0.5 text-sun" data-tmpl-stars aria-label="5/5 sao">
           {[1, 2, 3, 4, 5].map((n) => (
@@ -236,10 +236,10 @@ const avgScore = totalCount > 0
         </div>
         <span class="tag bg-brand-50 text-xs font-semibold text-brand">Đánh giá của bạn</span>
       </div>
-      <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed" data-tmpl-text></blockquote>
-      <figcaption class="mt-5 flex items-center gap-3 border-t border-line pt-4">
-        <span class="inline-flex size-11 items-center justify-center rounded-full bg-brand-50 font-bold text-brand" data-tmpl-avatar></span>
-        <div class="min-w-0 text-sm">
+      <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed break-words" data-tmpl-text></blockquote>
+      <figcaption class="mt-5 flex min-w-0 items-center gap-3 border-t border-line pt-4">
+        <span class="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-50 font-bold text-brand" data-tmpl-avatar></span>
+        <div class="min-w-0 flex-1 text-sm">
           <p class="font-semibold text-ink" data-tmpl-name></p>
           <p class="truncate text-xs text-muted" data-tmpl-meta></p>
         </div>

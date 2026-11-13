@@ -203,17 +203,17 @@ const jsonLd = {
     <section class:list={['section', tint('reviews') && 'bg-cream']} id="danh-gia">
       <div class="container-x">
         <SectionHead eyebrow="Khách hàng nói gì" title="Cảm nhận từ khách hàng VIO GREEN" />
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-home-reviews-grid>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" data-home-reviews-grid>
           {initialHomeReviews.map((r, i) => (
-            <figure class="card flex flex-col p-6 shadow-soft" data-reveal style={`--d:${(i % 3) * 80}ms`}>
+            <figure class="card flex min-w-0 flex-col overflow-hidden p-5 sm:p-6 shadow-soft" data-reveal style={`--d:${(i % 3) * 80}ms`}>
               <div class="flex gap-0.5 text-sun" aria-label={`${r.rating}/5 sao`}>
                 {[1, 2, 3, 4, 5].map((n) => <Icon name="star" class:list={['size-4', n <= r.rating ? 'fill-current' : 'opacity-30']} />)}
               </div>
-              <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed">“{r.text}”</blockquote>
-              <figcaption class="mt-5 flex items-center gap-3 border-t border-line pt-4">
-                {r.photo ? <img src={r.photo} alt="" class="size-11 rounded-full object-cover" loading="lazy" />
-                         : <span class="inline-flex size-11 items-center justify-center rounded-full bg-brand-50 font-bold text-brand">{r.name.trim().split(' ').pop()?.[0]}</span>}
-                <div class="min-w-0 text-sm">
+              <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed break-words">“{r.text}”</blockquote>
+              <figcaption class="mt-5 flex min-w-0 items-center gap-3 border-t border-line pt-4">
+                {r.photo ? <img src={r.photo} alt="" class="size-11 shrink-0 rounded-full object-cover" loading="lazy" />
+                         : <span class="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-50 font-bold text-brand">{r.name.trim().split(' ').pop()?.[0]}</span>}
+                <div class="min-w-0 flex-1 text-sm">
                   <p class="font-semibold text-ink">{r.name}</p>
                   {(r.place || r.product) && (
                     <p class="truncate text-xs text-muted">
@@ -231,7 +231,7 @@ const jsonLd = {
 
   <!-- Template và script xáo trộn ngẫu nhiên 3 đánh giá 4-5 sao mỗi lần xem trang -->
   <template id="vg-home-review-tmpl">
-    <figure class="card flex flex-col p-6 shadow-soft" data-reveal>
+    <figure class="card flex min-w-0 flex-col overflow-hidden p-5 sm:p-6 shadow-soft" data-reveal>
       <div class="flex gap-0.5 text-sun" data-tmpl-stars aria-label="5/5 sao">
         {[1, 2, 3, 4, 5].map((n) => (
           <span data-star-n={n} class="inline-flex">
@@ -239,10 +239,10 @@ const jsonLd = {
           </span>
         ))}
       </div>
-      <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed" data-tmpl-text></blockquote>
-      <figcaption class="mt-5 flex items-center gap-3 border-t border-line pt-4">
-        <span class="inline-flex size-11 items-center justify-center rounded-full bg-brand-50 font-bold text-brand" data-tmpl-avatar></span>
-        <div class="min-w-0 text-sm">
+      <blockquote class="mt-4 flex-1 text-ink/90 leading-relaxed break-words" data-tmpl-text></blockquote>
+      <figcaption class="mt-5 flex min-w-0 items-center gap-3 border-t border-line pt-4">
+        <span class="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-50 font-bold text-brand" data-tmpl-avatar></span>
+        <div class="min-w-0 flex-1 text-sm">
           <p class="font-semibold text-ink" data-tmpl-name></p>
           <p class="truncate text-xs text-muted" data-tmpl-meta></p>
         </div>

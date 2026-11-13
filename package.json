@@ -11,6 +11,7 @@
     "models": "node scripts/stl-to-glb.mjs",
     "models:ai": "node scripts/build-ai-models.mjs",
     "models:tam": "node scripts/make-temp-models.mjs",
+    "models:usdz": "node scripts/make-usdz.mjs",
     "dvhc": "node scripts/fetch-dvhc.mjs",
     "images": "node scripts/optimize-images.mjs"
   },

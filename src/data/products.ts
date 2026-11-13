@@ -10,6 +10,8 @@
 //  thumb        => ảnh trên thẻ sản phẩm / giỏ hàng (mặc định images[0])
 //  info         => ảnh có chữ, hiện trong phần mô tả (ECOHUB)
 //  model: null  => nút AR hiện "Đang cập nhật". Khi có file 3D: { glb: '/models/ecohub-sol-plus.glb' } (tạo bằng npm run models)
+//               usdz = file AR của Apple (npm run models:usdz). KHÔNG gắn mặc định vì nặng vài MB: Safari tự chuyển đổi
+//               từ GLB nên không cần; chỉ Chrome/Edge/Firefox trên iPhone mới dùng, và chỉ khi khách bấm đồng ý.
 //  Đổi slug → nhớ thêm dòng chuyển hướng 301 trong public/_redirects.
 // ============================================================
 
@@ -101,7 +103,7 @@ const raw: Raw[] = [
     price: 2_599_000,
     images: [img('ecohub-sol')],
     // 3D TẠM (11/11/2026, chủ web yêu cầu): model Sol Pro thu nhỏ ×0,77 cho đúng cỡ máy (npm run models:tam) – thay khi có 3D riêng
-    model: { glb: '/models/ecohub-sol-tam.glb' },
+    model: { glb: '/models/ecohub-sol-tam.glb', usdz: '/models/ecohub-sol-tam.usdz' },
     info: [img('ecohub-sol-info')],
   },
   {
@@ -129,7 +131,7 @@ const raw: Raw[] = [
     price: 2_199_000,
     images: [img('ecohub-grid')],
     // 3D TẠM (11/11/2026, chủ web yêu cầu): model Grid Pro thu nhỏ ×0,77 cho đúng cỡ máy (npm run models:tam) – thay khi có 3D riêng
-    model: { glb: '/models/ecohub-grid-tam.glb' },
+    model: { glb: '/models/ecohub-grid-tam.glb', usdz: '/models/ecohub-grid-tam.usdz' },
     info: [img('ecohub-grid-info')],
   },
   {
@@ -158,7 +160,7 @@ const raw: Raw[] = [
     price: 3_299_000,
     images: [img('ecohub-sol-plus')],
     // 3D TẠM (11/11/2026, chủ web yêu cầu): model Sol Pro thu nhỏ ×0,66 cho đúng cỡ máy (npm run models:tam) – bản 3D AI cũ vẫn giữ ở /models/ecohub-sol-plus.glb
-    model: { glb: '/models/ecohub-sol-plus-tam.glb' },
+    model: { glb: '/models/ecohub-sol-plus-tam.glb', usdz: '/models/ecohub-sol-plus-tam.usdz' },
     info: [img('ecohub-sol-plus-info')],
   },
   {
@@ -186,7 +188,7 @@ const raw: Raw[] = [
     price: 2_799_000,
     images: [img('ecohub-grid-plus')],
     // 3D TẠM (11/11/2026, chủ web yêu cầu): model Grid Pro thu nhỏ ×0,66 cho đúng cỡ máy (npm run models:tam) – bản 3D AI cũ vẫn giữ ở /models/ecohub-grid-plus.glb
-    model: { glb: '/models/ecohub-grid-plus-tam.glb' },
+    model: { glb: '/models/ecohub-grid-plus-tam.glb', usdz: '/models/ecohub-grid-plus-tam.usdz' },
     info: [img('ecohub-grid-plus-info')],
     note: 'Việc lắp đặt phải tuân thủ hướng dẫn kỹ thuật của sản phẩm.',
   },
@@ -215,7 +217,7 @@ const raw: Raw[] = [
     price: 5_099_000,
     images: [img('ecohub-sol-pro')],
     // 3D bản Pro (12 STL gốc, thân 40×40×50 cm) dựng theo ảnh máy thật 11/11/2026 (cột + tấm pin, sọc đen, cụm nút, logo); màu chỉnh theo ảnh (ΔE2000)
-    model: { glb: '/models/ecohub-sol-pro.glb' },
+    model: { glb: '/models/ecohub-sol-pro.glb', usdz: '/models/ecohub-sol-pro.usdz' },
     info: [img('ecohub-sol-pro-info')],
   },
   {
@@ -243,7 +245,7 @@ const raw: Raw[] = [
     price: 4_399_000,
     images: [img('ecohub-grid-pro')],
     // 3D = thân Sol Pro bỏ cột + tấm pin (chưa có ảnh máy Grid Pro thật, 11/11/2026)
-    model: { glb: '/models/ecohub-grid-pro.glb' },
+    model: { glb: '/models/ecohub-grid-pro.glb', usdz: '/models/ecohub-grid-pro.usdz' },
     info: [img('ecohub-grid-pro-info')],
   },
 

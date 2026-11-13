@@ -36,11 +36,49 @@ const laIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const iosKhongPhaiSafari = laIOS && /CriOS\/|EdgiOS\/|FxiOS\/|GSA\/|DuckDuckGo\//.test(navigator.userAgent);
 
+/**
+ * Chrome / Edge / Firefox trên iPhone chỉ ướm được khi web đưa sẵn file .usdz.
+ * File này nặng hơn hẳn GLB (vài MB vì ghi hình khối dạng chữ) nên không gắn mặc định:
+ * mời Safari trước, ai vẫn muốn dùng trình duyệt hiện tại thì bấm nút để tải.
+ */
+async function moiTaiUsdz(mv: HTMLElement & { canActivateAR?: boolean }, usdz: string, hint: Element) {
+  const chon = $('[data-ar-chon]', modal!) as HTMLElement | null;
+  if (!chon) return;
+  let mb = '';
+  try {
+    const n = +((await fetch(usdz, { method: 'HEAD' })).headers.get('content-length') ?? 0);
+    if (n) mb = ` ~${(n / 1048576).toFixed(1)} MB`;
+  } catch { /* không đọc được dung lượng thì thôi, vẫn cho bấm */ }
+  chon.innerHTML = `<button type="button" class="btn btn-light" data-tai-usdz>Vẫn dùng trình duyệt này (tải thêm${esc(mb)})</button>`;
+  chon.hidden = false;
+  $('[data-tai-usdz]', chon)!.addEventListener('click', async (e) => {
+    const nut = e.currentTarget as HTMLButtonElement;
+    nut.disabled = true;
+    nut.textContent = 'Đang tải…';
+    hint.textContent = CHI_DAN.dangTai;
+    try {
+      // tải trước để khách biết đã xong, rồi mới giao đường dẫn cho model-viewer
+      if (!(await fetch(usdz)).ok) throw new Error('tải hỏng');
+      mv.setAttribute('ios-src', usdz);
+      for (let i = 0; i < 80 && !mv.canActivateAR; i++) await new Promise((r) => setTimeout(r, 100));
+      if (!mv.canActivateAR) throw new Error('vẫn không bật được');
+      chon.hidden = true;
+      hint.textContent = CHI_DAN.sanSang;
+    } catch {
+      hint.textContent = CHI_DAN.loi;
+      chon.hidden = true;
+    }
+  }, { once: true });
+}
+
 /** Dòng hướng dẫn dưới khung xem, tuỳ máy có ướm được AR hay không */
 const CHI_DAN = {
   co: 'Kéo để xoay 360°, chụm hai ngón để phóng to. Bấm “Xem trong không gian của bạn” để ướm máy vào chỗ bạn định đặt.',
   iosKhacSafari: 'Kéo để xoay 360°, chụm hai ngón để phóng to. Trên iPhone, chế độ ướm vào không gian thật '
-    + 'chỉ chạy trong Safari – hãy mở lại trang này bằng Safari rồi bấm “Xem trong không gian của bạn”.',
+    + 'chạy sẵn trong Safari – mở lại trang này bằng Safari là bấm được ngay, không phải tải thêm gì.',
+  dangTai: 'Đang chuẩn bị file cho trình duyệt này…',
+  sanSang: 'Đã sẵn sàng. Bấm “Xem trong không gian của bạn” để ướm máy vào chỗ bạn định đặt.',
+  loi: 'Không tải được file cho trình duyệt này. Bạn mở lại trang bằng Safari giúp nhé.',
   khong: 'Kéo để xoay 360°, lăn chuột hoặc chụm hai ngón để phóng to. Muốn ướm máy vào không gian thật, hãy mở trang này '
     + 'trên điện thoại: iPhone mở bằng Safari (đang ở trong Zalo hay Facebook thì bấm ⋯ rồi chọn “Mở trong Safari”), '
     + 'Android dùng Chrome và cần cài “Google Play Services for AR”.',
@@ -51,6 +89,7 @@ async function openAR(slug: string) {
   if (!modal || !p) return;
   const stage = $('[data-ar-stage]', modal)!;
   const hint = $('[data-ar-hint]', modal)!;
+  const chon = $('[data-ar-chon]', modal)!; chon.hidden = true; chon.innerHTML = '';
   $('[data-ar-title]', modal)!.textContent = p.shortName;
 
   if (p.model) {
@@ -59,7 +98,7 @@ async function openAR(slug: string) {
     openLayer(modal);
     try {
       await loadModelViewer();
-      stage.innerHTML = `<model-viewer src="${esc(p.model.glb)}" ${p.model.usdz ? `ios-src="${esc(p.model.usdz)}"` : ''}
+      stage.innerHTML = `<model-viewer src="${esc(p.model.glb)}"
         alt="Mô hình 3D ${esc(p.shortName)}" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor"
         camera-controls auto-rotate shadow-intensity="1" touch-action="pan-y"
         style="display:block;width:100%;height:auto;aspect-ratio:4/3;background:var(--color-cream)">
@@ -71,6 +110,7 @@ async function openAR(slug: string) {
       const mv = $('model-viewer', stage) as (HTMLElement & { canActivateAR?: boolean; loaded?: boolean }) | null;
       const datChiDan = () => {
         hint.textContent = iosKhongPhaiSafari ? CHI_DAN.iosKhacSafari : mv?.canActivateAR ? CHI_DAN.co : CHI_DAN.khong;
+        if (iosKhongPhaiSafari && mv && p.model?.usdz) moiTaiUsdz(mv, p.model.usdz, hint);
       };
       if (mv?.loaded) datChiDan(); else mv?.addEventListener('load', datChiDan, { once: true });
     } catch {
@@ -102,7 +142,7 @@ if (modal) {
     const t = e.target as HTMLElement;
     const btn = t.closest<HTMLElement>('[data-ar]');
     if (btn) { e.preventDefault(); openAR(btn.dataset.ar!); return; }
-    if (t.closest('[data-ar-close]') && !modal.hidden) { closeLayer(modal); $('[data-ar-stage]', modal)!.innerHTML = ''; }
+    if (t.closest('[data-ar-close]') && !modal.hidden) { closeLayer(modal); $('[data-ar-stage]', modal)!.innerHTML = ''; const c = $('[data-ar-chon]', modal)!; c.hidden = true; c.innerHTML = ''; }
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !modal.hidden) $$('[data-ar-close]', modal)[0]?.click();

@@ -7,7 +7,6 @@ import ContactForm from '../components/ContactForm.astro';
 import { inCategory } from '../data/products';
 import { faq } from '../data/faq';
 import { reviews } from '../data/reviews';
-import { posts, fmtDate } from '../data/blog';
 import { site } from '../data/site';
 
 // Hero 3 slide (ảnh khách gửi 18/10/2026, gốc trong images-src/ → `npm run images`).
@@ -38,14 +37,10 @@ const whys = [
   ['ar', 'Ướm thử trước khi mua', 'Công nghệ AR cho phép người dùng hình dung ECOHUB trong chính không gian của mình, hỗ trợ lựa chọn vị trí và cách bố trí phù hợp.'],
 ] as const;
 // Nội dung 4 – Một hệ thống, nhiều cách sống xanh
-const steps = [
-  ['Thu thập dữ liệu', 'Cảm biến IoT ghi nhận các điều kiện thực tế liên quan đến nhu cầu chăm sóc cây.'],
-  ['Hỗ trợ chăm sóc', 'ECOHUB sử dụng dữ liệu cảm biến để vận hành chức năng tưới tự động; Web App hỗ trợ theo dõi và AI đưa ra gợi ý chăm sóc.'],
-  ['Theo dõi và điều chỉnh', 'Người dùng theo dõi tình trạng hệ thống qua Web App và chủ động điều chỉnh việc chăm sóc khi cần.'],
-] as const;
-
-// Đánh giá / blog chỉ hiện khi có nội dung thật; nền xen kẽ kem – trắng cho các mục cuối trang
-const tail = [reviews.length > 0 && 'reviews', posts.length > 0 && 'blog', 'contact'].filter(Boolean) as string[];
+// Nền xen kẽ kem – trắng cho các mục cuối trang. Mục đánh giá chỉ hiện khi có đánh giá thật nên danh sách
+// phải tính động, nếu không sẽ có 2 mục cùng màu dính liền nhau.
+// (Mục blog đã bỏ khỏi trang chủ 13/11/2026 theo yêu cầu khách; trang /tin-tuc/ vẫn còn.)
+const tail = ['featured', reviews.length > 0 && 'reviews', 'contact', 'faq'].filter(Boolean) as string[];
 const tint = (key: string) => tail.indexOf(key) % 2 === 0;
 
 const jsonLd = {
@@ -171,25 +166,6 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- NỘI DUNG 3 – ECOHUB TRONG KHÔNG GIAN SỐNG -->
-  <section class="section bg-brand text-white">
-    <div class="container-x grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-      <div class="breath aspect-[16/11]" data-reveal>
-        <img src="/assets/hero-2-800.webp" srcset="/assets/hero-2-800.webp 800w, /assets/hero-2.webp 1680w" sizes="(min-width: 1024px) 50vw, 100vw"
-          alt="Góc ban công xanh với máy ECOHUB" class="size-full object-cover" loading="lazy" />
-      </div>
-      <div data-reveal style="--d:120ms">
-        <p class="eyebrow eyebrow-light">ECOHUB trong không gian sống</p>
-        <h2 class="h-display">Góc xanh đẹp, chăm cây nhẹ nhàng hơn</h2>
-        <div class="mt-5 space-y-4 text-brand-100 sm:text-lg">
-          <p>Dù là ban công nhỏ hay sân thượng gia đình, bạn vẫn có thể duy trì góc xanh của riêng mình mà không phải dành quá nhiều thời gian cho những công việc chăm sóc thường xuyên.</p>
-          <p>ECOHUB hỗ trợ đơn giản hóa việc chăm cây, giúp bạn chủ động hơn trong quá trình chăm sóc và dễ dàng đưa lối sống xanh vào nhịp sống hằng ngày.</p>
-        </div>
-        <a class="link-arrow mt-6 text-white" href="/san-pham/#ecohub">Xem các dòng ECOHUB <Icon name="arrowRight" /></a>
-      </div>
-    </div>
-  </section>
-
   <!-- WHY -->
   <section class="section">
     <div class="container-x">
@@ -207,27 +183,8 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- NỘI DUNG 4 – MỘT HỆ THỐNG, NHIỀU CÁCH SỐNG XANH -->
-  <section class="section bg-cream">
-    <div class="container-x grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-      <div data-reveal>
-        <h2 class="text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl">Một hệ thống<br /><span class="text-brand">Nhiều cách sống xanh.</span></h2>
-        <p class="mt-5 text-lg text-muted">Từ dữ liệu chăm sóc cây đến việc điều phối dinh dưỡng phù hợp.</p>
-        <a class="link-arrow mt-6" href="/san-pham/#ecohub">Khám phá cách ECOHUB hoạt động <Icon name="arrowRight" /></a>
-      </div>
-      <ol class="space-y-4">
-        {steps.map(([t, d], i) => (
-          <li class="card flex gap-5 p-5 sm:p-6" data-reveal style={`--d:${i * 90}ms`}>
-            <span class="text-3xl leading-none font-extrabold text-brand-300 tabular-nums">0{i + 1}.</span>
-            <div><h3 class="text-lg font-bold">{t}</h3><p class="mt-1.5 text-muted">{d}</p></div>
-          </li>
-        ))}
-      </ol>
-    </div>
-  </section>
-
   <!-- FEATURED -->
-  <section class="section">
+  <section class:list={['section', tint('featured') && 'bg-cream']}>
     <div class="container-x">
       <SectionHead eyebrow="Sản phẩm" title="Các dòng ECOHUB" sub="Chọn theo số lượng cây, nguồn điện và nguồn nước của không gian bạn." />
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -264,28 +221,6 @@ const jsonLd = {
     </section>
   )}
 
-  <!-- BLOG / TIN TỨC (chỉ hiện khi có bài trong src/content/blog/) -->
-  {posts.length > 0 && (
-    <section class:list={['section', tint('blog') && 'bg-cream']} id="tin-tuc">
-      <div class="container-x">
-        <SectionHead eyebrow="Blog & tin tức" title="Góc chia sẻ từ VIO GREEN" />
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.slice(0, 3).map((p, i) => (
-            <article class="card card-hover group relative flex flex-col overflow-hidden" data-reveal style={`--d:${i * 80}ms`}>
-              {p.thumb && <img src={p.thumb} alt="" width="800" height="500" class="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" loading="lazy" />}
-              <div class="flex flex-1 flex-col gap-2 p-5">
-                <p class="flex items-center gap-1.5 text-xs text-muted"><Icon name="calendar" class="size-3.5" />{fmtDate(p.date)}</p>
-                <h3 class="text-lg leading-snug font-bold"><a href={`/tin-tuc/${p.slug}/`} class="after:absolute after:inset-0 hover:text-brand">{p.title}</a></h3>
-                <p class="line-clamp-3 text-sm text-muted">{p.excerpt}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-        {posts.length > 3 && <div class="mt-10 text-center"><a class="btn btn-outline" href="/tin-tuc/">Xem tất cả bài viết <Icon name="arrowRight" /></a></div>}
-      </div>
-    </section>
-  )}
-
   <!-- CONTACT -->
   <section class:list={['section', tint('contact') && 'bg-cream']} id="tu-van">
     <div class="container-x grid items-center gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
@@ -302,7 +237,7 @@ const jsonLd = {
   </section>
 
   <!-- FAQ -->
-  <section class="section" id="faq">
+  <section class:list={['section', tint('faq') && 'bg-cream']} id="faq">
     <div class="container-x grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
       <div class="lg:sticky lg:top-40 lg:self-start" data-reveal>
         <h2 class="text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl">Câu hỏi nhỏ.<br /><span class="text-brand">Yên tâm lớn.</span></h2>

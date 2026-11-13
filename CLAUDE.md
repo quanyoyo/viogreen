@@ -135,8 +135,10 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 
 **Đã xong:** 34 trang build OK, `astro check` 0 lỗi, đã thử trên mobile (360px) và desktop.
 
-**Đợt sửa 13/11/2026 – trang chủ ngắn lại (khách yêu cầu "đang bị dài quá"; yêu cầu: `docs/superpowers/plans/2026-11-13-yeu-cau-trang-chu.md`):** bỏ 3 mục khỏi `index.astro` – "ECOHUB trong không gian sống" (nền xanh), "Một hệ thống / Nhiều cách sống xanh" (3 thẻ 01–03, kèm hằng `steps`), và "Blog & tin tức" (kèm import `posts`). **Trang `/tin-tuc/` và 5 bài viết giữ nguyên**, menu "Tin tức" vẫn còn. Nền xen kẽ kem – trắng phải sửa theo: `tail` nay là `['featured', reviews?, 'contact', 'faq']` và mục "Các dòng ECOHUB" + "Câu hỏi thường gặp" dùng `tint()`, nếu không sẽ có 2 mục trắng dính nhau. Trang chủ cao 7870 → 5816 px (máy tính 1440), bớt 26%; 360px không cuộn ngang.
-**Đang chờ khách:** nội dung **đánh giá khách hàng thật** để điền `src/data/reviews.ts` – mục "Khách hàng nói gì" đã dựng sẵn, có dữ liệu là tự hiện (xem mục 9).
+**Đợt sửa 13/11/2026 (Đánh giá khách hàng & form nhận xét sản phẩm):**
+- **Trang chủ:** Điền 3 đánh giá 5 sao vào `src/data/reviews.ts` (Mai Lan, Quốc Tuấn, Hoàng Nam – đã bỏ đại từ nhân xưng); mục "Khách hàng nói gì" trên trang chủ tự động hiển thị lưới 3 cột cân đối.
+- **Trang chi tiết sản phẩm (`/san-pham/[slug]`):** Thêm component `ProductReviews.astro` hiển thị danh sách đánh giá theo sản phẩm, điểm số trung bình, và form cho khách hàng tự viết đánh giá (chọn 1–5 sao tương tác, họ tên, liên hệ, không gian, nhận xét chi tiết; lưu `localStorage` để hiện ngay trên máy khách và đồng thời gửi lead về Firestore).
+- **Trang chủ ngắn lại:** bỏ 3 mục khỏi `index.astro` – "ECOHUB trong không gian sống", "Một hệ thống / Nhiều cách sống xanh", và "Blog & tin tức". Trang `/tin-tuc/` vẫn giữ nguyên. Đã chạy `npm run check` và `npm run build` 0 lỗi.
 
 **Đợt sửa 12/11/2026 (AR mặt trước quanh logo – chủ web đã xem và xác nhận hết ô vuông):** xem chi tiết mục 8.4 "Sửa 12/11/2026". Tóm tắt: miếng vá lỗ vít nay khớp vào mặt cong trơn + pháp tuyến trơn (hết 4 vết lồi lõm và hết ô chữ nhật lệch màu), ảnh dán logo chuyển thành **ảnh đục ghép sẵn lên màu vỏ** (hết ô sáng quanh logo khi xem AR trên iPhone). Đã đẩy lên web và kiểm tra lại cả 6 file 3D.
 
@@ -243,7 +245,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Liên kết:** link Messenger, Zalo, Instagram (icon đang ẩn, điền link vào `site.social` là tự hiện).
 - **Nội dung 5 trang chưa có** (đang ẩn khỏi footer): Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
 - **Hình ảnh và file:** ảnh Bio-Nutri; **file 3D dùng để render ảnh SP** (để 3D giống ảnh hoàn toàn) hoặc CAD đầy đủ (tấm pin + cột, hộp Bio-Tank, nút bấm) cho 6 máy; 3D bản thường Sol / Grid; logo gốc SVG/PNG. Ảnh `nha-phu-cay-xanh-750px.jpg` (Drive) chưa dùng – nhỏ và có vẻ là ảnh trên mạng.
-- **Đánh giá khách hàng thật – khách đã yêu cầu thêm mục này 13/11/2026** → điền vào `src/data/reviews.ts` (mục "Khách hàng nói gì" trên trang chủ đã dựng sẵn, có dữ liệu là tự hiện). Mỗi đánh giá cần: `name`, `rating` 1–5, `text` (bắt buộc); `place`, `product`, `date`, `photo` (tuỳ chọn, ảnh đặt trong `public/reviews/`). Nên có từ 3 cái cho đủ 1 hàng. **Không tự viết nội dung** (mục 2 quy tắc 3). Nếu khách muốn người mua tự gửi đánh giá trên web thì phải làm form + Firestore + bước duyệt – việc riêng, chưa quyết. **Bài blog mới** → file .md trong `src/content/blog/` (đã có 5 bài, ngày đăng 05/11/2026; `seoTitle`, `excerpt` = meta description, `cover`, `order`).
+- **Đánh giá khách hàng:** đã điền 3 đánh giá mẫu 5 sao (Mai Lan, Quốc Tuấn, Hoàng Nam) vào `src/data/reviews.ts`, mục "Khách hàng nói gì" trên trang chủ đã hiển thị. Trang chi tiết từng sản phẩm đã có component `ProductReviews.astro` cho khách tự viết đánh giá. Khi khách gửi nội dung thật mới, chỉ cần cập nhật lại `src/data/reviews.ts`.
 - **Ô trống trong bảng phí vận chuyển** (Figma để trống): hiện đang hiển thị "—".
 
 ## 10. Ghi chú

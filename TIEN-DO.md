@@ -26,6 +26,7 @@
 | 05/11/2026 | Sửa theo `web_information.docx`: giá thật 8 mục, gộp ECOBOX theo máy (16 → 12 SP), Bio-Nutri Box, ảnh SP thật + phóng to, 5 bài blog; **ra mắt** (mở cho Google); AR bản tạm cho 4 máy Plus / Pro |
 | 06/11/2026 | Tạm tắt AR Sol Pro / Grid Pro (khách chỉ cần AR bản Plus) |
 | 07/11/2026 | **AR Grid Plus và Sol Plus thay bằng bản 3D AI đã chỉnh** (chủ web duyệt) |
+| 13/11/2026 | Rút gọn trang chủ (bỏ 3 khối) + hiện đánh giá khách hàng trang chủ + thêm phần đánh giá và form viết nhận xét ở từng sản phẩm |
 
 ## 3. Đã xong
 
@@ -73,7 +74,7 @@
 - **Liên kết:** Messenger, Zalo, Instagram (icon đang ẩn, có link là tự hiện).
 - **Nội dung 5 trang chưa có:** Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
 - **File:** file 3D gốc dùng để render ảnh SP (để 3D giống ảnh hoàn toàn), logo gốc SVG/PNG.
-- **Đánh giá khách hàng thật** (mục đánh giá đang ẩn, có là tự hiện).
+- **Đánh giá khách hàng:** đã có 3 đánh giá 5 sao mẫu (Mai Lan, Quốc Tuấn, Hoàng Nam) trên trang chủ và form tự viết đánh giá ở từng sản phẩm. Khi có thêm đánh giá thật từ khách thì chỉ cần điền vào `src/data/reviews.ts`.
 - **Email / Zalo nhận thông báo đơn mới** (cho bước email báo đơn).
 
 ## 6. Cần khách xác nhận

@@ -7,6 +7,7 @@ import ProductCard from '../../components/ProductCard.astro';
 import PolicyStrip from '../../components/PolicyStrip.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ProductReviews from '../../components/ProductReviews.astro';
 import { products, bySlug, categoryOf, productTags, plantLabels, powerLabels, waterLabels, variantPrice, vnd, smallImage, type Product } from '../../data/products';
 import { site, telHref } from '../../data/site';
 
@@ -191,7 +192,9 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="section">
+  <ProductReviews product={p} />
+
+  <section class="section bg-cream">
     <div class="container-x">
       <SectionHead title={related.title} />
       <div class:list={['grid gap-6', relCols]}>{related.items.map((x, i) => <ProductCard p={x} delay={i * 70} />)}</div>

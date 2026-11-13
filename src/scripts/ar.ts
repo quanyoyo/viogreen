@@ -28,6 +28,12 @@ const loadModelViewer = () =>
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
+const SPINNER_SVG = (cls = 'size-5 text-white') =>
+  `<svg class="animate-spin shrink-0 inline-block ${cls}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">`
+  + `<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>`
+  + `<path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>`
+  + `</svg>`;
+
 // Trên iPhone, chế độ ướm (AR Quick Look của Apple) chỉ chạy trong Safari (chủ web kiểm chứng 12/11/2026).
 // Trong mã model-viewer: điều kiện bật quick-look là `Gd && !kd && (!Od || ios-src != null)`, với Od = Chrome /
 // Edge / Firefox / DuckDuckGo / ứng dụng Google trên iPhone. Tức các trình duyệt đó chỉ chạy được nếu web tự
@@ -54,7 +60,7 @@ async function moiTaiUsdz(mv: HTMLElement & { canActivateAR?: boolean }, usdz: s
   $('[data-tai-usdz]', chon)!.addEventListener('click', async (e) => {
     const nut = e.currentTarget as HTMLButtonElement;
     nut.disabled = true;
-    nut.textContent = 'Đang tải…';
+    nut.innerHTML = `${SPINNER_SVG('size-4 text-brand mr-2')}<span>Đang tải file AR…</span>`;
     hint.textContent = CHI_DAN.dangTai;
     try {
       // tải trước để khách biết đã xong, rồi mới giao đường dẫn cho model-viewer
@@ -98,16 +104,78 @@ async function openAR(slug: string) {
     openLayer(modal);
     try {
       await loadModelViewer();
-      stage.innerHTML = `<model-viewer src="${esc(p.model.glb)}"
-        alt="Mô hình 3D ${esc(p.shortName)}" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor"
-        camera-controls auto-rotate shadow-intensity="1" touch-action="pan-y"
-        style="display:block;width:100%;height:auto;aspect-ratio:4/3;background:var(--color-cream)">
-        <button slot="ar-button" class="btn btn-primary absolute bottom-4 left-1/2 -translate-x-1/2">Xem trong không gian của bạn</button>
-      </model-viewer>`;
+      stage.innerHTML = `
+        <model-viewer src="${esc(p.model.glb)}"
+          alt="Mô hình 3D ${esc(p.shortName)}" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor"
+          camera-controls auto-rotate shadow-intensity="1" touch-action="pan-y"
+          style="display:block;width:100%;height:auto;aspect-ratio:4/3;background:var(--color-cream)">
+          <button slot="ar-button" class="btn btn-primary absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 shadow-lift" data-ar-btn>
+            Xem trong không gian của bạn
+          </button>
+        </model-viewer>
+        <!-- Loading xoay tròn khi đang mở AR (đặc biệt khi chuẩn bị file trên iPhone Chrome) -->
+        <div data-ar-loading class="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center bg-ink/60 p-4 text-white opacity-0 transition-opacity duration-300" hidden>
+          <div class="flex flex-col items-center gap-3.5 rounded-2xl bg-ink/90 px-6 py-5 text-center shadow-2xl backdrop-blur-md">
+            ${SPINNER_SVG('size-11 text-leaf')}
+            <div>
+              <p class="font-bold text-base text-white">Đang tải không gian AR…</p>
+              <p class="mt-1 text-xs text-white/80 max-w-xs">Đang mở chế độ xem thực tế ảo, vui lòng chờ trong giây lát</p>
+            </div>
+          </div>
+        </div>`;
+
       // Máy không ướm được AR thì model-viewer tự ẩn nút → dòng hướng dẫn phải nói đúng, nếu không khách
       // tưởng web hỏng. Máy tính không bao giờ có AR; trên iPhone, trình duyệt trong Zalo / Facebook cũng không.
       // canActivateAR chỉ đúng sau khi model tải xong, nên phải đợi sự kiện "load".
       const mv = $('model-viewer', stage) as (HTMLElement & { canActivateAR?: boolean; loaded?: boolean }) | null;
+      const loadingOverlay = $('[data-ar-loading]', stage) as HTMLElement | null;
+      const arBtn = $('[data-ar-btn]', stage) as HTMLButtonElement | null;
+      const defaultBtnHtml = 'Xem trong không gian của bạn';
+      let loadingTimer: number | undefined;
+
+      const showLoading = () => {
+        if (loadingOverlay) {
+          loadingOverlay.hidden = false;
+          requestAnimationFrame(() => loadingOverlay.classList.remove('opacity-0'));
+        }
+        if (arBtn) {
+          arBtn.disabled = true;
+          arBtn.innerHTML = `${SPINNER_SVG('size-5 text-white mr-1.5')}<span>Đang mở AR…</span>`;
+        }
+        clearTimeout(loadingTimer);
+        // Tự động tắt sau 15s phòng trường hợp hệ điều hành không phản hồi
+        loadingTimer = window.setTimeout(hideLoading, 15000);
+      };
+
+      const hideLoading = () => {
+        clearTimeout(loadingTimer);
+        if (loadingOverlay) {
+          loadingOverlay.classList.add('opacity-0');
+          setTimeout(() => { loadingOverlay.hidden = true; }, 250);
+        }
+        if (arBtn) {
+          arBtn.disabled = false;
+          arBtn.innerHTML = defaultBtnHtml;
+        }
+      };
+
+      arBtn?.addEventListener('click', showLoading);
+
+      mv?.addEventListener('ar-status', (e: Event) => {
+        const status = (e as CustomEvent).detail?.status;
+        if (status === 'session-started' || status === 'object-placed') {
+          // AR đang chạy
+        } else if (status === 'not-presenting' || status === 'failed') {
+          hideLoading();
+        }
+      });
+
+      // Khi chuyển đổi ứng dụng hoặc quay lại từ Quick Look trên iOS
+      window.addEventListener('focus', hideLoading);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') hideLoading();
+      });
+
       const datChiDan = () => {
         hint.textContent = iosKhongPhaiSafari ? CHI_DAN.iosKhacSafari : mv?.canActivateAR ? CHI_DAN.co : CHI_DAN.khong;
         if (iosKhongPhaiSafari && mv && p.model?.usdz) moiTaiUsdz(mv, p.model.usdz, hint);

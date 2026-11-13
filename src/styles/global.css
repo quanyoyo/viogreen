@@ -37,6 +37,12 @@
   --animate-mio-float: mio-float 3.2s ease-in-out infinite;
   --animate-mio-shadow: mio-shadow 3.2s ease-in-out infinite;
   --animate-marquee: marquee 38s linear infinite;
+  --animate-spin: spin 1s linear infinite;
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 
   @keyframes fade-up {
     from { opacity: 0; transform: translateY(28px); }

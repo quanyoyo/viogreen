@@ -139,6 +139,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Trang chủ:** Điền 3 đánh giá 5 sao vào `src/data/reviews.ts` (Mai Lan, Quốc Tuấn, Hoàng Nam – đã bỏ đại từ nhân xưng); mục "Khách hàng nói gì" trên trang chủ tự động hiển thị lưới 3 cột cân đối.
 - **Trang chi tiết sản phẩm (`/san-pham/[slug]`):** Thêm component `ProductReviews.astro` hiển thị danh sách đánh giá theo sản phẩm, điểm số trung bình, và form cho khách hàng tự viết đánh giá (chọn 1–5 sao tương tác, họ tên, liên hệ, không gian, nhận xét chi tiết; lưu `localStorage` để hiện ngay trên máy khách và đồng thời gửi lead về Firestore).
 - **Trang chủ ngắn lại:** bỏ 3 mục khỏi `index.astro` – "ECOHUB trong không gian sống", "Một hệ thống / Nhiều cách sống xanh", và "Blog & tin tức". Trang `/tin-tuc/` vẫn giữ nguyên. Đã chạy `npm run check` và `npm run build` 0 lỗi.
+- **AR (Loading xoay tròn trên iPhone Chrome):** Thêm spinner xoay tròn khi bấm "Xem trong không gian của bạn" và overlay thông báo đang tải AR (tự tắt khi mở Quick Look hoặc quay lại từ Quick Look); thêm spinner trên nút tải file AR riêng cho Chrome trên iPhone.
 
 **Đợt sửa 12/11/2026 (AR mặt trước quanh logo – chủ web đã xem và xác nhận hết ô vuông):** xem chi tiết mục 8.4 "Sửa 12/11/2026". Tóm tắt: miếng vá lỗ vít nay khớp vào mặt cong trơn + pháp tuyến trơn (hết 4 vết lồi lõm và hết ô chữ nhật lệch màu), ảnh dán logo chuyển thành **ảnh đục ghép sẵn lên màu vỏ** (hết ô sáng quanh logo khi xem AR trên iPhone). Đã đẩy lên web và kiểm tra lại cả 6 file 3D.
 

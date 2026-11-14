@@ -4,6 +4,7 @@
 //  - clearChecker: ảnh có nền "ô cờ" giả trong suốt in liền vào ảnh → tô trắng phần nền nối với mép ảnh.
 //  - rotate: xoay thêm (độ) sau khi đã xoay theo thẻ EXIF của máy ảnh.
 //  - trim: cắt bớt nền trắng quanh sản phẩm rồi chừa lại viền (phần trăm cạnh dài), ép khung 4:3 nền trắng.
+//  - squareCopy: ép khung vuông bằng cách kéo dài điểm ở mép ảnh (cho ảnh có phông chuyển màu).
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -43,15 +44,15 @@ const jobs = [
   ...product('SẢN PHẨM PHỤ KIỆN/vòi nước/bộ vòi nước.png', 'dripper-set'),
   ...product('SẢN PHẨM PHỤ KIỆN/vòi nước/bộ vòi nước (2).png', 'dripper-set-2'),
   ...product('SẢN PHẨM PHỤ KIỆN/vòi nước/vòi tưới.png', 'dripper'),
-  // Ảnh Bio-Nutri (11/11/2026, Drive "Bộ sản phẩm" – link "phân bón" trong tài liệu khách).
-  // Ảnh chụp thật, sản phẩm nhỏ giữa nền sáng → xoay cho đứng + cắt bớt nền (xem framed()).
-  // "nhieu" (nhiều gói, có chậu cây phía sau) không cân trắng vì nền có cây, không phải phông trơn.
+  // Ảnh Bio-Nutri (14/11/2026, Drive 1ER2Kv5toGSdSO2gIopchgIkRC36Uoc28 – thay bộ ảnh chụp DSC0… ngày 11/11/2026
+  // trong images-src/2026-11/bio-nutri/). Ảnh dựng sẵn nền trắng → cắt sát sản phẩm, khung vuông (xem framed()).
+  // Ảnh hộp đơn 500gr ban đầu đã được chủ web thay bằng "hộp phân.png" (250g) trên Drive → lưu là hop-phan-250g.png.
   ...[
-    ['DSC01375.JPG', 'bio-nutri-25g', -90, 8, true], ['DSC01376.JPG', 'bio-nutri-25g-sau', -90, 8, true],
-    ['DSC01387.JPG', 'bio-nutri-25g-tay', 0, 7, true], ['DSC01377.JPG', 'bio-nutri-25g-nhieu', 0, 4, false],
-    ['DSC01395.JPG', 'bio-nutri-box', 0, 2, true], ['DSC01400.JPG', 'bio-nutri-box-goi', 0, 7, true],
-    ['DSC01427.JPG', 'bio-nutri-box-nhieu', 0, 3, true], ['DSC01394.JPG', 'bio-nutri-box-tay', 0, 7, true],
-  ].map(([f, out, rotate, trim, white]) => ({ src: `2026-11/bio-nutri/${f}`, out: `products/${out}.webp`, width: 1600, small: true, rotate, trim, white })),
+    ['16d15568.png', 'bio-nutri-25g', 6], ['d3b8712d.png', 'bio-nutri-25g-sau', 6],
+  ].map(([f, out, trim]) => ({ src: `2026-11/bio-nutri-moi/${f}`, out: `products/${out}.webp`, width: 1600, small: true, trim, white: true })),
+  // Hộp 250g: phông xám chuyển dần → không cắt/bù trắng (lộ đường viền), kéo dài mép ảnh cho đủ khung vuông.
+  { src: '2026-11/bio-nutri-moi/hop-phan-250g.png', out: 'products/bio-nutri-box.webp', width: 1600, small: true, squareCopy: true },
+  { src: '2026-11/bio-nutri-moi/fe6c8883.png', out: 'products/bio-nutri-box-3.webp', width: 1600, small: true, squareCopy: true },
   // Ảnh bài blog (05/11/2026, lấy từ web_information.docx – trùng Drive "Ảnh cho bài SEO"). Ảnh bìa có thêm bản -800 cho thẻ bài viết.
   ...['ban-cong-cover.jpg', 'tuoi-cay-cover.png', 'he-thong-tuoi-cover.png', 'web-app-theo-doi.png', 'ecohub-ban-cong.png', 'ecohub-san-thuong.png']
     .map((f) => ({ src: `2026-11/blog-doc/${f}`, out: `blog/${f.replace(/\.\w+$/, '.webp')}`, width: 1600, small: true })),
@@ -163,6 +164,12 @@ for (const j of jobs) {
   if (!fs.existsSync(file)) { console.warn('Thiếu', file); continue; }
   let input = j.clearChecker ? await clearChecker(file) : file;
   if (j.rotate || j.trim) input = await framed(input, j);
+  if (j.squareCopy) {
+    // Khung vuông bằng cách lặp lại hàng/cột điểm ở mép ảnh (nền chuyển màu vẫn liền)
+    const { width: w, height: h } = await sharp(input).metadata();
+    const dy = Math.max(0, w - h), dx = Math.max(0, h - w);
+    input = await sharp(input).extend({ top: dy >> 1, bottom: dy - (dy >> 1), left: dx >> 1, right: dx - (dx >> 1), extendWith: 'copy' }).png().toBuffer();
+  }
   const out = path.join('public', j.out);
   fs.mkdirSync(path.dirname(out), { recursive: true });
   await sharp(input).resize({ width: j.width, withoutEnlargement: true }).webp({ quality: 80 }).toFile(out);

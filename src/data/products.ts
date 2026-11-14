@@ -373,8 +373,8 @@ const raw: Raw[] = [
       'Có thể kết hợp với hệ thống ECOHUB khi cấu hình và hướng dẫn sử dụng cho phép.',
       'Thuận tiện cho việc bảo quản và sử dụng theo từng gói.',
     ] },
-    // Ảnh chụp thật (Drive "Bộ sản phẩm", 11/11/2026). Bao bì in "VIO-NUTRI", tên trên web giữ "Bio-Nutri" theo bảng giá khách.
-    images: [img('bio-nutri-25g'), img('bio-nutri-25g-sau'), img('bio-nutri-25g-tay'), img('bio-nutri-25g-nhieu')],
+    // Ảnh mặt trước + mặt sau gói (Drive khách gửi 14/11/2026, thay ảnh chụp 11/11). Bao bì in "VIO-NUTRI", tên trên web giữ "Bio-Nutri" theo bảng giá khách.
+    images: [img('bio-nutri-25g'), img('bio-nutri-25g-sau')],
     note: 'Sử dụng theo nhãn sản phẩm và hướng dẫn chính thức của VIO GREEN. Không tự ý tăng liều lượng hoặc sử dụng theo cách chưa được hướng dẫn.',
   },
   {
@@ -398,7 +398,8 @@ const raw: Raw[] = [
       'Có thể kết hợp với hệ thống bổ sung dinh dưỡng tự động của ECOHUB.',
       'Phù hợp với người dùng ECOHUB có nhu cầu bổ sung dinh dưỡng định kỳ cho cây.',
     ] },
-    images: [img('bio-nutri-box'), img('bio-nutri-box-goi'), img('bio-nutri-box-nhieu'), img('bio-nutri-box-tay')],
+    // Ảnh hộp 250g + ảnh 3 hộp (Drive khách gửi 14/11/2026).
+    images: [img('bio-nutri-box'), img('bio-nutri-box-3')],
     note: 'Sử dụng theo nhãn sản phẩm và hướng dẫn chính thức của VIO GREEN. Không tự ý tăng liều lượng hoặc sử dụng theo cách chưa được hướng dẫn.',
   },
 ];

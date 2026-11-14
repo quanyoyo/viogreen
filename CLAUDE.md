@@ -135,6 +135,8 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 
 **Đã xong:** 34 trang build OK, `astro check` 0 lỗi, đã thử trên mobile (360px) và desktop.
 
+**Đợt sửa 14/11/2026 (ảnh Bio-Nutri mới):** thay bộ ảnh chụp 11/11 bằng 4 ảnh dựng sẵn từ Drive `1ER2Kv5toGSdSO2gIopchgIkRC36Uoc28` (`images-src/2026-11/bio-nutri-moi/`): 25g = mặt trước + mặt sau gói; Box = ảnh hộp đơn 250g (`hop-phan-250g.png`, chủ web thay cho ảnh hộp in nhầm "500gr" đã xoá) + ảnh 3 hộp (`bio-nutri-box-3`); 2 ảnh Box ép khung vuông bằng `squareCopy`. Đã xoá 10 file webp cũ không còn dùng.
+
 **Đợt sửa 13/11/2026 (Đánh giá khách hàng & form nhận xét sản phẩm):**
 - **Trang chủ:** Điền danh sách đánh giá vào `src/data/reviews.ts` (đã bỏ đại từ nhân xưng); chỉ lọc các đánh giá tích cực **4 và 5 sao**, tự động **chọn ngẫu nhiên (random) 3 đánh giá** mỗi lần khách ghé thăm hoặc tải lại trang, hiển thị lưới 3 cột cân đối.
 - **Trang chi tiết sản phẩm (`/san-pham/[slug]`):** Thêm component `ProductReviews.astro` hiển thị danh sách đánh giá theo sản phẩm, điểm số trung bình, và form cho khách hàng tự viết đánh giá (chọn 1–5 sao tương tác, họ tên, liên hệ, không gian, nhận xét chi tiết; lưu `localStorage` để hiện ngay trên máy khách và đồng thời gửi lead về Firestore).

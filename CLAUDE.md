@@ -66,7 +66,8 @@ src/
   scripts/               ui.ts (reveal, carousel, menu), cart.ts, forms.ts, ar.ts, chatbot.ts, data.ts,
                          fb.ts (Firebase: auth, đơn, lead, quản trị), order-view.ts (hiển thị đơn dùng chung),
                          address.ts (chọn Tỉnh/thành → Phường/xã),
-                         product-page.ts (trang chi tiết: đổi ảnh, khung phóng to ảnh, giá theo lựa chọn, ?may=s|plus|pro)
+                         product-page.ts (trang chi tiết: đổi ảnh, khung phóng to ảnh, giá theo lựa chọn, ?may=s|plus|pro),
+                         public-reviews.ts (đọc đánh giá đã duyệt qua Firestore REST, không tải SDK)
   data/                  site.ts (cấu hình, notice, weather), products.ts (12 SP), faq.ts, chatbot-kb.ts (+ quickQuestions),
                          reviews.ts (đánh giá THẬT – trống = ẩn), blog.ts (đọc src/content/blog)
   content/policies/      van-chuyen, doi-tra, bao-hanh, bao-mat (.md; {{address}} {{email}}… thay từ site.ts)
@@ -134,6 +135,14 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 ## 7. Trạng thái (cập nhật 16/11/2026)
 
 **Đã xong:** 35 trang build OK (thêm `/kiem-tra-ar/` từ 12/11), `astro check` 0 lỗi, đã thử trên mobile (360px) và desktop. Bản trên `https://viogreen.com` = commit mới nhất trên `main`.
+
+**17/11/2026 – Đánh giá khách gửi hiện công khai sau khi duyệt (commit `c7d61f5`, đã push; chủ web đã publish `firestore.rules` mới):**
+- Firestore `reviews/{id}`: `product` (slug), `productName`, `name`, `place?`, `rating` (int 1–5), `text`, `approved`, `createdAt` – **không có SĐT / email** (bản đã duyệt ai cũng đọc được). Khách tạo với `approved: false`; ai cũng đọc bản `approved == true` (truy vấn phải lọc đúng điều kiện này, không thì bị 403); chỉ admin đọc tất cả, đổi `approved`, xoá.
+- Trang SP (`ProductReviews.astro`) đọc bản đã duyệt qua **Firestore REST** (`src/scripts/public-reviews.ts`, không tải SDK Firebase); đánh giá của chính khách (localStorage, có `id`) hiện kèm nhãn "Đánh giá của bạn · chờ duyệt", khi đã duyệt thì tự bỏ bản trên máy; số đánh giá + điểm TB tính lại gồm cả `reviews.ts`.
+- Khách để lại SĐT / email → thêm 1 lead `source: product-review` (chỉ admin đọc) để nhân viên gọi lại.
+- `/quan-tri/` có tab **"Đánh giá (n chờ duyệt)"**: Duyệt / Ẩn / Xoá (Xoá có hỏi lại).
+- Trang chủ **vẫn chỉ lấy đánh giá từ `reviews.ts`** (chưa lấy đánh giá đã duyệt).
+- Đã thử đủ vòng trên Firestore thật (đánh giá "TEST Claude" cho ECOHUB Sol): gửi → người ngoài không đọc được (403) → duyệt trên viogreen.com/quan-tri/ → hiện ở trang SP với khách lạ → Ẩn → Xoá. TEST đã xoá.
 
 **Sửa 17/11/2026 (form đánh giá sản phẩm làm mất đánh giá):** ô "Số điện thoại hoặc Email" trước đây luôn gửi vào trường `phone` (rules giới hạn 20 ký tự) → email dài bị Firestore từ chối nhưng web vẫn báo "gửi thành công". Nay `ProductReviews.astro`: có "@" → trường `email`, còn lại → `phone`; gửi Firestore **trước**, hỏng thì báo lỗi và không lưu vào máy khách; thêm `maxlength` (tên 100, liên hệ 200, khu vực 200, nhận xét 2500 – vừa giới hạn `message` 3000). Không đổi `firestore.rules`. Đã thử trường hợp bị từ chối trên dev server (báo lỗi đúng, không ghi gì). **Đã gửi thật trên viogreen.com (00:08 17/11/2026, chủ web đồng ý):** lead "TEST Claude", email 35 ký tự lưu đúng vào trường Email, hiện trong `/quan-tri/` → chủ web đánh dấu "Xong" hoặc xoá trong Console (rules chặn xoá từ web). Lúc đó `/quan-tri/` chỉ có đúng lead TEST này và **0 đơn hàng** → chưa có đánh giá thật nào được gửi qua form. Ngày trên thẻ đánh giá (lưu ở máy khách) nay lấy theo giờ máy khách – trước dùng `toISOString` (giờ quốc tế) nên trước 7h sáng ở Việt Nam bị lùi 1 ngày. Đánh giá khách gửi chỉ xem được ở `/quan-tri/` (lead, chủ đề "Đánh giá sản phẩm …"), muốn hiện công khai phải chép vào `reviews.ts`.
 
@@ -250,7 +259,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Liên kết:** link Messenger, Zalo, Instagram (icon đang ẩn, điền link vào `site.social` là tự hiện).
 - **Nội dung 5 trang chưa có** (đang ẩn khỏi footer): Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
 - **Hình ảnh và file:** **file 3D dùng để render ảnh SP** (để 3D giống ảnh hoàn toàn) hoặc CAD đầy đủ (tấm pin + cột, hộp Bio-Tank, nút bấm) cho 6 máy; 3D bản thường Sol / Grid; logo gốc SVG/PNG. Ảnh `nha-phu-cay-xanh-750px.jpg` (Drive) chưa dùng – nhỏ và có vẻ là ảnh trên mạng.
-- **Đánh giá khách hàng:** `src/data/reviews.ts` có 5 đánh giá (13/11/2026): Mai Lan, Quốc Tuấn, Hoàng Nam, Thanh Hương (5 sao), Đức Huy (4 sao). **Cần chủ web xác nhận đây là đánh giá thật của khách** (quy tắc mục 2.3 – trước đây ghi là "đánh giá mẫu"). Mục "Khách hàng nói gì" trên trang chủ đã hiển thị (ngẫu nhiên 3 đánh giá 4-5 sao, layout chống vỡ tràn viền trên mobile 360px/375px). Trang chi tiết từng sản phẩm đã có component `ProductReviews.astro` cho khách tự viết đánh giá. Khi khách gửi nội dung thật mới, chỉ cần cập nhật lại `src/data/reviews.ts`.
+- **Đánh giá khách hàng:** `src/data/reviews.ts` có 5 đánh giá (13/11/2026): Mai Lan, Quốc Tuấn, Hoàng Nam, Thanh Hương (5 sao), Đức Huy (4 sao). **Cần chủ web xác nhận đây là đánh giá thật của khách** (quy tắc mục 2.3 – trước đây ghi là "đánh giá mẫu"). Mục "Khách hàng nói gì" trên trang chủ đã hiển thị (ngẫu nhiên 3 đánh giá 4-5 sao, layout chống vỡ tràn viền trên mobile 360px/375px). Trang chi tiết từng sản phẩm có `ProductReviews.astro` cho khách tự viết đánh giá; từ 17/11/2026 đánh giá khách gửi vào Firestore `reviews`, chủ web duyệt ở `/quan-tri/` thì hiện công khai (mục 7). `reviews.ts` vẫn dùng cho đánh giá nhập tay và cho trang chủ.
 - **Ô trống trong bảng phí vận chuyển** (Figma để trống): hiện đang hiển thị "—".
 
 ## 10. Ghi chú

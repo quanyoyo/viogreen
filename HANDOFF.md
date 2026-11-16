@@ -1,4 +1,4 @@
-# VIO GREEN web – bàn giao giữa các phiên chat (cập nhật 16/11/2026)
+# VIO GREEN web – bàn giao giữa các phiên chat (cập nhật 17/11/2026)
 
 **Nguồn sự thật là `CLAUDE.md`** (quy tắc, stack, trạng thái mục 7, việc tiếp theo mục 8, chờ khách mục 9). File này chỉ tóm tắt nhanh để mở phiên mới. Báo cáo tiến độ cho chủ web / khách: `TIEN-DO.md`.
 
@@ -13,6 +13,7 @@
 - **12/11:** AR Pro sửa mặt trước quanh logo (logo dán như ảnh đục, hết ô sáng trên iPhone); dòng hướng dẫn AR tự đổi theo máy; trang `/kiem-tra-ar/`.
 - **13/11:** Chrome trên iPhone ướm được nếu khách chọn tải thêm `.usdz` (`npm run models:usdz`); vòng xoay khi mở AR; trang chủ bỏ 3 khối; đánh giá khách hàng (random 3 đánh giá 4–5 sao) + form nhận xét ở trang sản phẩm.
 - **14/11:** ảnh Bio-Nutri mới từ Drive (`images-src/2026-11/bio-nutri-moi/`): 25g trước/sau, Box = hộp đơn 250g + 3 hộp. Commit `704b2fc`, đã push và kiểm tra trên web.
+- **17/11:** form đánh giá: email vào trường `email` (trước bị mất khi email > 20 ký tự), ngày theo giờ máy khách. **Đánh giá khách gửi → Firestore `reviews` (chờ duyệt) → chủ web duyệt ở `/quan-tri/` tab Đánh giá → hiện công khai ở trang SP** (đọc qua REST, `public-reviews.ts`). Rules mới đã publish. Đã thử đủ vòng, TEST đã xoá. Trang chủ vẫn chỉ dùng `reviews.ts`.
 
 ## Đang dở / chờ
 - **Đánh giá khách hàng:** `reviews.ts` có 5 đánh giá; CLAUDE.md trước ghi là "đánh giá mẫu" → cần chủ web xác nhận là đánh giá thật (quy tắc không dùng đánh giá giả).

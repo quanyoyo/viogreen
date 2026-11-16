@@ -1,6 +1,6 @@
 # VIO GREEN – Tiến độ dự án website
 
-*Cập nhật: 16/11/2026. Chi tiết kỹ thuật đầy đủ ở `CLAUDE.md`; tóm tắt cho phiên làm việc mới ở `HANDOFF.md`.*
+*Cập nhật: 17/11/2026. Chi tiết kỹ thuật đầy đủ ở `CLAUDE.md`; tóm tắt cho phiên làm việc mới ở `HANDOFF.md`.*
 
 ## 1. Tóm tắt nhanh
 
@@ -29,6 +29,7 @@
 | 12/11/2026 | AR: sửa mặt trước quanh logo (hết ô vuông lệch màu, kể cả trên iPhone); dòng hướng dẫn tự đổi theo loại máy; trang chẩn đoán `/kiem-tra-ar/` |
 | 13/11/2026 | Chrome trên iPhone cũng ướm AR được (khách tự chọn tải thêm file); vòng xoay chờ khi mở AR; rút gọn trang chủ (bỏ 3 khối); hiện đánh giá khách hàng + form nhận xét ở từng sản phẩm |
 | 14/11/2026 | **Ảnh Bio-Nutri mới** (ảnh dựng sẵn từ Drive): gói 25g mặt trước + mặt sau; Box = hộp đơn 250g + ảnh 3 hộp |
+| 17/11/2026 | Form đánh giá: sửa lỗi mất đánh giá khi khách nhập email dài, sửa ngày lệch trước 7h sáng. **Đánh giá khách gửi hiện công khai sau khi chủ web duyệt** ở `/quan-tri/` (tab Đánh giá) |
 
 ## 3. Đã xong
 
@@ -36,8 +37,8 @@
 - **Trang:** Trang chủ, Sản phẩm (nhóm, bộ lọc, tìm kiếm không dấu), 12 trang chi tiết, Giỏ hàng, Đặt hàng, Đặt hàng thành công, Giới thiệu, Trải nghiệm AR, Liên hệ, 4 trang chính sách, Tin tức (5 bài), 404, Đăng nhập, Tài khoản, Quản trị, trang chẩn đoán AR `/kiem-tra-ar/` (ẩn, chỉ để nhờ khách kiểm tra máy).
 - **Đặt hàng:** giỏ hàng lưu trên máy khách, có biến thể và số lượng, giá theo lựa chọn; chọn Tỉnh/thành → Phường/xã theo danh mục mới; thanh toán **COD (SPX Express)** hoặc **chuyển khoản** (trang thành công hiện QR + số tài khoản + nội dung = mã đơn). Mã đơn dạng `VG-yymmdd-XXXX`.
 - **Tài khoản (tuỳ chọn):** đăng nhập Google hoặc email; xem lịch sử đơn; lưu hồ sơ địa chỉ.
-- **Quản trị `/quan-tri/`:** nhân viên xem và đổi trạng thái đơn (Mới → Đã xác nhận → Đang giao → Hoàn tất / Đã huỷ), xem liên hệ và lead.
-- **Đánh giá:** trang chủ hiện ngẫu nhiên 3 đánh giá 4–5 sao; mỗi trang sản phẩm có danh sách đánh giá, điểm trung bình và form để khách tự viết đánh giá.
+- **Quản trị `/quan-tri/`:** nhân viên xem và đổi trạng thái đơn (Mới → Đã xác nhận → Đang giao → Hoàn tất / Đã huỷ), xem liên hệ và lead, **duyệt / ẩn / xoá đánh giá khách gửi**.
+- **Đánh giá:** trang chủ hiện ngẫu nhiên 3 đánh giá 4–5 sao (lấy từ danh sách nhập tay). Mỗi trang sản phẩm có danh sách đánh giá, điểm trung bình và form để khách tự viết đánh giá. Đánh giá khách gửi chờ chủ web **duyệt** rồi mới hiện cho mọi người; người gửi thấy ngay đánh giá của mình kèm nhãn "chờ duyệt". SĐT / email người gửi không bao giờ hiện công khai.
 - **Chatbot MIO:** lời chào nổi, 4 câu hỏi thường gặp, tư vấn chọn máy qua 3 câu hỏi, trả lời giá / FAQ / chính sách, xin tên + SĐT khi không hiểu câu hỏi (lưu vào Firestore), báo ngoài giờ làm việc.
 - **SEO:** meta, Open Graph, JSON-LD (Organization, FAQPage, Product, Breadcrumb), sitemap, robots.txt; các trang giỏ hàng / đặt hàng / tài khoản / quản trị / 404 để noindex.
 - **Giao diện:** hiệu ứng hiện dần khi cuộn, hero chuyển slide, thẻ sản phẩm nổi khi rê chuột; dùng tốt trên điện thoại 360 px và máy tính.

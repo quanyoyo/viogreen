@@ -14,6 +14,8 @@ const BADGE: Record<string, string> = {
   'Đã huỷ': 'bg-red-100 text-red-700',
   'Đã liên hệ': 'bg-brand-100 text-brand-800',
   'Xong': 'bg-brand text-white',
+  'Chờ duyệt': 'bg-sun/25 text-ink',
+  'Đã duyệt': 'bg-brand text-white',
 };
 export const badge = (status: string) =>
   `<span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold ${BADGE[status] ?? 'bg-cream-200 text-ink'}">${esc(status)}</span>`;

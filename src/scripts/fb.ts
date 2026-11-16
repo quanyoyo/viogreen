@@ -7,7 +7,7 @@ import {
   updateProfile, sendEmailVerification, sendPasswordResetEmail, signOut, type User,
 } from 'firebase/auth';
 import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, where, orderBy, limit,
+  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, query, where, orderBy, limit,
   onSnapshot, getDocs, serverTimestamp, type Timestamp,
 } from 'firebase/firestore';
 import { site } from '../data/site';
@@ -33,6 +33,9 @@ export interface Lead {
   id: string; type: 'contact' | 'newsletter' | 'chat-lead'; status: string; createdAt?: Timestamp;
   [k: string]: unknown;
 }
+/** Đánh giá sản phẩm khách gửi — khớp `reviews` trong firestore.rules (không có SĐT / email) */
+export interface ReviewInput { product: string; productName: string; name: string; place?: string; rating: number; text: string }
+export interface Review extends ReviewInput { id: string; approved: boolean; createdAt?: Timestamp }
 export interface Profile { name?: string; phone?: string; province?: string; ward?: string; address?: string }
 
 /* ---------- Đăng nhập ---------- */
@@ -87,6 +90,13 @@ export async function createLead(type: Lead['type'], data: Record<string, string
   await addDoc(collection(db, 'leads'), { ...data, type, status: LEAD_STATUS[0], createdAt: serverTimestamp() });
 }
 
+/** Gửi đánh giá (chờ duyệt). Trả về mã document để trang sản phẩm nhận ra khi đánh giá đã được duyệt. */
+export async function createReview(r: ReviewInput): Promise<string> {
+  const data: Record<string, unknown> = { ...r, rating: Math.round(r.rating), approved: false, createdAt: serverTimestamp() };
+  if (!r.place) delete data.place;
+  return (await addDoc(collection(db, 'reviews'), data)).id;
+}
+
 /** Đơn của khách: đơn đặt khi đã đăng nhập + đơn vãng lai có email trùng email đã xác minh */
 export async function myOrders(user: User): Promise<Order[]> {
   const col = collection(db, 'orders');
@@ -114,5 +124,10 @@ export const watchOrders = (cb: (orders: Order[]) => void, onError: (e: Error) =
 export const watchLeads = (cb: (leads: Lead[]) => void, onError: (e: Error) => void) =>
   onSnapshot(query(collection(db, 'leads'), orderBy('createdAt', 'desc'), limit(300)),
     (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }) as Lead)), onError);
-export const setOrderStatus = (id: string, status: string) => updateDoc(doc(db, 'orders', id), { status, updatedAt: serverTimestamp() });
+export const watchReviews = (cb: (reviews: Review[]) => void, onError: (e: Error) => void) =>
+  onSnapshot(query(collection(db, 'reviews'), orderBy('createdAt', 'desc'), limit(300)),
+    (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }) as Review)), onError);
+export const setReviewApproved = (id: string, approved: boolean) => updateDoc(doc(db, 'reviews', id), { approved, updatedAt: serverTimestamp() });
+export const deleteReview = (id: string) => deleteDoc(doc(db, 'reviews', id));
+export const setOrderStatus =(id: string, status: string) => updateDoc(doc(db, 'orders', id), { status, updatedAt: serverTimestamp() });
 export const setLeadStatus = (id: string, status: string) => updateDoc(doc(db, 'leads', id), { status, updatedAt: serverTimestamp() });

@@ -28,6 +28,7 @@ import Icon from '../../components/Icon.astro';
         <div class="mb-5 flex gap-2 border-b border-line" role="tablist">
           <button type="button" role="tab" class="-mb-px border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-muted aria-selected:border-brand aria-selected:text-brand" aria-selected="true" data-tab="orders">Đơn hàng <span data-count-orders></span></button>
           <button type="button" role="tab" class="-mb-px border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-muted aria-selected:border-brand aria-selected:text-brand" aria-selected="false" data-tab="leads">Liên hệ & khách để lại SĐT <span data-count-leads></span></button>
+          <button type="button" role="tab" class="-mb-px border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-muted aria-selected:border-brand aria-selected:text-brand" aria-selected="false" data-tab="reviews">Đánh giá <span data-count-reviews></span></button>
         </div>
 
         <div data-panel="orders">
@@ -37,13 +38,18 @@ import Icon from '../../components/Icon.astro';
         <div data-panel="leads" hidden>
           <div class="space-y-3" data-lead-list></div>
         </div>
+        <div data-panel="reviews" hidden>
+          <p class="mb-4 text-sm text-muted">Bấm <strong>Duyệt</strong> thì đánh giá hiện công khai ở trang sản phẩm; <strong>Ẩn</strong> để gỡ xuống. SĐT / email của người viết (nếu có) nằm ở tab Liên hệ.</p>
+          <div class="space-y-3" data-review-list></div>
+        </div>
         <p class="mt-6 text-xs text-muted">Danh sách tự cập nhật khi có đơn mới (hiển thị 300 mục gần nhất).</p>
       </div>
     </div>
   </section>
 
   <script>
-    import { currentUser, isAdmin, logout, watchOrders, watchLeads, setOrderStatus, setLeadStatus, ORDER_STATUS, LEAD_STATUS, type Order, type Lead } from '../../scripts/fb';
+    import { currentUser, isAdmin, logout, watchOrders, watchLeads, watchReviews, setOrderStatus, setLeadStatus, setReviewApproved, deleteReview,
+      ORDER_STATUS, LEAD_STATUS, type Order, type Lead, type Review } from '../../scripts/fb';
     import { esc, badge, fmtTime, itemsHtml, totalText, paymentText } from '../../scripts/order-view';
     import { $, $$, toast } from '../../scripts/ui';
 
@@ -99,6 +105,25 @@ import Icon from '../../components/Icon.astro';
         </div>`).join('') : '<p class="card p-8 text-center text-muted">Chưa có liên hệ nào.</p>';
     }
 
+    function renderReviews(reviews: Review[]) {
+      const waiting = reviews.filter((r) => !r.approved).length;
+      $('[data-count-reviews]')!.textContent = waiting ? `(${waiting} chờ duyệt)` : '';
+      $('[data-review-list]')!.innerHTML = reviews.length ? reviews.map((r) => `
+        <div class="card flex flex-wrap items-start gap-4 p-4">
+          <div class="min-w-0 flex-1 space-y-1 text-sm">
+            <p class="font-bold"><span class="text-sun">${'★'.repeat(r.rating)}</span><span class="opacity-30">${'★'.repeat(5 - r.rating)}</span>
+              · <a class="text-brand" href="/san-pham/${esc(r.product)}/#danh-gia-san-pham" target="_blank">${esc(r.productName)}</a>
+              <span class="font-normal text-muted">· ${fmtTime(r.createdAt)}</span></p>
+            <p><span class="text-muted">Người viết:</span> ${esc(r.name)}${r.place ? ` <span class="text-muted">(${esc(r.place)})</span>` : ''}</p>
+            <p class="whitespace-pre-line break-words">${esc(r.text)}</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">${badge(r.approved ? 'Đã duyệt' : 'Chờ duyệt')}
+            <button type="button" class="btn ${r.approved ? 'btn-outline' : 'btn-primary'} min-h-10 px-4 py-2" data-review-act="${r.approved ? 'hide' : 'approve'}" data-id="${esc(r.id)}">${r.approved ? 'Ẩn' : 'Duyệt'}</button>
+            <button type="button" class="btn btn-outline min-h-10 px-4 py-2 text-red-700" data-review-act="delete" data-id="${esc(r.id)}">Xoá</button>
+          </div>
+        </div>`).join('') : '<p class="card p-8 text-center text-muted">Chưa có đánh giá nào.</p>';
+    }
+
     async function main() {
       const user = await currentUser();
       if (!user) return location.replace('/dang-nhap/?next=/quan-tri/');
@@ -117,6 +142,25 @@ import Icon from '../../components/Icon.astro';
       const fail = (e: Error) => { console.error(e); toast('Mất kết nối dữ liệu, vui lòng tải lại trang.'); };
       watchOrders((o) => { orders = o; renderOrders(); }, fail);
       watchLeads(renderLeads, fail);
+      watchReviews(renderReviews, fail);
+
+      // Duyệt / ẩn / xoá đánh giá
+      $('[data-review-list]')!.addEventListener('click', async (e) => {
+        const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-review-act]');
+        if (!b) return;
+        const act = b.dataset.reviewAct!;
+        if (act === 'delete' && !confirm('Xoá hẳn đánh giá này? Không khôi phục được.')) return;
+        b.disabled = true;
+        try {
+          if (act === 'delete') await deleteReview(b.dataset.id!);
+          else await setReviewApproved(b.dataset.id!, act === 'approve');
+          toast(act === 'approve' ? 'Đã duyệt – đánh giá đang hiện công khai' : act === 'hide' ? 'Đã ẩn đánh giá' : 'Đã xoá đánh giá');
+        } catch (err) {
+          console.error(err);
+          toast('Chưa thực hiện được, vui lòng thử lại.');
+          b.disabled = false;
+        }
+      });
 
       // Tab
       $$<HTMLButtonElement>('[data-tab]').forEach((t) => t.addEventListener('click', () => {

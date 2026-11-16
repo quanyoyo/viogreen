@@ -72,6 +72,28 @@ service cloud.firestore {
         && optStr(request.resource.data, 'address', 300);
     }
 
+    // ---- Đánh giá sản phẩm: khách gửi (chờ duyệt), chủ web duyệt ở /quan-tri/ thì mới hiện công khai ----
+    // Không chứa SĐT / email (ai cũng đọc được bản đã duyệt); liên hệ của người viết nằm trong `leads`.
+    match /reviews/{id} {
+      function validReview(d) {
+        return d.keys().hasOnly(['product', 'productName', 'name', 'place', 'rating', 'text', 'approved', 'createdAt'])
+          && d.product is string && d.product.matches('^[a-z0-9-]{1,100}$')
+          && str(d.productName, 200)
+          && str(d.name, 100) && d.name.size() > 0
+          && optStr(d, 'place', 200)
+          && d.rating is int && d.rating >= 1 && d.rating <= 5
+          && str(d.text, 2500) && d.text.size() >= 5
+          && d.approved == false && d.createdAt == request.time;
+      }
+      allow create: if validReview(request.resource.data);
+      // Ai cũng đọc được đánh giá đã duyệt (truy vấn phải lọc approved == true); quản trị đọc tất cả.
+      allow read: if resource.data.approved == true || isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['approved', 'updatedAt'])
+        && request.resource.data.approved is bool;
+      allow delete: if isAdmin();
+    }
+
     // ---- Danh sách nhân viên quản trị (chỉ sửa trong Console) ----
     match /admins/{uid} {
       allow get: if signedIn() && request.auth.uid == uid;

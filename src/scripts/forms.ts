@@ -17,6 +17,20 @@ const setMsg = (form: HTMLFormElement, text: string, state: 'ok' | 'error' | '' 
 };
 const cleanPhone = (s: string) => s.replace(/[\s().-]/g, '');
 
+/** Gửi đánh giá sản phẩm (chờ duyệt). Trả về mã đánh giá, '' nếu chế độ thử, null nếu lỗi. */
+export async function submitReview(r: import('./fb').ReviewInput): Promise<string | null> {
+  if (!firebaseOn) {
+    console.info('[VIO GREEN] Chế độ thử – chưa cấu hình Firebase. Đánh giá:', r);
+    return '';
+  }
+  try {
+    return await (await loadFb()).createReview(r);
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 /** Lưu liên hệ / nhận tin / lead chatbot. Trả về true nếu thành công. */
 export async function submitLead(type: 'contact' | 'newsletter' | 'chat-lead', data: Record<string, string>): Promise<boolean> {
   const payload: Record<string, string> = { page: location.pathname };

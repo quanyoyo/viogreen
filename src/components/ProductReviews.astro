@@ -423,7 +423,9 @@ const avgScore = totalCount > 0
         submitBtn.textContent = 'Đang gửi…';
       }
 
-      const today = new Date().toISOString().slice(0, 10);
+      // Ngày theo giờ máy khách (toISOString là giờ quốc tế → trước 7h sáng ở Việt Nam bị lùi 1 ngày)
+      const d = new Date();
+      const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       const newReview: LocalReview = {
         name,
         place,

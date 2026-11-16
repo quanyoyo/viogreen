@@ -135,6 +135,8 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 
 **Đã xong:** 35 trang build OK (thêm `/kiem-tra-ar/` từ 12/11), `astro check` 0 lỗi, đã thử trên mobile (360px) và desktop. Bản trên `https://viogreen.com` = commit mới nhất trên `main`.
 
+**Sửa 17/11/2026 (form đánh giá sản phẩm làm mất đánh giá):** ô "Số điện thoại hoặc Email" trước đây luôn gửi vào trường `phone` (rules giới hạn 20 ký tự) → email dài bị Firestore từ chối nhưng web vẫn báo "gửi thành công". Nay `ProductReviews.astro`: có "@" → trường `email`, còn lại → `phone`; gửi Firestore **trước**, hỏng thì báo lỗi và không lưu vào máy khách; thêm `maxlength` (tên 100, liên hệ 200, khu vực 200, nhận xét 2500 – vừa giới hạn `message` 3000). Không đổi `firestore.rules`. Đã thử trường hợp bị từ chối trên dev server (báo lỗi đúng, không ghi gì); **chưa thử gửi thật** (sẽ ghi 1 lead thật vào Firestore). Đánh giá khách gửi chỉ xem được ở `/quan-tri/` (lead, chủ đề "Đánh giá sản phẩm …"), muốn hiện công khai phải chép vào `reviews.ts`.
+
 **Đợt sửa 14/11/2026 (ảnh Bio-Nutri mới – commit `704b2fc`, đã push, đã kiểm tra trên viogreen.com):** thay bộ ảnh chụp 11/11 bằng 4 ảnh dựng sẵn từ Drive `1ER2Kv5toGSdSO2gIopchgIkRC36Uoc28` (`images-src/2026-11/bio-nutri-moi/`): 25g = mặt trước + mặt sau gói; Box = ảnh hộp đơn 250g (`hop-phan-250g.png`, chủ web thay cho ảnh hộp in nhầm "500gr" đã xoá) + ảnh 3 hộp (`bio-nutri-box-3`); 2 ảnh Box ép khung vuông bằng `squareCopy`. Đã xoá 10 file webp cũ không còn dùng. Tài liệu khách chỉ có 2 quy cách 25g và 250g, **không có hộp 500g**.
 
 **Đợt sửa 13/11/2026 (Đánh giá khách hàng & form nhận xét sản phẩm):**

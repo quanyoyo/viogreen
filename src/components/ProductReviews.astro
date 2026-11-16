@@ -108,6 +108,7 @@ const avgScore = totalCount > 0
               class="input"
               name="name"
               required
+              maxlength="100"
               autocomplete="name"
               placeholder="Nhập tên của bạn (VD: Minh Anh)"
             />
@@ -117,6 +118,7 @@ const avgScore = totalCount > 0
             <input
               class="input"
               name="contact"
+              maxlength="200"
               placeholder="090xxxxxxx hoặc email@domain.com"
             />
           </label>
@@ -127,6 +129,7 @@ const avgScore = totalCount > 0
           <input
             class="input"
             name="place"
+            maxlength="200"
             placeholder="VD: Ban công chung cư Cầu Giấy, Sân thượng nhà phố Q7..."
           />
         </label>
@@ -137,6 +140,7 @@ const avgScore = totalCount > 0
             class="input min-h-28 resize-y"
             name="text"
             required
+            maxlength="2500"
             rows="3"
             placeholder="Chia sẻ cảm nhận của bạn về khả năng tưới tự động, độ bền, kết nối app hoặc tính tiện lợi..."
           ></textarea>
@@ -428,7 +432,23 @@ const avgScore = totalCount > 0
         date: today,
       };
 
-      // 1. Lưu localStorage
+      // 1. Gửi lead lưu vào Firestore. Ô liên hệ có "@" → trường email (tối đa 200 ký tự),
+      //    còn lại → trường phone (tối đa 20 ký tự) – trước đây email dài bị Firestore từ chối, mất đánh giá.
+      const isEmail = contact.includes('@');
+      const ok = await submitLead('contact', {
+        source: 'product-review',
+        name,
+        ...(isEmail ? { email: contact } : { phone: contact }),
+        message: `[Đánh giá ${rating} sao cho ${productName} - ${place || 'Không ghi địa chỉ'}]: ${text}`,
+        topic: `Đánh giá sản phẩm ${productName}`,
+      });
+      if (!ok) {
+        if (msg) { msg.textContent = 'Chưa gửi được đánh giá, vui lòng kiểm tra lại thông tin rồi thử lại.'; msg.dataset.state = 'error'; }
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = oldHtml; }
+        return;
+      }
+
+      // 2. Lưu localStorage (chỉ khi đã gửi được, để khách không tưởng đã gửi)
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         const list: LocalReview[] = raw ? JSON.parse(raw) : [];
@@ -436,19 +456,6 @@ const avgScore = totalCount > 0
         localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
       } catch {
         /* ignore */
-      }
-
-      // 2. Gửi lead để lưu vào Firestore (nếu có kết nối Firebase)
-      try {
-        await submitLead('contact', {
-          source: 'product-review',
-          name,
-          phone: contact,
-          message: `[Đánh giá ${rating} sao cho ${productName} - ${place || 'Không ghi địa chỉ'}]: ${text}`,
-          topic: `Đánh giá sản phẩm ${productName}`,
-        });
-      } catch (err) {
-        console.error(err);
       }
 
       // 3. Render ngay lên giao diện

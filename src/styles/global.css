@@ -191,9 +191,7 @@
   &::-webkit-scrollbar { display: none; }
 }
 
-/* Thẻ thông báo thông tin (PrivacyNotice) đang hiện: trên điện thoại MIO nhích lên trên thẻ.
-   Để ngoài @layer để thắng class bottom-4 của Tailwind. */
-@media (max-width: 639px) {
-  [data-fab] { transition: bottom 0.35s var(--ease-soft); }
-  html[data-privacy-open] [data-fab] { bottom: calc(var(--vg-privacy-h, 0px) + 0.75rem); }
-}
+/* Thẻ thông báo thông tin (PrivacyNotice) đang hiện (kéo hết chiều ngang): MIO nhích lên trên thẻ.
+   Để ngoài @layer để thắng class bottom-4 / sm:bottom-6 của Tailwind. */
+[data-fab] { transition: bottom 0.35s var(--ease-soft); }
+html[data-privacy-open] [data-fab] { bottom: calc(var(--vg-privacy-h, 0px) + 0.75rem); }

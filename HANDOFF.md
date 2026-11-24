@@ -14,7 +14,7 @@
 - **13/11:** Chrome trên iPhone ướm được nếu khách chọn tải thêm `.usdz` (`npm run models:usdz`); vòng xoay khi mở AR; trang chủ bỏ 3 khối; đánh giá khách hàng (random 3 đánh giá 4–5 sao) + form nhận xét ở trang sản phẩm.
 - **14/11:** ảnh Bio-Nutri mới từ Drive (`images-src/2026-11/bio-nutri-moi/`): 25g trước/sau, Box = hộp đơn 250g + 3 hộp. Commit `704b2fc`, đã push và kiểm tra trên web.
 - **17/11:** form đánh giá: email vào trường `email` (trước bị mất khi email > 20 ký tự), ngày theo giờ máy khách. **Đánh giá khách gửi → Firestore `reviews` (chờ duyệt) → chủ web duyệt ở `/quan-tri/` tab Đánh giá → hiện công khai ở trang SP** (đọc qua REST, `public-reviews.ts`). Rules mới đã publish. Đã thử đủ vòng, TEST đã xoá. Trang chủ vẫn chỉ dùng `reviews.ts`.
-- **24/11:** **thẻ thông báo thu thập thông tin** (khách yêu cầu) – `PrivacyNotice.astro`, chữ ở `site.ts → privacyNotice`, chỉ có nút "Đã hiểu" (web không có công cụ theo dõi; gắn Analytics/Pixel sau này thì phải thêm nút Từ chối + tăng `version`). Điện thoại: MIO nhích lên trên thẻ, lời chào đợi bấm "Đã hiểu". Chính sách bảo mật có 2 câu chưa khớp → chờ khách duyệt (CLAUDE.md mục 9).
+- **24/11:** **thẻ thông báo thu thập thông tin** (khách yêu cầu) – `PrivacyNotice.astro`, chữ ở `site.ts → privacyNotice`, chỉ có nút "Đã hiểu" (web không có công cụ theo dõi; gắn Analytics/Pixel sau này thì phải thêm nút Từ chối + tăng `version`). Thẻ kéo hết chiều ngang ở mọi khổ; MIO nhích lên trên thẻ, lời chào đợi bấm "Đã hiểu". Chính sách bảo mật có 2 câu chưa khớp → chờ khách duyệt (CLAUDE.md mục 9).
 
 ## Đang dở / chờ
 - **Đánh giá khách hàng:** `reviews.ts` có 5 đánh giá; CLAUDE.md trước ghi là "đánh giá mẫu" → cần chủ web xác nhận là đánh giá thật (quy tắc không dùng đánh giá giả).

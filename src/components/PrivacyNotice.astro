@@ -5,10 +5,11 @@ const n = site.privacyNotice;
 ---
 <!-- Thẻ thông báo thu thập thông tin: hiện lần đầu vào web, bấm "Đã hiểu" thì không hiện lại
      (localStorage vg-privacy = version). Khi thẻ hiện: html[data-privacy-open] + biến --vg-privacy-h
-     → trên điện thoại MIO nhích lên trên thẻ (global.css) và lời chào MIO đợi khách bấm (chatbot.ts). -->
+     → MIO nhích lên trên thẻ (global.css) và lời chào MIO đợi khách bấm (chatbot.ts).
+     Thẻ kéo hết chiều ngang ở mọi khổ (chủ web yêu cầu 24/11/2026); từ lg chữ và nút nằm cùng 1 hàng. -->
 <section data-privacy data-version={n.version} role="region" aria-label={n.title} hidden
-  class="fixed inset-x-3 bottom-3 z-[45] translate-y-4 rounded-3xl bg-white p-4 opacity-0 shadow-lift ring-1 ring-line transition-all duration-300 ease-(--ease-soft) data-[show]:translate-y-0 data-[show]:opacity-100 sm:inset-x-auto sm:bottom-6 sm:left-6 sm:w-[380px] sm:p-5">
-  <div class="flex gap-3">
+  class="fixed inset-x-3 bottom-3 z-[45] translate-y-4 rounded-3xl bg-white p-4 opacity-0 shadow-lift ring-1 ring-line transition-all duration-300 ease-(--ease-soft) data-[show]:translate-y-0 data-[show]:opacity-100 sm:inset-x-6 sm:bottom-6 sm:p-5 lg:flex lg:items-center lg:gap-8 lg:px-8">
+  <div class="flex gap-3 lg:flex-1 lg:items-center lg:gap-4">
     <span class="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-brand-200 bg-brand-50 text-brand">
       <Icon name="leaf" class="size-5" />
     </span>
@@ -17,7 +18,7 @@ const n = site.privacyNotice;
       <p class="mt-1.5 text-sm leading-relaxed text-ink/75">{n.text}</p>
     </div>
   </div>
-  <div class="mt-3 flex items-center justify-end gap-4">
+  <div class="mt-3 flex shrink-0 items-center justify-end gap-4 lg:mt-0">
     <a href={n.href} class="text-sm font-semibold text-brand underline-offset-4 hover:underline">{n.linkText}</a>
     <button type="button" data-privacy-ok class="btn btn-primary min-h-10 px-5 py-2">{n.button}</button>
   </div>
@@ -28,7 +29,8 @@ const n = site.privacyNotice;
     if (!box) return;
     var KEY = 'vg-privacy', ver = box.getAttribute('data-version'), root = document.documentElement;
     try { if (localStorage.getItem(KEY) === ver) return; } catch (e) { /* không đọc được: vẫn hiện thẻ */ }
-    function measure() { root.style.setProperty('--vg-privacy-h', box.offsetHeight + 12 + 'px'); }
+    // Khoảng từ đáy màn hình tới mép trên thẻ (cao thẻ + khoảng cách đáy: 12px điện thoại, 24px máy tính)
+    function measure() { root.style.setProperty('--vg-privacy-h', box.offsetHeight + (parseFloat(getComputedStyle(box).bottom) || 0) + 'px'); }
     box.hidden = false;
     root.setAttribute('data-privacy-open', '');
     measure();
@@ -37,13 +39,22 @@ const n = site.privacyNotice;
     // Đo lại khi thẻ đổi cỡ (font Inter tải xong, xoay màn hình…)
     var ro = 'ResizeObserver' in window ? new ResizeObserver(measure) : null;
     if (ro) ro.observe(box); else window.addEventListener('resize', measure);
-    box.querySelector('[data-privacy-ok]').addEventListener('click', function () {
-      try { localStorage.setItem(KEY, ver); } catch (e) { /* không lưu được: chỉ ẩn trên trang này */ }
+    function close() {
+      if (box.hidden) return;
       if (ro) ro.disconnect(); else window.removeEventListener('resize', measure);
       root.removeAttribute('data-privacy-open');
       box.removeAttribute('data-show');
       setTimeout(function () { box.hidden = true; }, 300);
       window.dispatchEvent(new Event('vg:privacy-ok'));
+    }
+    box.querySelector('[data-privacy-ok]').addEventListener('click', function () {
+      try { localStorage.setItem(KEY, ver); } catch (e) { /* không lưu được: chỉ ẩn trên trang này */ }
+      close();
+    });
+    // Bấm "Đã hiểu" ở trang khác rồi bấm Quay lại: trình duyệt lấy trang cũ từ bộ nhớ đệm (thẻ còn mở) → đóng
+    window.addEventListener('pageshow', function (e) {
+      if (!e.persisted) return;
+      try { if (localStorage.getItem(KEY) === ver) close(); } catch (err) { /* ignore */ }
     });
   })();
 </script>

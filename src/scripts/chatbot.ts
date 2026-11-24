@@ -292,14 +292,25 @@ function initHint() {
     const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
     if (nav?.type === 'reload') sessionStorage.removeItem(HINT_KEY);
   } catch { /* ignore */ }
-  // Màn hẹp: thẻ thông báo thông tin (PrivacyNotice) đang hiện ở đáy → lời chào đợi khách bấm "Đã hiểu".
-  // Tới 767px vì ở 640–735px thẻ (góc trái, rộng 380px) vẫn chạm lời chào.
-  if (document.documentElement.hasAttribute('data-privacy-open') && matchMedia('(max-width: 767px)').matches) {
-    window.addEventListener('vg:privacy-ok', () => showHint(800), { once: true });
-    return;
-  }
-  showHint(1500);
+  showHintAfterPrivacy(1500);
 }
+
+/* Thẻ thông báo thông tin (PrivacyNotice, kéo hết chiều ngang ở đáy) đang hiện → lời chào đợi khách bấm "Đã hiểu" */
+let privacyWaiting = false;
+function showHintAfterPrivacy(delay: number) {
+  if (!document.documentElement.hasAttribute('data-privacy-open')) return showHint(delay);
+  if (privacyWaiting) return;
+  privacyWaiting = true;
+  window.addEventListener('vg:privacy-ok', () => {
+    privacyWaiting = false;
+    if (!chat || chat.hidden) showHint(800);
+  }, { once: true });
+}
+
+/* Khung chat che thẻ thông báo (điện thoại: cả thẻ; máy tính: phần bên phải có nút) → khoá thẻ (inert)
+   để không bấm / Tab nhầm vào chỗ bị che */
+const privacyBox = $('[data-privacy]');
+const setPrivacyInert = (on: boolean) => { if (privacyBox) privacyBox.inert = on; };
 
 /* ---------- Mở / đóng / khởi tạo ---------- */
 function restore() {
@@ -315,6 +326,7 @@ function openChat() {
   hideHint(false); // ẩn tạm khi chat đang mở; đóng chat thì hiện lại
   openLayer(chat);
   $('[data-fab]')?.classList.add('max-sm:hidden');
+  setPrivacyInert(true);
   if (!history.length && !restore()) welcome();
   setTimeout(() => { if (history.length) scroll(); if (matchMedia('(min-width: 640px)').matches) $<HTMLInputElement>('input', form!)?.focus(); }, 320);
 }
@@ -322,7 +334,8 @@ function closeChat() {
   if (!chat) return;
   closeLayer(chat);
   $('[data-fab]')?.classList.remove('max-sm:hidden');
-  showHint(800);
+  setPrivacyInert(false);
+  showHintAfterPrivacy(800);
 }
 
 if (chat && log && form) {

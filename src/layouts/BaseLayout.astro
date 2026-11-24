@@ -47,13 +47,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   </head>
   <body class="flex min-h-dvh flex-col">
     <a href="#main" class="sr-only z-[100] rounded-full bg-brand px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">Bỏ qua tới nội dung</a>
+    <!-- Thẻ thông báo đứng đầu trang để phím Tab tới nó trước (thẻ nằm cố định ở đáy màn hình) -->
+    <PrivacyNotice />
     <Header active={active} />
     <NoticeBar />
     <main id="main" class="flex-1"><slot /></main>
     <Footer />
     <ArModal />
     <Chatbot />
-    <PrivacyNotice />
     <div data-toast role="status" aria-live="polite"
       class="pointer-events-none fixed top-24 left-1/2 z-[70] -translate-x-1/2 -translate-y-2 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white opacity-0 shadow-lift transition-all duration-300 data-[show]:translate-y-0 data-[show]:opacity-100"></div>
     <script type="application/json" id="vg-data" set:html={JSON.stringify(clientProducts)} />

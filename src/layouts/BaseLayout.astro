@@ -7,6 +7,7 @@ import NoticeBar from '../components/NoticeBar.astro';
 import Footer from '../components/Footer.astro';
 import ArModal from '../components/ArModal.astro';
 import Chatbot from '../components/Chatbot.astro';
+import PrivacyNotice from '../components/PrivacyNotice.astro';
 
 interface Props {
   title?: string;
@@ -52,6 +53,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <Footer />
     <ArModal />
     <Chatbot />
+    <PrivacyNotice />
     <div data-toast role="status" aria-live="polite"
       class="pointer-events-none fixed top-24 left-1/2 z-[70] -translate-x-1/2 -translate-y-2 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white opacity-0 shadow-lift transition-all duration-300 data-[show]:translate-y-0 data-[show]:opacity-100"></div>
     <script type="application/json" id="vg-data" set:html={JSON.stringify(clientProducts)} />

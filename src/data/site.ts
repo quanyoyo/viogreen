@@ -73,6 +73,17 @@ export const site = {
     { icon: 'support', text: 'Tư vấn miễn phí' },
   ],
 
+  // ---- Thẻ thông báo thu thập thông tin (hiện lần đầu vào web, khách yêu cầu 24/11/2026) ----
+  // Tăng `version` = thẻ hiện lại cho mọi người (VD khi gắn Analytics / Pixel → cần nút Từ chối).
+  privacyNotice: {
+    version: 1,
+    title: 'VIO GREEN tôn trọng thông tin của bạn',
+    text: 'Web chỉ lưu giỏ hàng và thông tin bạn đã nhập ngay trên máy của bạn. Thông tin cá nhân chỉ gửi về VIO GREEN khi bạn đặt hàng, liên hệ hoặc đăng ký nhận tin, và chỉ dùng để phục vụ bạn.',
+    button: 'Đã hiểu',
+    linkText: 'Xem chính sách bảo mật',
+    href: '/chinh-sach/bao-mat/',
+  },
+
   // ---- Thời tiết + giờ trên ảnh hero trang chủ (Open-Meteo, miễn phí, không cần khoá) ----
   weather: { label: 'Hà Nội', lat: 21.0285, lon: 105.8542 },
 };

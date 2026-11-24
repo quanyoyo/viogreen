@@ -62,6 +62,7 @@ src/
   layouts/BaseLayout.astro   head/SEO, Header, NoticeBar, Footer, Chatbot, AR modal
   components/            Header, NoticeBar (chữ chạy ngang), Footer, ProductCard, PolicyStrip, CtaBand, SectionHead,
                          Ph (ảnh tạm), Chatbot, ArModal, ContactForm, Breadcrumbs, Logo, Social, Icon,
+                         PrivacyNotice (thẻ thông báo thu thập thông tin, lần đầu vào web),
                          Coverflow (băng ảnh trượt: ảnh giữa to, 2 ảnh bên nằm một phần dưới – đầu trang Sản phẩm)
   scripts/               ui.ts (reveal, carousel, menu), cart.ts, forms.ts, ar.ts, chatbot.ts, data.ts,
                          fb.ts (Firebase: auth, đơn, lead, quản trị), order-view.ts (hiển thị đơn dùng chung),
@@ -132,7 +133,14 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Thanh toán:** `paymentMethod` = `cod` | `bank` (đơn trước 07/10/2026 không có → hiển thị "—"). Nhãn hiển thị ở `order-view.ts → PAYMENT_LABEL`.
 - **Mã đơn:** `VG-yymmdd-XXXX`. Đơn lưu ở Firestore `orders/{mã đơn}`; `site.firebase.projectId` trống = chế độ thử, không gửi dữ liệu đi.
 
-## 7. Trạng thái (cập nhật 16/11/2026)
+## 7. Trạng thái (cập nhật 24/11/2026)
+
+**24/11/2026 – Thẻ thông báo thu thập thông tin (khách yêu cầu; thiết kế + kế hoạch: `docs/superpowers/specs/2026-11-24-thong-bao-thong-tin-design.md`, `docs/superpowers/plans/2026-11-24-thong-bao-thong-tin.md`):**
+- `src/components/PrivacyNotice.astro` (gắn trong BaseLayout, mọi trang). Chữ ở `site.ts → privacyNotice` (chủ web đã duyệt chữ, bỏ câu "VIO GREEN không bán thông tin của bạn"). Máy tính: thẻ góc dưới trái 380px; điện thoại: thẻ ngang sát đáy.
+- Hiện lần đầu; bấm "Đã hiểu" → `localStorage vg-privacy = version`, không hiện lại. **Tăng `version` = hiện lại cho mọi người.** Trình duyệt chặn lưu → bấm xong chỉ ẩn trên trang đó.
+- **Không có nút "Từ chối"** (cách A, chủ web chọn): web không có Analytics / Pixel / cookie bên thứ ba nên không có gì để từ chối. **Nếu sau này gắn công cụ theo dõi → phải chuyển sang thẻ có Đồng ý / Từ chối** (chỉ tải công cụ khi khách đồng ý) và tăng `version`.
+- Khi thẻ hiện: script inline đặt `html[data-privacy-open]` + `--vg-privacy-h` (đo bằng ResizeObserver vì font tải sau làm thẻ cao thêm) → điện thoại: `[data-fab]` (MIO + nút gọi) nhích lên trên thẻ (`global.css`, luật để ngoài `@layer` để thắng `bottom-4`); lời chào MIO đợi sự kiện `vg:privacy-ok` (`chatbot.ts → initHint`, màn ≤ 767px – ở 640–735px thẻ góc trái vẫn chạm lời chào). Khung chat (z-[55]) nằm trên thẻ (z-[45]).
+- Đã thử trên dev server 360px + 800px: hiện, nhích MIO, bấm ẩn + lưu, tải lại không hiện, chặn localStorage không lỗi, mở chat đè lên thẻ.
 
 **Đã xong:** 35 trang build OK (thêm `/kiem-tra-ar/` từ 12/11), `astro check` 0 lỗi, đã thử trên mobile (360px) và desktop. Bản trên `https://viogreen.com` = commit mới nhất trên `main`.
 
@@ -260,6 +268,7 @@ Hai file Figma "Web thương mại" (`en71kyh7uPWqtgZL5FAdpu`) và "Web App 360x
 - **Nội dung 5 trang chưa có** (đang ẩn khỏi footer): Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
 - **Hình ảnh và file:** **file 3D dùng để render ảnh SP** (để 3D giống ảnh hoàn toàn) hoặc CAD đầy đủ (tấm pin + cột, hộp Bio-Tank, nút bấm) cho 6 máy; 3D bản thường Sol / Grid; logo gốc SVG/PNG. Ảnh `nha-phu-cay-xanh-750px.jpg` (Drive) chưa dùng – nhỏ và có vẻ là ảnh trên mạng.
 - **Đánh giá khách hàng:** `src/data/reviews.ts` có 5 đánh giá (13/11/2026): Mai Lan, Quốc Tuấn, Hoàng Nam, Thanh Hương (5 sao), Đức Huy (4 sao). **Cần chủ web xác nhận đây là đánh giá thật của khách** (quy tắc mục 2.3 – trước đây ghi là "đánh giá mẫu"). Mục "Khách hàng nói gì" trên trang chủ đã hiển thị (ngẫu nhiên 3 đánh giá 4-5 sao, layout chống vỡ tràn viền trên mobile 360px/375px). Trang chi tiết từng sản phẩm có `ProductReviews.astro` cho khách tự viết đánh giá; từ 17/11/2026 đánh giá khách gửi vào Firestore `reviews`, chủ web duyệt ở `/quan-tri/` thì hiện công khai (mục 7). `reviews.ts` vẫn dùng cho đánh giá nhập tay và cho trang chủ.
+- **Chính sách bảo mật chưa khớp với web (ghi 24/11/2026, chưa sửa – cần khách duyệt chữ):** mục 1 ghi "Phân tích hành vi sử dụng website" (web không có công cụ phân tích nào); câu mở đầu "Việc tiếp tục sử dụng website đồng nghĩa với…" (Nghị định 13/2023: im lặng / tiếp tục dùng không được tính là đồng ý). Thẻ thông báo (mục 7) đã nói đúng thực tế.
 - **Ô trống trong bảng phí vận chuyển** (Figma để trống): hiện đang hiển thị "—".
 
 ## 10. Ghi chú

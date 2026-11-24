@@ -1,6 +1,6 @@
 # VIO GREEN – Tiến độ dự án website
 
-*Cập nhật: 17/11/2026. Chi tiết kỹ thuật đầy đủ ở `CLAUDE.md`; tóm tắt cho phiên làm việc mới ở `HANDOFF.md`.*
+*Cập nhật: 24/11/2026. Chi tiết kỹ thuật đầy đủ ở `CLAUDE.md`; tóm tắt cho phiên làm việc mới ở `HANDOFF.md`.*
 
 ## 1. Tóm tắt nhanh
 
@@ -30,6 +30,7 @@
 | 13/11/2026 | Chrome trên iPhone cũng ướm AR được (khách tự chọn tải thêm file); vòng xoay chờ khi mở AR; rút gọn trang chủ (bỏ 3 khối); hiện đánh giá khách hàng + form nhận xét ở từng sản phẩm |
 | 14/11/2026 | **Ảnh Bio-Nutri mới** (ảnh dựng sẵn từ Drive): gói 25g mặt trước + mặt sau; Box = hộp đơn 250g + ảnh 3 hộp |
 | 17/11/2026 | Form đánh giá: sửa lỗi mất đánh giá khi khách nhập email dài, sửa ngày lệch trước 7h sáng. **Đánh giá khách gửi hiện công khai sau khi chủ web duyệt** ở `/quan-tri/` (tab Đánh giá) |
+| 24/11/2026 | **Thẻ thông báo thu thập thông tin** (khách yêu cầu): hiện lần đầu vào web, nói rõ web lưu gì và gửi gì, nút "Đã hiểu" + link Chính sách bảo mật |
 
 ## 3. Đã xong
 
@@ -41,6 +42,7 @@
 - **Đánh giá:** trang chủ hiện ngẫu nhiên 3 đánh giá 4–5 sao (lấy từ danh sách nhập tay). Mỗi trang sản phẩm có danh sách đánh giá, điểm trung bình và form để khách tự viết đánh giá. Đánh giá khách gửi chờ chủ web **duyệt** rồi mới hiện cho mọi người; người gửi thấy ngay đánh giá của mình kèm nhãn "chờ duyệt". SĐT / email người gửi không bao giờ hiện công khai.
 - **Chatbot MIO:** lời chào nổi, 4 câu hỏi thường gặp, tư vấn chọn máy qua 3 câu hỏi, trả lời giá / FAQ / chính sách, xin tên + SĐT khi không hiểu câu hỏi (lưu vào Firestore), báo ngoài giờ làm việc.
 - **SEO:** meta, Open Graph, JSON-LD (Organization, FAQPage, Product, Breadcrumb), sitemap, robots.txt; các trang giỏ hàng / đặt hàng / tài khoản / quản trị / 404 để noindex.
+- **Thẻ thông báo thu thập thông tin** (24/11/2026, khách yêu cầu): hiện ở lần đầu vào web – "VIO GREEN tôn trọng thông tin của bạn", nói rõ web chỉ lưu giỏ hàng và thông tin đã nhập trên máy khách, thông tin cá nhân chỉ gửi về khi khách đặt hàng / liên hệ / đăng ký nhận tin. Nút "Đã hiểu" (không hiện lại) + link Chính sách bảo mật. Không có nút "Từ chối" vì web không dùng công cụ theo dõi nào (Analytics, Pixel…) – nếu sau này gắn thì phải thêm nút Từ chối. Sửa chữ trong `site.ts → privacyNotice`.
 - **Giao diện:** hiệu ứng hiện dần khi cuộn, hero chuyển slide, thẻ sản phẩm nổi khi rê chuột; dùng tốt trên điện thoại 360 px và máy tính.
 
 ### Sản phẩm (12)
@@ -80,6 +82,7 @@
 - **Nội dung 5 trang chưa có:** Mua hàng & thanh toán, Đại lý, Điều khoản dịch vụ, Hướng dẫn mua hàng, Hướng dẫn thanh toán.
 - **File:** file 3D gốc dùng để render ảnh SP (để 3D giống ảnh hoàn toàn và có 3D riêng cho Sol / Grid / Plus), logo gốc SVG/PNG.
 - **Email / Zalo nhận thông báo đơn mới** (cho bước email báo đơn).
+- **Chính sách bảo mật chưa khớp với web:** mục 1 ghi web "phân tích hành vi sử dụng website" (web không làm việc này), và câu "tiếp tục sử dụng website đồng nghĩa với…" (theo Nghị định 13/2023, im lặng / tiếp tục dùng không được tính là đồng ý). Cần khách duyệt chữ sửa.
 
 ## 6. Cần khách xác nhận
 

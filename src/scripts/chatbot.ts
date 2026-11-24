@@ -292,6 +292,12 @@ function initHint() {
     const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
     if (nav?.type === 'reload') sessionStorage.removeItem(HINT_KEY);
   } catch { /* ignore */ }
+  // Màn hẹp: thẻ thông báo thông tin (PrivacyNotice) đang hiện ở đáy → lời chào đợi khách bấm "Đã hiểu".
+  // Tới 767px vì ở 640–735px thẻ (góc trái, rộng 380px) vẫn chạm lời chào.
+  if (document.documentElement.hasAttribute('data-privacy-open') && matchMedia('(max-width: 767px)').matches) {
+    window.addEventListener('vg:privacy-ok', () => showHint(800), { once: true });
+    return;
+  }
   showHint(1500);
 }
 

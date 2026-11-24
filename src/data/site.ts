@@ -78,7 +78,7 @@ export const site = {
   privacyNotice: {
     version: 1,
     title: 'VIO GREEN tôn trọng thông tin của bạn',
-    text: 'Web chỉ lưu giỏ hàng và thông tin bạn đã nhập ngay trên máy của bạn. Thông tin cá nhân chỉ gửi về VIO GREEN khi bạn đặt hàng, liên hệ hoặc đăng ký nhận tin, và chỉ dùng để phục vụ bạn.',
+    text: 'Web chỉ lưu giỏ hàng và thông tin bạn đã nhập ngay trên máy của bạn. Thông tin cá nhân chỉ gửi về VIO GREEN khi bạn đặt hàng, liên hệ hoặc đăng ký nhận tin, và chỉ dùng để phục vụ bạn (kể cả gửi cho đơn vị vận chuyển khi giao hàng).',
     button: 'Đã hiểu',
     linkText: 'Xem chính sách bảo mật',
     href: '/chinh-sach/bao-mat/',
